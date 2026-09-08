@@ -21,7 +21,7 @@
     <h1>Disc golfa sacensības</h1>
 
     @auth
-        @if(auth()->user()->role === 'admin')
+        @if(auth()->user())
             <a class="button" href="/competitions/create">
                 + Izveidot sacensības
             </a>

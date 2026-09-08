@@ -16,7 +16,7 @@
 
         <div>
             <a href="/">Sākums</a>
-            <a href="#">Sacensības</a>
+            <a href="/competitions">Sacensības</a>
             <a href="#">Spēlētāji</a>
             @if (Auth::check())
     <span>Sveiks, {{ Auth::user()->name }}!</span>
@@ -37,7 +37,7 @@
 
         <p>Disku golfa sacensību un rezultātu pārvaldības sistēma.</p>
 
-        <a class="button" href="#">Apskatīt sacensības</a>
+        <a class="button" href="/competitions">Apskatīt sacensības</a>
     </main>
 
 </body>
