@@ -17,18 +17,24 @@
         <div>
             <a href="/">Sākums</a>
             <a href="/competitions">Sacensības</a>
-            <a href="#">Spēlētāji</a>
-            @if (Auth::check())
-    <span>Sveiks, {{ Auth::user()->name }}!</span>
 
-    <form method="POST" action="/logout" style="display:inline;">
-        @csrf
-        <button type="submit">Iziet</button>
-    </form>
-@else
-    <a href="/login">Pieslēgties</a>
-    <a href="/register">Reģistrēties</a>
-@endif
+            @if (Auth::check())
+                <a href="/profile">Mans profils</a>
+            @endif
+        </div>
+
+        <div class="nav-auth">
+            @if (Auth::check())
+                <span>Sveiks, {{ Auth::user()->name }}!</span>
+
+                <form method="POST" action="/logout">
+                    @csrf
+                    <button type="submit">Iziet</button>
+                </form>
+            @else
+                <a href="/login">Pieslēgties</a>
+                <a href="/register">Reģistrēties</a>
+            @endif
         </div>
     </nav>
 
@@ -37,7 +43,15 @@
 
         <p>Disku golfa sacensību un rezultātu pārvaldības sistēma.</p>
 
-        <a class="button" href="/competitions">Apskatīt sacensības</a>
+        <a class="button" href="/competitions">
+            Apskatīt sacensības
+        </a>
+
+        @if (Auth::check())
+            <a class="button" href="/profile">
+                Mans profils
+            </a>
+        @endif
     </main>
 
 </body>

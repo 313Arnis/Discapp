@@ -1,3 +1,13 @@
+/* =========================
+   PAMATA IESTATĪJUMI
+========================= */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -5,18 +15,35 @@ body {
     color: #222;
 }
 
+a {
+    color: #222;
+}
+
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+}
+
+
+/* =========================
+   NAVIGĀCIJA
+========================= */
+
 nav {
     background: #222;
     color: white;
     padding: 15px 40px;
 
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 30px;
 }
 
 nav h2 {
     margin: 0;
+    margin-right: auto;
 }
 
 nav a {
@@ -29,101 +56,520 @@ nav a:hover {
     text-decoration: underline;
 }
 
+
+/* Lietotāja daļa navigācijā */
+
+.nav-auth {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-auth form {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    max-width: none;
+}
+
+.nav-auth button {
+    width: auto;
+
+    background: #c0392b;
+    color: white;
+
+    border: none;
+    padding: 8px 15px;
+
+    border-radius: 5px;
+
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.nav-auth button:hover {
+    background: #a93226;
+}
+
+
+/* =========================
+   GALVENAIS SATURS
+========================= */
+
 main {
     max-width: 1000px;
-    margin: 80px auto;
-    text-align: center;
+    margin: 60px auto;
+    padding: 0 20px;
 }
 
 main h1 {
-    font-size: 50px;
+    font-size: 42px;
+    margin-bottom: 15px;
 }
+
+main > p {
+    color: #555;
+    font-size: 18px;
+}
+
+
+/* =========================
+   POGAS
+========================= */
 
 .button {
     display: inline-block;
+
     background: #222;
     color: white;
+
     padding: 12px 20px;
+
     text-decoration: none;
+
     border-radius: 5px;
+
+    border: none;
+
+    cursor: pointer;
+
+    font-size: 15px;
 }
+
+.button:hover {
+    background: #444;
+}
+
+
+/* =========================
+   DZĒŠANAS POGA
+========================= */
+
 .delete-button {
-    margin-top: 15px;
-    padding: 10px 20px;
+    margin-top: 0;
+
+    padding: 8px 15px;
+
     background: #c0392b;
     color: white;
+
     border: none;
     border-radius: 5px;
+
     cursor: pointer;
+
+    font-size: 14px;
 }
 
 .delete-button:hover {
     background: #a93226;
 }
-form {
-    max-width: 400px;
-    margin: 50px auto;
+
+
+/* =========================
+   PROFILS
+========================= */
+
+.profile {
     background: white;
+
+    max-width: 600px;
+
+    margin: 30px auto;
+
     padding: 30px;
+
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+
+    text-align: left;
 }
 
-form h2 {
+.profile h2 {
+    margin-top: 0;
     margin-bottom: 20px;
-    font-size: 24px;
-    color: #222;
-    text-align: center;
 }
 
-form label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
+.profile p {
+    margin: 10px 0;
     color: #555;
 }
 
-form input[type="text"],
-form input[type="email"],
-form input[type="password"] {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
+.profile-links {
+    text-align: center;
+    margin-top: 20px;
 }
 
-form input[type="text"]:focus,
-form input[type="email"]:focus,
-form input[type="password"]:focus {
+
+/* =========================
+   DISKI
+========================= */
+
+.discs {
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+
+    gap: 20px;
+
+    margin-top: 30px;
+}
+
+.disc {
+    background: white;
+
+    padding: 20px;
+
+    border-radius: 10px;
+
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+
+    text-align: left;
+}
+
+.disc h3 {
+    margin-top: 0;
+}
+
+.disc p {
+    color: #666;
+}
+
+
+/* Diski saraksta stilam */
+
+main ul {
+    list-style: none;
+
+    padding: 0;
+
+    margin: 30px auto;
+
+    max-width: 700px;
+}
+
+main ul li {
+    background: white;
+
+    padding: 15px 20px;
+
+    margin-bottom: 10px;
+
+    border-radius: 8px;
+
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+}
+
+
+/* =========================
+   FORMAS
+========================= */
+
+main form:not(.nav-auth form) {
+    max-width: 500px;
+
+    margin: 30px auto;
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 10px;
+
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+
+    text-align: left;
+}
+
+main form h2 {
+    margin-top: 0;
+
+    margin-bottom: 20px;
+
+    font-size: 24px;
+
+    color: #222;
+
+    text-align: center;
+}
+
+main form label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-weight: bold;
+
+    color: #555;
+}
+
+main form input[type="text"],
+main form input[type="email"],
+main form input[type="password"],
+main form input[type="date"],
+main form input[type="number"],
+main form select,
+main form textarea {
+    width: 100%;
+
+    padding: 11px;
+
+    margin-bottom: 18px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 5px;
+
+    font-size: 16px;
+
+    background: white;
+}
+
+main form textarea {
+    min-height: 120px;
+
+    resize: vertical;
+}
+
+main form input:focus,
+main form select:focus,
+main form textarea:focus {
     border-color: #222;
+
     outline: none;
 }
 
-form button {
+main form button:not(.delete-button) {
     width: 100%;
+
     padding: 12px;
+
     background: #222;
+
     color: white;
+
     border: none;
+
     border-radius: 5px;
+
     font-size: 16px;
+
     cursor: pointer;
 }
 
-form button:hover {
+main form button:not(.delete-button):hover {
     background: #444;
 }
 
-form .link {
-    display: block;
-    margin-top: 15px;
+
+/* =========================
+   LOGIN / REĢISTRĀCIJA
+========================= */
+
+.auth-form {
+    max-width: 400px;
+
+    margin: 60px auto;
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 10px;
+
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.auth-form h2 {
     text-align: center;
+
+    margin-top: 0;
+
+    margin-bottom: 25px;
+}
+
+.auth-form .link {
+    display: block;
+
+    margin-top: 15px;
+
+    text-align: center;
+
     color: #222;
+
     text-decoration: none;
 }
 
-form .link:hover {
+.auth-form .link:hover {
     text-decoration: underline;
+}
+
+
+/* =========================
+   PAZIŅOJUMI
+========================= */
+
+.success {
+    background: #dff0d8;
+
+    color: #2e7d32;
+
+    padding: 12px 15px;
+
+    border-radius: 5px;
+
+    margin: 20px 0;
+}
+
+.error {
+    background: #f8d7da;
+
+    color: #842029;
+
+    padding: 12px 15px;
+
+    border-radius: 5px;
+
+    margin-bottom: 20px;
+}
+
+.error p {
+    margin: 5px 0;
+}
+
+
+/* =========================
+   SACENSĪBAS
+========================= */
+
+.competitions {
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+
+    gap: 20px;
+
+    margin-top: 30px;
+}
+
+.competition {
+    background: white;
+
+    padding: 25px;
+
+    border-radius: 10px;
+
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+
+    text-align: left;
+}
+
+.competition h2 {
+    margin-top: 0;
+}
+
+.competition p {
+    color: #555;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 800px) {
+
+    nav {
+        flex-wrap: wrap;
+
+        padding: 15px 20px;
+    }
+
+    nav h2 {
+        width: 100%;
+
+        margin-bottom: 10px;
+    }
+
+    nav a {
+        margin-left: 0;
+
+        margin-right: 15px;
+    }
+
+    .nav-auth {
+        width: 100%;
+
+        justify-content: space-between;
+
+        margin-top: 10px;
+    }
+
+    main {
+        margin: 40px auto;
+    }
+
+    main h1 {
+        font-size: 34px;
+    }
+
+    main ul li {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+    .delete-button {
+        margin-top: 5px;
+    }
+}
+
+
+@media (max-width: 500px) {
+
+    nav {
+        padding: 15px;
+    }
+
+    nav div {
+        width: 100%;
+    }
+
+    nav a {
+        display: inline-block;
+
+        margin-bottom: 8px;
+    }
+
+    main {
+        padding: 0 15px;
+    }
+
+    main h1 {
+        font-size: 30px;
+    }
+
+    .profile,
+    main form,
+    .auth-form {
+        padding: 20px;
+    }
+
+    .button {
+        width: 100%;
+
+        text-align: center;
+
+        margin-bottom: 10px;
+    }
 }
