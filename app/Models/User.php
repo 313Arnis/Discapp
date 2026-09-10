@@ -11,7 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Disc;
-
+use App\Models\Competition;
 #[Fillable(['name', 'email', 'password', 'role'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
@@ -31,8 +31,12 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    public function discs(): HasMany
+    public function discs()
 {
     return $this->hasMany(Disc::class);
+}
+public function competitions()
+{
+    return $this->belongsToMany(Competition::class);
 }
 }

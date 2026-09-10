@@ -10,5 +10,10 @@ class Disc extends Model
         'user_id',
         'name',
         'type',
+        'speed',
+        'glide',
+        'turn',
+        'fade',
+        'image',
     ];
 }

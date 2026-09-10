@@ -31,31 +31,185 @@
     </div>
 </nav>
 
-<main>
 
-    <h1>Mans profils</h1>
+<main class="profile-page">
 
-    <div class="profile">
+    <div class="profile-header">
 
-        <h2>{{ $user->name }}</h2>
+        <div class="profile-user">
 
-        <p>
-            <strong>E-pasts:</strong>
-            {{ $user->email }}
-        </p>
+            <div class="profile-avatar">
+                {{ strtoupper(substr($user->name, 0, 1)) }}
+            </div>
 
-        <p>
-            <strong>Loma:</strong>
-            {{ $user->role }}
-        </p>
+            <div>
+                <h1>{{ $user->name }}</h1>
+                <p>{{ $user->email }}</p>
+                <span class="profile-status">Spēlētājs</span>
+            </div>
+
+        </div>
+
+
+        <div class="profile-rating">
+            <span>Reitings</span>
+            <strong>865</strong>
+        </div>
 
     </div>
 
-    <div class="profile-links">
 
-        <a href="{{ route('profile.discs.index') }}" class="button">
-            Mani diski
-        </a>
+    <div class="profile-stats">
+
+        <div class="stat-box">
+            <span>Sacensības</span>
+            <strong>0</strong>
+        </div>
+
+        <div class="stat-box">
+            <span>Izspēlētās sacensības</span>
+            <strong>0</strong>
+        </div>
+
+        <div class="stat-box">
+            <span>Uzvaras</span>
+            <strong>0</strong>
+        </div>
+
+        <div class="stat-box">
+            <span>Diski somā</span>
+            <strong>{{ $user->discs->count() }}</strong>
+        </div>
+
+    </div>
+
+
+    <div class="profile-content">
+
+        <div class="profile-section">
+
+            <div class="section-header">
+                <h2>Par spēlētāju</h2>
+            </div>
+
+            <div class="profile-info">
+
+                <div>
+                    <span>Vārds</span>
+                    <strong>{{ $user->name }}</strong>
+                </div>
+
+                <div>
+                    <span>E-pasts</span>
+                    <strong>{{ $user->email }}</strong>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="profile-section">
+
+            <div class="section-header">
+
+                <h2>Mana disku soma</h2>
+
+                <a href="{{ route('profile.discs.index') }}" class="button">
+                    Pārvaldīt diskus
+                </a>
+
+            </div>
+
+
+            @if($user->discs->count() > 0)
+
+                <div class="discs">
+
+                    @foreach($user->discs as $disc)
+
+                        <div class="disc">
+
+                            @if($disc->image)
+
+                                <img
+                                    src="{{ asset('storage/' . $disc->image) }}"
+                                    alt="{{ $disc->name }}"
+                                    class="disc-image"
+                                >
+
+                            @else
+
+                                <div class="disc-no-image">
+                                    🥏
+                                </div>
+
+                            @endif
+
+
+                            <h3>{{ $disc->name }}</h3>
+
+
+                            @if($disc->type)
+                                <p>
+                                    <strong>Tips:</strong>
+                                    {{ $disc->type }}
+                                </p>
+                            @endif
+
+
+                            <div class="flight-numbers">
+
+                                <div>
+                                    <span>Speed</span>
+                                    <strong>{{ $disc->speed }}</strong>
+                                </div>
+
+                                <div>
+                                    <span>Glide</span>
+                                    <strong>{{ $disc->glide }}</strong>
+                                </div>
+
+                                <div>
+                                    <span>Turn</span>
+                                    <strong>{{ $disc->turn }}</strong>
+                                </div>
+
+                                <div>
+                                    <span>Fade</span>
+                                    <strong>{{ $disc->fade }}</strong>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    @endforeach
+
+                </div>
+
+            @else
+
+                <div class="bag-empty">
+
+                    <div class="bag-icon">🥏</div>
+
+                    <h3>Disku soma vēl ir tukša</h3>
+
+                    <p>
+                        Pievieno savus diskus profilam, lai vienuviet
+                        redzētu savu disku golfa somas saturu.
+                    </p>
+
+                    <a href="{{ route('profile.discs.index') }}" class="button">
+                        Pievienot diskus
+                    </a>
+
+                </div>
+
+            @endif
+
+        </div>
 
     </div>
 

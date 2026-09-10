@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class Competition extends Model
 {
@@ -12,6 +13,12 @@ class Competition extends Model
         'date',
         'location',
         'max_players',
-        'status',
     ];
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class)
+            ->withPivot('division')
+            ->withTimestamps();
+    }
 }

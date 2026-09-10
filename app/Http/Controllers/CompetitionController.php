@@ -8,11 +8,11 @@ use Illuminate\Http\Request;
 class CompetitionController extends Controller
 {
     public function index()
-    {
-        $competitions = Competition::latest()->get();
+{
+    $competitions = Competition::latest()->get();
 
-        return view('competitions.index', compact('competitions'));
-    }
+    return view('competitions.index', compact('competitions'));
+}
 
     public function create()
     {
@@ -72,4 +72,78 @@ class CompetitionController extends Controller
 
         return redirect('/competitions');
     }
+
+    public function join(Competition $competition)
+{
+    $rating = auth()->user()->rating ?? 865;
+
+    $divisions = $this->getAvailableDivisions($rating);
+
+    if (count($divisions) === 0) {
+        return back()->with('error', 'Tev nav pieejama neviena divīzija.');
+    }
+
+    return view('competitions.join', compact(
+        'competition',
+        'divisions',
+        'rating'
+    ));
+}
+public function storeJoin(Request $request, Competition $competition)
+{
+    $rating = auth()->user()->rating ?? 865;
+
+    $divisions = $this->getAvailableDivisions($rating);
+
+    $request->validate([
+        'division' => 'required|in:' . implode(',', array_keys($divisions)),
+    ]);
+
+    if (
+        $competition->max_players &&
+        $competition->users()->count() >= $competition->max_players
+    ) {
+        return back()->with('error', 'Šīs sacensības jau ir pilnas.');
+    }
+
+    $competition->users()->syncWithoutDetaching([
+        auth()->id() => [
+            'division' => $request->division
+        ]
+    ]);
+
+    return redirect()
+        ->route('competitions.show', $competition)
+        ->with('success', 'Tu veiksmīgi pieteicies sacensībām!');
+}
+
+private function getAvailableDivisions($rating)
+{
+    $divisions = [];
+
+    $divisions['MA1'] = 'MA1 - Mixed Amateur 1';
+
+    if ($rating <= 934) {
+        $divisions['MA2'] = 'MA2 - Mixed Amateur 2';
+    }
+
+    if ($rating <= 899) {
+        $divisions['MA3'] = 'MA3 - Mixed Amateur 3';
+    }
+
+    if ($rating <= 849) {
+        $divisions['MA4'] = 'MA4 - Mixed Amateur 4';
+    }
+
+    return $divisions;
+}
+
+public function leave(Competition $competition)
+{
+    $competition->users()->detach(auth()->id());
+
+    return back()->with('success', 'Tu vairs nepiedalies šajās sacensībās.');
+}
+
+
 }
