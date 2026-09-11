@@ -44,10 +44,6 @@ Route::post('/logout', [AuthController::class, 'logout'])
 Route::get('/competitions', [CompetitionController::class, 'index'])
     ->name('competitions.index');
 
-// Vienas sacensības apskate
-Route::get('/competitions/{competition}', [CompetitionController::class, 'show'])
-    ->name('competitions.show');
-
 
 // =========================
 // IESLOGOTI LIETOTĀJI
@@ -56,7 +52,7 @@ Route::get('/competitions/{competition}', [CompetitionController::class, 'show']
 Route::middleware('auth')->group(function () {
 
     // -------------------------
-    // Sacensību izveide
+    // SACENSĪBU IZVEIDE
     // -------------------------
 
     Route::get('/competitions/create', [CompetitionController::class, 'create'])
@@ -67,24 +63,21 @@ Route::middleware('auth')->group(function () {
 
 
     // -------------------------
-    // Pievienošanās sacensībām
+    // PIEVIENOŠANĀS SACENSĪBĀM
     // -------------------------
 
-    // Parādīt divīziju izvēli
     Route::get('/competitions/{competition}/join', [CompetitionController::class, 'join'])
         ->name('competitions.join');
 
-    // Saglabāt pieteikšanos
     Route::post('/competitions/{competition}/join', [CompetitionController::class, 'storeJoin'])
         ->name('competitions.join.store');
 
-    // Izstāties no sacensībām
     Route::post('/competitions/{competition}/leave', [CompetitionController::class, 'leave'])
         ->name('competitions.leave');
 
 
     // -------------------------
-    // Sacensību rediģēšana
+    // SACENSĪBU REDIĢĒŠANA
     // -------------------------
 
     Route::get('/competitions/{competition}/edit', [CompetitionController::class, 'edit'])
@@ -95,7 +88,7 @@ Route::middleware('auth')->group(function () {
 
 
     // -------------------------
-    // Sacensību dzēšana
+    // SACENSĪBU DZĒŠANA
     // -------------------------
 
     Route::delete('/competitions/{competition}', [CompetitionController::class, 'destroy'])
@@ -126,6 +119,15 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile/discs/{disc}', [DiscController::class, 'destroy'])
         ->name('profile.discs.destroy');
 });
+
+
+// =========================
+// VIENAS SACENSĪBAS APSKATE
+// =========================
+
+// SVARĪGI: šim jābūt PĒC /competitions/create
+Route::get('/competitions/{competition}', [CompetitionController::class, 'show'])
+    ->name('competitions.show');
 
 
 // =========================
