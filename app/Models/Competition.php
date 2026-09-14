@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
+use App\Models\CompetitionResult;
 
 class Competition extends Model
 {
@@ -20,5 +21,9 @@ class Competition extends Model
         return $this->belongsToMany(User::class)
             ->withPivot('division')
             ->withTimestamps();
+    }
+    public function results()
+    {
+    return $this->hasMany(CompetitionResult::class);
     }
 }

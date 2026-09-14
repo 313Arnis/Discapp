@@ -140,3 +140,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
         ->name('admin');
 
 });
+Route::post(
+    '/competitions/{competition}/results',
+    [CompetitionController::class, 'storeResult']
+)->name('competitions.results.store');

@@ -1262,3 +1262,170 @@ main form button:not(.delete-button):not(.delete-link):hover {
     padding: 20px;
   }
 }
+
+/* =========================
+   REZULTĀTI
+========================= */
+
+.results-division {
+  padding: 0 35px;
+  margin-bottom: 25px;
+}
+
+.results-division .division-header {
+  margin-bottom: 12px;
+}
+
+.results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.result-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  padding: 12px 15px;
+
+  background: var(--bg-subtle);
+
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+
+  transition: var(--transition);
+}
+
+.result-row:hover {
+  background: #f0f0f0;
+}
+
+.result-place {
+  width: 35px;
+
+  text-align: center;
+
+  font-size: 16px;
+  font-weight: bold;
+
+  color: var(--text-light);
+
+  flex-shrink: 0;
+}
+
+.result-player {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  flex: 1;
+
+  min-width: 0;
+}
+
+.result-player-info {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+}
+
+.result-player-info strong {
+  overflow: hidden;
+
+  white-space: nowrap;
+
+  text-overflow: ellipsis;
+}
+
+.result-player-info span {
+  color: var(--text-light);
+
+  font-size: 11px;
+
+  text-transform: uppercase;
+}
+
+.result-score {
+  min-width: 100px;
+
+  text-align: right;
+}
+
+.result-score strong {
+  display: block;
+
+  font-size: 20px;
+}
+
+.result-score span {
+  color: var(--text-light);
+
+  font-size: 11px;
+}
+
+.result-not-entered {
+  color: var(--text-light) !important;
+
+  font-size: 13px !important;
+}
+
+
+/* =========================
+ MANS REZULTĀTS
+========================= */
+
+.result-form-section {
+  margin: 25px 35px 0;
+
+  padding: 20px;
+
+  background: var(--bg-subtle);
+
+  border: 1px solid var(--border-color);
+
+  border-radius: var(--radius);
+}
+
+.result-form-section h3 {
+  margin: 0 0 5px;
+
+  font-size: 18px;
+}
+
+.result-form-section > p {
+  margin: 0 0 18px;
+
+  color: var(--text-light);
+
+  font-size: 14px;
+}
+
+.result-form-section form {
+  width: 100% !important;
+
+  max-width: none !important;
+
+  margin: 0 !important;
+
+  padding: 0 !important;
+
+  background: transparent !important;
+
+  border: none !important;
+
+  box-shadow: none !important;
+}
+
+.result-form-section input {
+  max-width: 250px;
+}
+
+.result-form-section button {
+  width: auto !important;
+
+  display: inline-block;
+
+  margin-top: 5px;
+}
