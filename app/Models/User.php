@@ -59,14 +59,20 @@ class User extends Authenticatable
     /**
      * Lietotāja sacensības
      */
-    public function competitions()
+    public function createdCompetitions()
     {
+        return $this->hasMany(Competition::class, 'user_id');
+    }
+    
+    public function competitions()
+    {  // Pivot: Jo divīzija pieder nevis lietotājam vai sacensībām atsevišķi, bet konkrētā lietotāja dalībai konkrētajās sacensībās.
         return $this->belongsToMany(Competition::class)
             ->withPivot('division')
             ->withTimestamps();
     }
+    
     public function results()
     {
-    return $this->hasMany(CompetitionResult::class);
+        return $this->hasMany(CompetitionResult::class);
     }
 }

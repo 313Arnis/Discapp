@@ -90,6 +90,23 @@
                     {{ $competition->name }}
                 </h1>
 
+
+                {{-- STATUSS --}}
+
+                @php
+                    $statusNames = [
+                        'planned' => 'Plānotas',
+                        'ongoing' => 'Notiek',
+                        'finished' => 'Pabeigtas',
+                        'cancelled' => 'Atceltas',
+                    ];
+                @endphp
+
+                <span class="competition-status status-{{ $competition->status }}">
+                    {{ $statusNames[$competition->status] ?? 'Nezināms statuss' }}
+                </span>
+
+
                 @if($competition->description)
 
                     <p class="competition-description">
@@ -123,13 +140,11 @@
                     </span>
 
                     <strong>
-
                         {{ $participantsCount }}
 
                         <small>
                             / {{ $competition->max_players }}
                         </small>
-
                     </strong>
 
                 </div>
@@ -401,8 +416,8 @@
 
                 @php
 
-                    $divisionPlayers = $players
-                        ->sortBy(function ($player) use ($competition) {
+                    $divisionPlayers = $players->sortBy(
+                        function ($player) use ($competition) {
 
                             $result = $competition->results
                                 ->firstWhere('user_id', $player->id);
@@ -410,7 +425,8 @@
                             return $result
                                 ? $result->score
                                 : PHP_INT_MAX;
-                        });
+                        }
+                    );
 
                 @endphp
 
@@ -447,7 +463,6 @@
 
 
                             <div class="result-row">
-
 
                                 <div class="result-place">
 
@@ -508,7 +523,6 @@
 
                                 </div>
 
-
                             </div>
 
                         @endforeach
@@ -547,7 +561,11 @@
 
         @auth
 
-            @if($competition->users->contains(auth()->id()))
+            @if(
+                $competition->users->contains(auth()->id())
+                &&
+                $competition->user_id !== auth()->id()
+            )
 
                 @php
 
@@ -636,7 +654,16 @@
 
             @auth
 
-                @if($competition->users->contains(auth()->id()))
+                {{-- Veidotājs nevar izstāties no savām sacensībām --}}
+
+                @if($competition->user_id === auth()->id())
+
+                    <div class="creator-status">
+                        Tu esi šo sacensību veidotājs.
+                    </div>
+
+
+                @elseif($competition->users->contains(auth()->id()))
 
                     <form
                         method="POST"
@@ -656,6 +683,7 @@
                         </button>
 
                     </form>
+
 
                 @else
 
@@ -690,46 +718,50 @@
 
         @auth
 
-            <div class="competition-admin-actions">
+            @if($competition->user_id === auth()->id())
 
-                <a
-                    href="{{ route(
-                        'competitions.edit',
-                        $competition
-                    ) }}"
-                    class="edit-link"
-                >
-                    Rediģēt sacensības
-                </a>
+                <div class="competition-admin-actions">
 
-
-                <form
-                    method="POST"
-                    action="{{ route(
-                        'competitions.destroy',
-                        $competition
-                    ) }}"
-                    onsubmit="
-                        return confirm(
-                            'Vai tiešām vēlies dzēst šīs sacensības?'
-                        );
-                    "
-                >
-
-                    @csrf
-
-                    @method('DELETE')
-
-                    <button
-                        type="submit"
-                        class="delete-link"
+                    <a
+                        href="{{ route(
+                            'competitions.edit',
+                            $competition
+                        ) }}"
+                        class="edit-link"
                     >
-                        Dzēst sacensības
-                    </button>
+                        Rediģēt sacensības
+                    </a>
 
-                </form>
 
-            </div>
+                    <form
+                        method="POST"
+                        action="{{ route(
+                            'competitions.destroy',
+                            $competition
+                        ) }}"
+                        onsubmit="
+                            return confirm(
+                                'Vai tiešām vēlies dzēst šīs sacensības?'
+                            );
+                        "
+                    >
+
+                        @csrf
+
+                        @method('DELETE')
+
+                        <button
+                            type="submit"
+                            class="delete-link"
+                        >
+                            Dzēst sacensības
+                        </button>
+
+                    </form>
+
+                </div>
+
+            @endif
 
         @endauth
 

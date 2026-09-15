@@ -14,6 +14,8 @@ class Competition extends Model
         'date',
         'location',
         'max_players',
+        'status',
+        'user_id',
     ];
 
     public function users()
@@ -22,8 +24,14 @@ class Competition extends Model
             ->withPivot('division')
             ->withTimestamps();
     }
+
     public function results()
     {
-    return $this->hasMany(CompetitionResult::class);
+        return $this->hasMany(CompetitionResult::class);
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

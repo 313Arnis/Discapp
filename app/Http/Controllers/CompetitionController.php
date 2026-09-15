@@ -30,6 +30,7 @@ class CompetitionController extends Controller
             'date' => 'required|date',
             'location' => 'required|max:255',
             'max_players' => 'nullable|integer|min:1',
+            'status' => 'required|in:planned,active,finished,cancelled',
         ]);
 
         Competition::create([
@@ -38,6 +39,8 @@ class CompetitionController extends Controller
             'date' => $request->date,
             'location' => $request->location,
             'max_players' => $request->max_players,
+            'status' => $request->status,
+            'user_id' => auth()->id(),
         ]);
 
         return redirect()
@@ -51,6 +54,7 @@ class CompetitionController extends Controller
         $competition->load([
             'users',
             'results.user',
+            'creator',
         ]);
 
         return view('competitions.show', compact('competition'));
@@ -59,22 +63,37 @@ class CompetitionController extends Controller
 
     public function edit(Competition $competition)
     {
+        if ($competition->user_id !== auth()->id()) {
+            abort(403, 'Tev nav tiesību rediģēt šīs sacensības.');
+        }
+
         return view('competitions.edit', compact('competition'));
     }
 
 
     public function update(Request $request, Competition $competition)
     {
+        if ($competition->user_id !== auth()->id()) {
+            abort(403, 'Tev nav tiesību rediģēt šīs sacensības.');
+        }
+
         $request->validate([
             'name' => 'required|max:255',
             'description' => 'nullable',
             'date' => 'required|date',
             'location' => 'required|max:255',
             'max_players' => 'nullable|integer|min:1',
-            'status' => 'required',
+            'status' => 'required|in:planned,active,finished,cancelled',
         ]);
 
-        $competition->update($request->all());
+        $competition->update([
+            'name' => $request->name,
+            'description' => $request->description,
+            'date' => $request->date,
+            'location' => $request->location,
+            'max_players' => $request->max_players,
+            'status' => $request->status,
+        ]);
 
         return redirect()
             ->route('competitions.show', $competition)
@@ -84,6 +103,10 @@ class CompetitionController extends Controller
 
     public function destroy(Competition $competition)
     {
+        if ($competition->user_id !== auth()->id()) {
+            abort(403, 'Tev nav tiesību dzēst šīs sacensības.');
+        }
+
         $competition->delete();
 
         return redirect()
@@ -128,8 +151,12 @@ class CompetitionController extends Controller
         ]);
 
 
-        // Pārbauda vai spēlētājs jau ir pieteicies
-        if ($competition->users()->where('user_id', auth()->id())->exists()) {
+        // Pārbauda, vai spēlētājs jau ir pieteicies
+        if (
+            $competition->users()
+                ->where('user_id', auth()->id())
+                ->exists()
+        ) {
             return back()->with(
                 'error',
                 'Tu jau esi pieteicies šīm sacensībām.'
@@ -149,6 +176,7 @@ class CompetitionController extends Controller
         }
 
 
+        // Pievieno spēlētāju ar izvēlēto divīziju
         $competition->users()->attach(auth()->id(), [
             'division' => $request->division,
         ]);
@@ -167,18 +195,20 @@ class CompetitionController extends Controller
     {
         $divisions = [];
 
-        // MA1 ir pieejama visiem
+        // MA1 pieejama visiem
         $divisions['MA1'] = 'MA1 - Mixed Amateur 1';
 
-        // Zemāka reitinga spēlētāji var izvēlēties arī zemākas divīzijas
+        // MA2
         if ($rating <= 934) {
             $divisions['MA2'] = 'MA2 - Mixed Amateur 2';
         }
 
+        // MA3
         if ($rating <= 899) {
             $divisions['MA3'] = 'MA3 - Mixed Amateur 3';
         }
 
+        // MA4
         if ($rating <= 849) {
             $divisions['MA4'] = 'MA4 - Mixed Amateur 4';
         }
@@ -187,11 +217,23 @@ class CompetitionController extends Controller
     }
 
 
+    // =========================
+    // IZSTĀŠANĀS NO SACENSĪBĀM
+    // =========================
+
     public function leave(Competition $competition)
     {
+        // Sacensību veidotājs nevar izstāties no savas sacensības
+        if ($competition->user_id === auth()->id()) {
+            return back()->with(
+                'error',
+                'Sacensību veidotājs nevar izstāties no savām sacensībām.'
+            );
+        }
+
         $competition->users()->detach(auth()->id());
 
-        // Ja spēlētājam bija rezultāts, to arī dzēš
+        // Izdzēš arī spēlētāja rezultātu
         CompetitionResult::where('competition_id', $competition->id)
             ->where('user_id', auth()->id())
             ->delete();
@@ -216,12 +258,17 @@ class CompetitionController extends Controller
         ]);
 
 
-        // Tikai sacensību dalībnieks drīkst ievadīt savu rezultātu
-        if (!$competition->users()->where('user_id', auth()->id())->exists()) {
-            abort(403);
+        // Tikai sacensību dalībnieks drīkst ievadīt rezultātu
+        if (
+            !$competition->users()
+                ->where('user_id', auth()->id())
+                ->exists()
+        ) {
+            abort(403, 'Tev nav tiesību iesniegt rezultātu šajās sacensībās.');
         }
 
 
+        // Izveido vai atjaunina rezultātu
         CompetitionResult::updateOrCreate(
             [
                 'competition_id' => $competition->id,
