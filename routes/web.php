@@ -8,6 +8,7 @@ use App\Http\Controllers\CompetitionController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DiscController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CourseController;
 
 
 // =========================
@@ -40,7 +41,6 @@ Route::post('/logout', [AuthController::class, 'logout'])
 // SACENSĪBAS
 // =========================
 
-// Sacensību saraksts
 Route::get('/competitions', [CompetitionController::class, 'index'])
     ->name('competitions.index');
 
@@ -125,9 +125,18 @@ Route::middleware('auth')->group(function () {
 // VIENAS SACENSĪBAS APSKATE
 // =========================
 
-// SVARĪGI: šim jābūt PĒC /competitions/create
 Route::get('/competitions/{competition}', [CompetitionController::class, 'show'])
     ->name('competitions.show');
+
+
+// =========================
+// SACENSĪBU REZULTĀTI
+// =========================
+
+Route::post(
+    '/competitions/{competition}/results',
+    [CompetitionController::class, 'storeResult']
+)->name('competitions.results.store');
 
 
 // =========================
@@ -136,11 +145,33 @@ Route::get('/competitions/{competition}', [CompetitionController::class, 'show']
 
 Route::middleware(['auth', 'admin'])->group(function () {
 
+    // -------------------------
+    // ADMIN PANELIS
+    // -------------------------
+
     Route::get('/admin', [AdminController::class, 'index'])
         ->name('admin');
 
+
+    // -------------------------
+    // TRASĒS
+    // -------------------------
+
+    Route::get('/courses', [CourseController::class, 'index'])
+        ->name('courses.index');
+
+    Route::get('/courses/create', [CourseController::class, 'create'])
+        ->name('courses.create');
+
+    Route::post('/courses', [CourseController::class, 'store'])
+        ->name('courses.store');
+
+    Route::get('/courses/{course}/edit', [CourseController::class, 'edit'])
+        ->name('courses.edit');
+
+    Route::put('/courses/{course}', [CourseController::class, 'update'])
+        ->name('courses.update');
+
+    Route::delete('/courses/{course}', [CourseController::class, 'destroy'])
+        ->name('courses.destroy');
 });
-Route::post(
-    '/competitions/{competition}/results',
-    [CompetitionController::class, 'storeResult']
-)->name('competitions.results.store');

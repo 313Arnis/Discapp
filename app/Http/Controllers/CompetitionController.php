@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Competition;
 use App\Models\CompetitionResult;
 use Illuminate\Http\Request;
+use App\Models\Course;
 
 class CompetitionController extends Controller
 {
@@ -18,35 +19,42 @@ class CompetitionController extends Controller
 
     public function create()
     {
-        return view('competitions.create');
-    }
+    $courses = Course::orderBy('name')->get();
 
+    return view('competitions.create', compact('courses'));
+    }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|max:255',
-            'description' => 'nullable',
-            'date' => 'required|date',
-            'location' => 'required|max:255',
-            'max_players' => 'nullable|integer|min:1',
-            'status' => 'required|in:planned,active,finished,cancelled',
-        ]);
+{
+    $request->validate([
+        'name' => 'required|max:255',
+        'description' => 'nullable',
+        'date' => 'required|date',
+        'course_id' => 'required|exists:courses,id',
+        'max_players' => 'nullable|integer|min:1',
+        'status' => 'required|in:planned,active,finished,cancelled',
+    ]);
 
-        Competition::create([
-            'name' => $request->name,
-            'description' => $request->description,
-            'date' => $request->date,
-            'location' => $request->location,
-            'max_players' => $request->max_players,
-            'status' => $request->status,
-            'user_id' => auth()->id(),
-        ]);
+    $course = Course::findOrFail($request->course_id);
 
-        return redirect()
-            ->route('competitions.index')
-            ->with('success', 'Sacensības veiksmīgi izveidotas!');
-    }
+    Competition::create([
+        'name' => $request->name,
+        'description' => $request->description,
+        'date' => $request->date,
+
+        // Saglabā arī trases nosaukumu vecajā location laukā
+        'location' => $course->name,
+
+        'max_players' => $request->max_players,
+        'status' => $request->status,
+        'user_id' => auth()->id(),
+        'course_id' => $course->id,
+    ]);
+
+    return redirect()
+        ->route('competitions.index')
+        ->with('success', 'Sacensības veiksmīgi izveidotas!');
+}
 
 
     public function show(Competition $competition)
@@ -285,4 +293,61 @@ class CompetitionController extends Controller
             'Rezultāts veiksmīgi saglabāts!'
         );
     }
+    private function getLatvianCourses()
+{
+    return [
+        'Laumu Dabas Parks',
+        'Discgolfpark Ērgļi',
+        'Deviņkalnu Disku Golfa Parks',
+        'airBaltic Disc Golf Park',
+        'DiscGolfPark Vilce',
+        'Riekstukalns',
+        'Priekuļu Disku Golfa Laukums',
+        'Ikšķiles Disku Golfa Parks',
+        'Disc Golf Park "Pauku Priedes"',
+        'Inčukalna Medību Pils Laukums',
+        'Lūša Ķepa',
+        'Rezidence Kurzeme',
+        'PROPARK Disku golfa parks Baložos',
+        'airBaltic Training Disc Golf Park',
+        'LIMBO disc golf course',
+        'Disku golfa parks ZIBEŅI',
+        'Ziedoņi',
+        'Tukuma Disku Golfa parks',
+        'Ventspils Disku Golfa Parks',
+        'Zaķusala Disc Golf Park',
+        'Zaķumuižas Disku Golfa Parks',
+        'Sējas Disku Golf Parks',
+        'Disku golfa parks "Palsa"',
+        'Lēdurgas Disku Golfa Parks',
+        'Ķeguma Skolas Disc Golf Park',
+        'Garozas Disku golfa laukums',
+        'Salaspils Ako',
+        'Allendorf Discgolf course',
+        'Līgatnes disku golfa parks',
+        'Viesturskolas Disku Golfa Parks',
+        'Ceļa Ēzeļi',
+        'Piņķu ūdenskrātuves disku golfa parks',
+        'Sīmaņi',
+        'Līvbērze Disc Golf Park',
+        '"ZĪDŪŅS" - disku golfa parks "Malnova"',
+        '"MUIŽA" - disku golfa parks "Malnova"',
+        'Jumpravas Disku Golfa trase',
+        'Disku golfa parks "Vaidava"',
+        'DiscGolfPark BALVI',
+        'Kandavas Diksu Golfs',
+        'Reiņa Trase',
+        'Mežinieki',
+        'Upes iela park',
+        'Nrc "Vaivari" Disku Golfa Parks',
+        'Esena',
+        'Turlavas Disku Golfa Parks',
+        'Disku golfa parks "ABULS"',
+        'Pabažu disku golfa parks',
+        'Ļaudona_GRIEZE',
+        'Disc Golf Park "Lettes"',
+        'Aiviekstes Ozoli 6',
+        'Sesiles disku golfs',
+    ];
+}
 }

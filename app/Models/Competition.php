@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\CompetitionResult;
+use App\Models\Course;
 
 class Competition extends Model
 {
@@ -16,6 +17,7 @@ class Competition extends Model
         'max_players',
         'status',
         'user_id',
+        'course_id',
     ];
 
     public function users()
@@ -33,5 +35,10 @@ class Competition extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function course()
+    {
+        return $this->belongsTo(Course::class);
     }
 }
