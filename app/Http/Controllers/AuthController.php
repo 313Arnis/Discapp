@@ -30,7 +30,11 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect('/');
+        if ($user->role === 'admin') {
+            return redirect()->route('admin');
+        }
+
+        return redirect()->route('home');
     }
 
     public function showLogin()
@@ -46,9 +50,14 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials)) {
+
             $request->session()->regenerate();
 
-            return redirect('/');
+            if (Auth::user()->role === 'admin') {
+                return redirect()->route('admin');
+            }
+
+            return redirect()->route('home');
         }
 
         return back()->withErrors([
@@ -63,6 +72,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect()->route('home');
     }
 }

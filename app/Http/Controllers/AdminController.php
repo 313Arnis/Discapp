@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Course;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
@@ -12,59 +12,44 @@ class AdminController extends Controller
         return view('admin.index');
     }
 
-    public function courses()
+    public function users()
     {
-        $courses = Course::orderBy('name')->get();
+        $users = User::orderBy('name')->get();
 
-        return view('admin.courses.index', compact('courses'));
+        return view('admin.users', compact('users'));
     }
 
-    public function createCourse()
-    {
-        return view('admin.courses.create');
-    }
-
-    public function storeCourse(Request $request)
+    public function updateUser(Request $request, User $user)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'location' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'role' => 'required|in:user,admin',
+            'rating' => 'required|integer|min:0|max:2000',
         ]);
 
-        Course::create($validated);
-
-        return redirect()
-            ->route('admin.courses')
-            ->with('success', 'Trase veiksmīgi pievienota!');
-    }
-
-    public function editCourse(Course $course)
-    {
-        return view('admin.courses.edit', compact('course'));
-    }
-
-    public function updateCourse(Request $request, Course $course)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'location' => 'required|string|max:255',
-            'description' => 'nullable|string',
+        $user->update([
+            'role' => $validated['role'],
+            'rating' => $validated['rating'],
         ]);
 
-        $course->update($validated);
-
         return redirect()
-            ->route('admin.courses')
-            ->with('success', 'Trase veiksmīgi atjaunināta!');
+            ->route('admin.users')
+            ->with('success', 'Lietotāja informācija veiksmīgi atjaunota!');
     }
 
-    public function deleteCourse(Course $course)
+    public function destroyUser(User $user)
     {
-        $course->delete();
+        if ($user->id === auth()->id()) {
+            return redirect()
+                ->route('admin.users')
+                ->withErrors([
+                    'user' => 'Tu nevari izdzēst pats savu administratora kontu.'
+                ]);
+        }
+
+        $user->delete();
 
         return redirect()
-            ->route('admin.courses')
-            ->with('success', 'Trase veiksmīgi izdzēsta!');
+            ->route('admin.users')
+            ->with('success', 'Lietotājs veiksmīgi izdzēsts!');
     }
 }

@@ -154,6 +154,20 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
 
     // -------------------------
+    // LIETOTĀJI
+    // -------------------------
+
+    Route::get('/admin/users', [AdminController::class, 'users'])
+        ->name('admin.users');
+
+    Route::put('/admin/users/{user}', [AdminController::class, 'updateUser'])
+        ->name('admin.users.update');
+
+    Route::delete('/admin/users/{user}', [AdminController::class, 'destroyUser'])
+        ->name('admin.users.destroy');
+
+
+    // -------------------------
     // TRASĒS
     // -------------------------
 

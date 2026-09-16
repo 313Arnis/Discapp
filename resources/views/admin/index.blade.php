@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Discapp Admin</title>
+    <title>Admin panelis - Discapp</title>
 
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 </head>
@@ -25,7 +25,10 @@
             Profils
         </a>
 
-        <form method="POST" action="{{ route('logout') }}">
+        <form
+            method="POST"
+            action="{{ route('logout') }}"
+        >
             @csrf
 
             <button type="submit">
@@ -43,11 +46,15 @@
     <div class="profile-header">
 
         <div>
-            <h1>Admin panelis</h1>
+
+            <h1>
+                Admin panelis
+            </h1>
 
             <p>
                 Sveiks, {{ auth()->user()->name }}!
             </p>
+
         </div>
 
     </div>
@@ -56,11 +63,27 @@
     <section class="profile-stats">
 
         <div>
-            <strong>Administrators</strong>
+
+            <strong>
+                Administrators
+            </strong>
 
             <span>
                 {{ auth()->user()->email }}
             </span>
+
+        </div>
+
+        <div>
+
+            <strong>
+                Loma
+            </strong>
+
+            <span>
+                Administrators
+            </span>
+
         </div>
 
     </section>
@@ -72,10 +95,12 @@
 
             <div>
 
-                <h2>Disku golfa trases</h2>
+                <h2>
+                    Disku golfa trases
+                </h2>
 
                 <p>
-                    Pārvaldi trases, grozus un to PAR vērtības.
+                    Pārvaldi trases, grozus un PAR vērtības.
                 </p>
 
             </div>
@@ -88,6 +113,69 @@
                 >
                     Pārvaldīt trases
                 </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="competition">
+
+            <div>
+
+                <h2>
+                    Lietotāji
+                </h2>
+
+                <a
+    href="{{ route('admin.users') }}"
+    class="btn"
+>
+    Pārvaldīt lietotājus
+</a>
+
+            </div>
+
+            <div>
+
+                <button
+                    class="btn"
+                    type="button"
+                    disabled
+                    style="opacity: 0.5; cursor: not-allowed;"
+                >
+                    Drīzumā
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="competition">
+
+            <div>
+
+                <h2>
+                    Sacensības
+                </h2>
+
+                <p>
+                    Pārvaldi sistēmā izveidotās sacensības.
+                </p>
+
+            </div>
+
+            <div>
+
+                <button
+                    class="btn"
+                    type="button"
+                    disabled
+                    style="opacity: 0.5; cursor: not-allowed;"
+                >
+                    Drīzumā
+                </button>
 
             </div>
 
