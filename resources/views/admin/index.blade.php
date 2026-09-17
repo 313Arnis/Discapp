@@ -25,10 +25,7 @@
             Profils
         </a>
 
-        <form
-            method="POST"
-            action="{{ route('logout') }}"
-        >
+        <form method="POST" action="{{ route('logout') }}">
             @csrf
 
             <button type="submit">
@@ -46,50 +43,103 @@
     <div class="profile-header">
 
         <div>
-
-            <h1>
-                Admin panelis
-            </h1>
+            <h1>Admin panelis</h1>
 
             <p>
                 Sveiks, {{ auth()->user()->name }}!
             </p>
-
         </div>
 
     </div>
 
 
-    <section class="profile-stats">
+    <!-- STATISTIKA -->
+
+    <section
+        class="profile-stats"
+        style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        "
+    >
 
         <div>
-
-            <strong>
-                Administrators
-            </strong>
+            <strong>Lietotāji</strong>
 
             <span>
-                {{ auth()->user()->email }}
+                {{ $usersCount }}
             </span>
-
         </div>
 
-        <div>
 
-            <strong>
-                Loma
-            </strong>
+        <div>
+            <strong>Trases</strong>
 
             <span>
-                Administrators
+                {{ $coursesCount }}
             </span>
+        </div>
 
+
+        <div>
+            <strong>Sacensības</strong>
+
+            <span>
+                {{ $competitionsCount }}
+            </span>
+        </div>
+
+
+        <div>
+            <strong>Vidējais reitings</strong>
+
+            <span>
+                {{ $averageRating }}
+            </span>
         </div>
 
     </section>
 
 
+    <!-- ĀTRĀS DARBĪBAS -->
+
     <section class="competitions">
+
+        <h2 style="margin-bottom: 15px;">
+            Ātrās darbības
+        </h2>
+
+
+        <div class="competition">
+
+            <div>
+
+                <h2>
+                    Lietotāji
+                </h2>
+
+                <p>
+                    Skati un pārvaldi Discapp lietotājus,
+                    viņu lomas un reitingus.
+                </p>
+
+            </div>
+
+            <div>
+
+                <a
+                    href="{{ route('admin.users') }}"
+                    class="btn"
+                >
+                    Pārvaldīt lietotājus
+                </a>
+
+            </div>
+
+        </div>
+
 
         <div class="competition">
 
@@ -100,7 +150,8 @@
                 </h2>
 
                 <p>
-                    Pārvaldi trases, grozus un PAR vērtības.
+                    Pievieno un pārvaldi trases,
+                    grozus un PAR vērtības.
                 </p>
 
             </div>
@@ -124,44 +175,12 @@
             <div>
 
                 <h2>
-                    Lietotāji
-                </h2>
-
-                <a
-    href="{{ route('admin.users') }}"
-    class="btn"
->
-    Pārvaldīt lietotājus
-</a>
-
-            </div>
-
-            <div>
-
-                <button
-                    class="btn"
-                    type="button"
-                    disabled
-                    style="opacity: 0.5; cursor: not-allowed;"
-                >
-                    Drīzumā
-                </button>
-
-            </div>
-
-        </div>
-
-
-        <div class="competition">
-
-            <div>
-
-                <h2>
                     Sacensības
                 </h2>
 
                 <p>
-                    Pārvaldi sistēmā izveidotās sacensības.
+                    Sacensību administrēšana būs pieejama
+                    nākamajā sistēmas versijā.
                 </p>
 
             </div>
@@ -172,7 +191,10 @@
                     class="btn"
                     type="button"
                     disabled
-                    style="opacity: 0.5; cursor: not-allowed;"
+                    style="
+                        opacity: 0.5;
+                        cursor: not-allowed;
+                    "
                 >
                     Drīzumā
                 </button>
@@ -180,6 +202,64 @@
             </div>
 
         </div>
+
+    </section>
+
+
+    <!-- PĒDĒJIE LIETOTĀJI -->
+
+    <section
+        class="competitions"
+        style="margin-top: 30px;"
+    >
+
+        <h2 style="margin-bottom: 15px;">
+            Jaunākie lietotāji
+        </h2>
+
+
+        @forelse($recentUsers as $user)
+
+            <div class="competition">
+
+                <div>
+
+                    <h2>
+                        {{ $user->name }}
+                    </h2>
+
+                    <p>
+                        {{ $user->email }}
+                    </p>
+
+                </div>
+
+
+                <div style="text-align: right;">
+
+                    <strong>
+                        Reitings
+                    </strong>
+
+                    <p>
+                        {{ $user->rating }}
+                    </p>
+
+                </div>
+
+            </div>
+
+        @empty
+
+            <div class="competition">
+
+                <p>
+                    Lietotāju vēl nav.
+                </p>
+
+            </div>
+
+        @endforelse
 
     </section>
 
