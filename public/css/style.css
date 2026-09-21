@@ -1471,3 +1471,122 @@ main form button:not(.delete-button):not(.delete-link):hover {
   color: #999;
   text-decoration: line-through;
 }
+/* =========================
+   GROZU REZULTĀTI
+========================= */
+
+.my-score-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin: 25px 0;
+}
+
+.score-summary-card {
+  background: #f8f8f8;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 18px;
+}
+
+.score-summary-card span {
+  display: block;
+  color: #777;
+  font-size: 13px;
+  margin-bottom: 7px;
+}
+
+.score-summary-card strong {
+  font-size: 24px;
+  color: #222;
+}
+
+.holes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hole-result-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #f8f8f8;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 15px;
+}
+
+.hole-number {
+  width: 80px;
+}
+
+.hole-number span,
+.hole-par span {
+  display: block;
+  font-size: 11px;
+  color: #777;
+  margin-bottom: 3px;
+}
+
+.hole-number strong {
+  font-size: 22px;
+}
+
+.hole-par {
+  width: 60px;
+}
+
+.hole-par strong {
+  font-size: 20px;
+}
+
+.hole-result-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.hole-result-form input {
+  width: 110px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+.hole-result-form .button {
+  margin: 0;
+}
+
+@media (max-width: 700px) {
+
+  .my-score-summary {
+      grid-template-columns: 1fr;
+  }
+
+  .hole-result-card {
+      gap: 10px;
+  }
+
+  .hole-result-form {
+      flex-direction: column;
+      align-items: stretch;
+  }
+
+  .hole-result-form input {
+      width: 100%;
+  }
+
+  .hole-result-form .button {
+      width: 100%;
+  }
+}
+.save-all-results {
+  width: 100%;
+  margin-top: 25px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: bold;
+}

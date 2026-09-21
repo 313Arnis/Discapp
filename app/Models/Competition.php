@@ -3,9 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
-use App\Models\CompetitionResult;
-use App\Models\Course;
 
 class Competition extends Model
 {
@@ -20,6 +17,13 @@ class Competition extends Model
         'course_id',
     ];
 
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+
     public function users()
     {
         return $this->belongsToMany(User::class)
@@ -27,18 +31,21 @@ class Competition extends Model
             ->withTimestamps();
     }
 
+
     public function results()
     {
         return $this->hasMany(CompetitionResult::class);
     }
 
-    public function creator()
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
 
     public function course()
     {
         return $this->belongsTo(Course::class);
+    }
+
+
+    public function holeResults()
+    {
+        return $this->hasMany(CompetitionHoleResult::class);
     }
 }

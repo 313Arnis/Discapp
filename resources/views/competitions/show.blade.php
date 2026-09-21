@@ -91,11 +91,10 @@
                 </h1>
 
 
-                {{-- STATUSS --}}
-
                 @php
                     $statusNames = [
                         'planned' => 'Plānotas',
+                        'active' => 'Notiek',
                         'ongoing' => 'Notiek',
                         'finished' => 'Pabeigtas',
                         'cancelled' => 'Atceltas',
@@ -383,6 +382,107 @@
 
 
         {{-- ======================================
+             MANS REZULTĀTS PA GROZIEM
+        ====================================== --}}
+
+        @auth
+
+@php
+    $myHoleResults = $competition->holeResults
+        ->where('user_id', auth()->id())
+        ->keyBy('course_hole_id');
+
+    $totalThrows = $myHoleResults->sum('throws');
+    $totalPar = $competition->course->courseHoles->sum('par');
+    $holesPlayed = $myHoleResults->count();
+    $scoreToPar = $totalThrows - $totalPar;
+@endphp
+
+<div class="card">
+    <h2>Mans rezultāts</h2>
+
+    <div class="my-score-summary">
+        <div class="score-summary-card">
+            <span>Izspēlēti grozi</span>
+            <strong>
+                {{ $holesPlayed }} / {{ $competition->course->courseHoles->count() }}
+            </strong>
+        </div>
+
+        <div class="score-summary-card">
+            <span>Kopā metieni</span>
+            <strong>{{ $totalThrows }}</strong>
+        </div>
+
+        <div class="score-summary-card">
+            <span>PAR</span>
+            <strong>
+                {{ $scoreToPar > 0 ? '+' . $scoreToPar : $scoreToPar }}
+            </strong>
+        </div>
+    </div>
+
+    <form method="POST"
+          action="{{ route('competitions.hole-results.store', $competition) }}">
+
+        @csrf
+
+        <div class="holes-list">
+
+            @foreach(
+                $competition->course->courseHoles->sortBy('hole_number')
+                as $hole
+            )
+
+                @php
+                    $holeResult = $myHoleResults->get($hole->id);
+                @endphp
+
+                <div class="hole-result-card">
+
+                    <div class="hole-number">
+                        <span>GROZS</span>
+                        <strong>{{ $hole->hole_number }}</strong>
+                    </div>
+
+                    <div class="hole-par">
+                        <span>PAR</span>
+                        <strong>{{ $hole->par }}</strong>
+                    </div>
+
+                    <div class="hole-result-form">
+
+                        <input
+                            type="number"
+                            name="throws[{{ $hole->id }}]"
+                            min="1"
+                            max="100"
+                            value="{{ $holeResult?->throws }}"
+                            placeholder="Metieni"
+                        >
+
+                    </div>
+
+                </div>
+
+            @endforeach
+
+        </div>
+
+        <button type="submit" class="button save-all-results">
+            Saglabāt visus rezultātus
+        </button>
+
+    </form>
+</div>
+
+@endauth
+
+
+        <hr class="divider">
+
+
+        {{-- ======================================
              REZULTĀTI
         ====================================== --}}
 
@@ -401,7 +501,7 @@
             </div>
 
             <span class="badge">
-                {{ $competition->results->count() }}
+                {{ $competition->users->count() }}
             </span>
 
         </div>
@@ -413,23 +513,6 @@
                 $competition->users->groupBy('pivot.division')
                 as $division => $players
             )
-
-                @php
-
-                    $divisionPlayers = $players->sortBy(
-                        function ($player) use ($competition) {
-
-                            $result = $competition->results
-                                ->firstWhere('user_id', $player->id);
-
-                            return $result
-                                ? $result->score
-                                : PHP_INT_MAX;
-                        }
-                    );
-
-                @endphp
-
 
                 <div class="results-division">
 
@@ -452,12 +535,14 @@
 
                     <div class="results-list">
 
-                        @foreach($divisionPlayers as $player)
+                        @foreach($players as $player)
 
                             @php
 
-                                $result = $competition->results
-                                    ->firstWhere('user_id', $player->id);
+                                $playerHoleResults = $competition->holeResults
+                                    ->where('user_id', $player->id);
+
+                                $playerTotal = $playerHoleResults->sum('throws');
 
                             @endphp
 
@@ -465,13 +550,7 @@
                             <div class="result-row">
 
                                 <div class="result-place">
-
-                                    @if($result)
-                                        {{ $loop->iteration }}.
-                                    @else
-                                        -
-                                    @endif
-
+                                    {{ $loop->iteration }}.
                                 </div>
 
 
@@ -503,10 +582,10 @@
 
                                 <div class="result-score">
 
-                                    @if($result)
+                                    @if($playerHoleResults->count() > 0)
 
                                         <strong>
-                                            {{ $result->score }}
+                                            {{ $playerTotal }}
                                         </strong>
 
                                         <span>
@@ -547,100 +626,12 @@
                 </h3>
 
                 <p>
-                    Rezultāti parādīsies, kad spēlētāji tos iesniegs.
+                    Rezultāti parādīsies, kad spēlētāji sāks ievadīt savus rezultātus.
                 </p>
 
             </div>
 
         @endif
-
-
-        {{-- ======================================
-             MANS REZULTĀTS
-        ====================================== --}}
-
-        @auth
-
-            @if(
-                $competition->users->contains(auth()->id())
-                &&
-                $competition->user_id !== auth()->id()
-            )
-
-                @php
-
-                    $myResult = $competition->results
-                        ->firstWhere('user_id', auth()->id());
-
-                @endphp
-
-
-                <div class="result-form-section">
-
-                    <h3>
-                        Mans rezultāts
-                    </h3>
-
-                    <p>
-                        Ievadi savu kopējo metienu skaitu.
-                    </p>
-
-
-                    <form
-                        method="POST"
-                        action="{{ route(
-                            'competitions.results.store',
-                            $competition
-                        ) }}"
-                    >
-
-                        @csrf
-
-                        <label for="score">
-                            Metienu skaits
-                        </label>
-
-                        <input
-                            type="number"
-                            id="score"
-                            name="score"
-                            min="1"
-                            max="1000"
-                            value="{{ $myResult?->score }}"
-                            placeholder="Piemēram, 54"
-                            required
-                        >
-
-
-                        @error('score')
-
-                            <div class="error">
-                                {{ $message }}
-                            </div>
-
-                        @enderror
-
-
-                        <button
-                            type="submit"
-                            class="button"
-                        >
-
-                            @if($myResult)
-                                Atjaunināt rezultātu
-                            @else
-                                Iesniegt rezultātu
-                            @endif
-
-                        </button>
-
-                    </form>
-
-                </div>
-
-            @endif
-
-        @endauth
 
 
         <hr class="divider">
@@ -653,8 +644,6 @@
         <div class="competition-actions">
 
             @auth
-
-                {{-- Veidotājs nevar izstāties no savām sacensībām --}}
 
                 @if($competition->user_id === auth()->id())
 
