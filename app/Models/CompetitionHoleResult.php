@@ -10,21 +10,25 @@ class CompetitionHoleResult extends Model
         'competition_id',
         'user_id',
         'course_hole_id',
-        'throws',
+        'score',
     ];
 
+    protected $casts = [
+        'competition_id' => 'integer',
+        'user_id' => 'integer',
+        'course_hole_id' => 'integer',
+        'score' => 'integer',
+    ];
 
     public function competition()
     {
         return $this->belongsTo(Competition::class);
     }
 
-
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-
 
     public function courseHole()
     {

@@ -10,6 +10,10 @@ use App\Models\Course;
 
 class CompetitionController extends Controller
 {
+    // =========================
+    // SACENSĪBU SARAKSTS
+    // =========================
+
     public function index()
     {
         $competitions = Competition::latest()->get();
@@ -17,12 +21,18 @@ class CompetitionController extends Controller
         return view('competitions.index', compact('competitions'));
     }
 
+
+    // =========================
+    // SACENSĪBU IZVEIDE
+    // =========================
+
     public function create()
     {
         $courses = Course::orderBy('name')->get();
 
         return view('competitions.create', compact('courses'));
     }
+
 
     public function store(Request $request)
     {
@@ -53,6 +63,11 @@ class CompetitionController extends Controller
             ->with('success', 'Sacensības veiksmīgi izveidotas!');
     }
 
+
+    // =========================
+    // VIENAS SACENSĪBAS
+    // =========================
+
     public function show(Competition $competition)
     {
         $competition->load([
@@ -67,6 +82,11 @@ class CompetitionController extends Controller
         return view('competitions.show', compact('competition'));
     }
 
+
+    // =========================
+    // SACENSĪBU REDIĢĒŠANA
+    // =========================
+
     public function edit(Competition $competition)
     {
         if ($competition->user_id !== auth()->id()) {
@@ -76,8 +96,11 @@ class CompetitionController extends Controller
         return view('competitions.edit', compact('competition'));
     }
 
-    public function update(Request $request, Competition $competition)
-    {
+
+    public function update(
+        Request $request,
+        Competition $competition
+    ) {
         if ($competition->user_id !== auth()->id()) {
             abort(403, 'Tev nav tiesību rediģēt šīs sacensības.');
         }
@@ -98,13 +121,17 @@ class CompetitionController extends Controller
             'location' => $request->location,
             'max_players' => $request->max_players,
             'status' => $request->status,
-            'max_players' => $request->max_players,
         ]);
 
         return redirect()
             ->route('competitions.show', $competition)
             ->with('success', 'Sacensības veiksmīgi atjauninātas!');
     }
+
+
+    // =========================
+    // SACENSĪBU DZĒŠANA
+    // =========================
 
     public function destroy(Competition $competition)
     {
@@ -118,6 +145,11 @@ class CompetitionController extends Controller
             ->route('competitions.index')
             ->with('success', 'Sacensības izdzēstas!');
     }
+
+
+    // =========================
+    // PIEVIENOŠANĀS SACENSĪBĀM
+    // =========================
 
     public function join(Competition $competition)
     {
@@ -139,16 +171,23 @@ class CompetitionController extends Controller
         ));
     }
 
-    public function storeJoin(Request $request, Competition $competition)
-    {
+
+    public function storeJoin(
+        Request $request,
+        Competition $competition
+    ) {
         $rating = auth()->user()->rating;
 
         $divisions = $this->getAvailableDivisions($rating);
 
         $request->validate([
-            'division' => 'required|in:' . implode(',', array_keys($divisions)),
+            'division' => 'required|in:' . implode(
+                ',',
+                array_keys($divisions)
+            ),
         ]);
 
+        // Pārbauda, vai jau pieteicies
         if (
             $competition->users()
                 ->where('user_id', auth()->id())
@@ -160,6 +199,7 @@ class CompetitionController extends Controller
             );
         }
 
+        // Pārbauda maksimālo spēlētāju skaitu
         if (
             $competition->max_players &&
             $competition->users()->count() >= $competition->max_players
@@ -170,6 +210,7 @@ class CompetitionController extends Controller
             );
         }
 
+        // Pievieno spēlētāju
         $competition->users()->attach(auth()->id(), [
             'division' => $request->division,
         ]);
@@ -181,6 +222,7 @@ class CompetitionController extends Controller
                 'Tu veiksmīgi pieteicies sacensībām!'
             );
     }
+
 
     private function getAvailableDivisions($rating)
     {
@@ -203,6 +245,11 @@ class CompetitionController extends Controller
         return $divisions;
     }
 
+
+    // =========================
+    // IZSTĀŠANĀS
+    // =========================
+
     public function leave(Competition $competition)
     {
         if ($competition->user_id === auth()->id()) {
@@ -214,10 +261,12 @@ class CompetitionController extends Controller
 
         $competition->users()->detach(auth()->id());
 
+        // Vecais kopējais rezultāts
         CompetitionResult::where('competition_id', $competition->id)
             ->where('user_id', auth()->id())
             ->delete();
 
+        // Rezultāti pa groziem
         CompetitionHoleResult::where('competition_id', $competition->id)
             ->where('user_id', auth()->id())
             ->delete();
@@ -228,8 +277,95 @@ class CompetitionController extends Controller
         );
     }
 
-    public function storeHoleResults(Request $request, Competition $competition)
-    {
+
+    // =========================
+    // METRIX VEIDA SCORECARD
+    // =========================
+
+    public function scorecard(
+        Request $request,
+        Competition $competition
+    ) {
+        // Pārbauda, vai lietotājs ir sacensību dalībnieks
+        if (
+            !$competition->users()
+                ->where('user_id', auth()->id())
+                ->exists()
+        ) {
+            abort(
+                403,
+                'Tev nav tiesību ievadīt rezultātus šajās sacensībās.'
+            );
+        }
+
+        // Ielādē trasi un visus grozus
+        $competition->load([
+            'course.courseHoles',
+            'users',
+        ]);
+
+        if (!$competition->course) {
+            abort(
+                400,
+                'Šīm sacensībām nav piesaistīta trase.'
+            );
+        }
+
+        $courseHoles = $competition->course->courseHoles;
+
+        if ($courseHoles->count() === 0) {
+            abort(
+                400,
+                'Šai trasei nav pievienoti grozi.'
+            );
+        }
+
+        // Pašreizējais grozs
+        $holeNumber = (int) $request->get('hole', 1);
+
+        if ($holeNumber < 1) {
+            $holeNumber = 1;
+        }
+
+        if ($holeNumber > $courseHoles->count()) {
+            $holeNumber = $courseHoles->count();
+        }
+
+        $currentHole = $courseHoles->firstWhere(
+            'hole_number',
+            $holeNumber
+        );
+
+        // Lietotāja rezultāti
+        $results = CompetitionHoleResult::where(
+            'competition_id',
+            $competition->id
+        )
+            ->where('user_id', auth()->id())
+            ->get()
+            ->keyBy('course_hole_id');
+
+        return view(
+            'competitions.scorecard',
+            compact(
+                'competition',
+                'courseHoles',
+                'results',
+                'currentHole'
+            )
+        );
+    }
+
+
+    // =========================
+    // VIENA GROZA REZULTĀTA SAGLABĀŠANA
+    // =========================
+
+    public function storeHoleResult(
+        Request $request,
+        Competition $competition
+    ) {
+        // Pārbauda, vai lietotājs ir dalībnieks
         if (
             !$competition->users()
                 ->where('user_id', auth()->id())
@@ -242,46 +378,63 @@ class CompetitionController extends Controller
         }
 
         $request->validate([
-            'throws' => 'required|array',
-            'throws.*' => 'nullable|integer|min:1|max:100',
+            'course_hole_id' => 'required|exists:course_holes,id',
+            'score' => 'required|integer|min:1|max:100',
         ]);
 
-        $competition->load('course.courseHoles');
+        // Pārbauda, vai grozs pieder konkrētās sacensības trasei
+        $courseHole = $competition->course
+            ->courseHoles()
+            ->where('id', $request->course_hole_id)
+            ->first();
 
-        if (!$competition->course) {
-            abort(400, 'Šīm sacensībām nav piesaistīta trase.');
-        }
-
-        foreach ($request->throws as $courseHoleId => $throws) {
-            if ($throws === null || $throws === '') {
-                continue;
-            }
-
-            $hole = $competition->course->courseHoles
-                ->where('id', $courseHoleId)
-                ->first();
-
-            if (!$hole) {
-                abort(403, 'Šis grozs nepieder sacensību trasei.');
-            }
-
-            CompetitionHoleResult::updateOrCreate(
-                [
-                    'competition_id' => $competition->id,
-                    'user_id' => auth()->id(),
-                    'course_hole_id' => $courseHoleId,
-                ],
-                [
-                    'throws' => $throws,
-                ]
+        if (!$courseHole) {
+            abort(
+                403,
+                'Šis grozs nepieder sacensību trasei.'
             );
         }
 
-        return back()->with(
-            'success',
-            'Visi rezultāti veiksmīgi saglabāti!'
+        // Saglabā vai atjaunina rezultātu
+        CompetitionHoleResult::updateOrCreate(
+            [
+                'competition_id' => $competition->id,
+                'user_id' => auth()->id(),
+                'course_hole_id' => $courseHole->id,
+            ],
+            [
+                'score' => $request->score,
+            ]
         );
+
+        // Nākamais grozs
+        $nextHole = $courseHole->hole_number + 1;
+
+        if (
+            $nextHole >
+            $competition->course->courseHoles()->count()
+        ) {
+            $nextHole = $courseHole->hole_number;
+        }
+
+        return redirect()
+            ->route(
+                'competitions.scorecard',
+                [
+                    'competition' => $competition,
+                    'hole' => $nextHole,
+                ]
+            )
+            ->with(
+                'success',
+                'Rezultāts saglabāts!'
+            );
     }
+
+
+    // =========================
+    // LATVIJAS TRASĒS
+    // =========================
 
     private function getLatvianCourses()
     {
@@ -341,4 +494,3 @@ class CompetitionController extends Controller
         ];
     }
 }
-

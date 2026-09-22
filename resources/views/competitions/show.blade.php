@@ -382,99 +382,111 @@
 
 
         {{-- ======================================
-             MANS REZULTĀTS PA GROZIEM
-        ====================================== --}}
+     MANS REZULTĀTS
+====================================== --}}
 
-        @auth
+@auth
 
-@php
-    $myHoleResults = $competition->holeResults
-        ->where('user_id', auth()->id())
-        ->keyBy('course_hole_id');
+    @if($competition->users->contains(auth()->id()))
 
-    $totalThrows = $myHoleResults->sum('throws');
-    $totalPar = $competition->course->courseHoles->sum('par');
-    $holesPlayed = $myHoleResults->count();
-    $scoreToPar = $totalThrows - $totalPar;
-@endphp
+        @php
+            $myHoleResults = $competition->holeResults
+                ->where('user_id', auth()->id());
 
-<div class="card">
-    <h2>Mans rezultāts</h2>
+            $totalThrows = $myHoleResults->sum('score');
+            $holesPlayed = $myHoleResults->count();
+            $totalPar = $competition->course->courseHoles->sum('par');
 
-    <div class="my-score-summary">
-        <div class="score-summary-card">
-            <span>Izspēlēti grozi</span>
-            <strong>
-                {{ $holesPlayed }} / {{ $competition->course->courseHoles->count() }}
-            </strong>
-        </div>
+            $scoreToPar = $totalThrows - $totalPar;
+        @endphp
 
-        <div class="score-summary-card">
-            <span>Kopā metieni</span>
-            <strong>{{ $totalThrows }}</strong>
-        </div>
+        <div class="card">
 
-        <div class="score-summary-card">
-            <span>PAR</span>
-            <strong>
-                {{ $scoreToPar > 0 ? '+' . $scoreToPar : $scoreToPar }}
-            </strong>
-        </div>
-    </div>
+            <div class="section-title-wrapper">
 
-    <form method="POST"
-          action="{{ route('competitions.hole-results.store', $competition) }}">
+                <div>
+                    <span class="section-label">
+                        MANS REZULTĀTS
+                    </span>
 
-        @csrf
+                    <h2>
+                        Rezultātu ievade
+                    </h2>
+                </div>
 
-        <div class="holes-list">
+            </div>
 
-            @foreach(
-                $competition->course->courseHoles->sortBy('hole_number')
-                as $hole
-            )
 
-                @php
-                    $holeResult = $myHoleResults->get($hole->id);
-                @endphp
+            <div class="my-score-summary">
 
-                <div class="hole-result-card">
+                <div class="score-summary-card">
 
-                    <div class="hole-number">
-                        <span>GROZS</span>
-                        <strong>{{ $hole->hole_number }}</strong>
-                    </div>
+                    <span>
+                        Izspēlēti grozi
+                    </span>
 
-                    <div class="hole-par">
-                        <span>PAR</span>
-                        <strong>{{ $hole->par }}</strong>
-                    </div>
-
-                    <div class="hole-result-form">
-
-                        <input
-                            type="number"
-                            name="throws[{{ $hole->id }}]"
-                            min="1"
-                            max="100"
-                            value="{{ $holeResult?->throws }}"
-                            placeholder="Metieni"
-                        >
-
-                    </div>
+                    <strong>
+                        {{ $holesPlayed }}
+                        /
+                        {{ $competition->course->courseHoles->count() }}
+                    </strong>
 
                 </div>
 
-            @endforeach
+
+                <div class="score-summary-card">
+
+                    <span>
+                        Metieni
+                    </span>
+
+                    <strong>
+                        {{ $totalThrows }}
+                    </strong>
+
+                </div>
+
+
+                <div class="score-summary-card">
+
+                    <span>
+                        Pret PAR
+                    </span>
+
+                    <strong>
+
+                        @if($scoreToPar > 0)
+                            +{{ $scoreToPar }}
+                        @elseif($scoreToPar < 0)
+                            {{ $scoreToPar }}
+                        @else
+                            0
+                        @endif
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div style="margin-top: 20px;">
+
+                <a
+                    href="{{ route(
+                        'competitions.scorecard',
+                        $competition
+                    ) }}"
+                    class="button"
+                >
+                    Ievadīt / labot rezultātu
+                </a>
+
+            </div>
 
         </div>
 
-        <button type="submit" class="button save-all-results">
-            Saglabāt visus rezultātus
-        </button>
-
-    </form>
-</div>
+    @endif
 
 @endauth
 

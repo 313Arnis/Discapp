@@ -37,8 +37,7 @@ class CourseSeeder extends Seeder
                 'name' => $course,
                 'holes' => 18,
 
-                // Pagaidām tukšas vērtības.
-                // Tās aizpildīsim ar Metrix datiem.
+                
                 'rating_1000_score' => 0,
                 'rating_per_throw' => 0,
             ]);
