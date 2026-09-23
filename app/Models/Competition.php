@@ -17,12 +17,15 @@ class Competition extends Model
         'course_id',
     ];
 
+    protected $casts = [
+        'date' => 'date',
+        'max_players' => 'integer',
+    ];
 
     public function creator()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-
 
     public function users()
     {
@@ -31,18 +34,15 @@ class Competition extends Model
             ->withTimestamps();
     }
 
-
     public function results()
     {
         return $this->hasMany(CompetitionResult::class);
     }
 
-
     public function course()
     {
         return $this->belongsTo(Course::class);
     }
-
 
     public function holeResults()
     {

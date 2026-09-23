@@ -38,78 +38,145 @@ Route::post('/logout', [AuthController::class, 'logout'])
 
 
 // =====================================================
-// SACENSĪBAS — PUBLISKIE MARŠRUTI
+// SACENSĪBU SARAKSTS
 // =====================================================
 
-Route::get('/competitions', [CompetitionController::class, 'index'])
-    ->name('competitions.index');
+Route::get('/competitions', [
+    CompetitionController::class,
+    'index'
+])->name('competitions.index');
 
 
 // =====================================================
-// IESLOGOTI LIETOTĀJI (AUTH)
+// IESLOGOTI LIETOTĀJI
 // =====================================================
 
 Route::middleware('auth')->group(function () {
 
-    // SACENSĪBU IZVEIDE (Obligāti jābūt PIRMS /competitions/{competition})
-    Route::get('/competitions/create', [CompetitionController::class, 'create'])
-        ->name('competitions.create');
+    // -------------------------------------------------
+    // SACENSĪBU IZVEIDE
+    // -------------------------------------------------
 
-    Route::post('/competitions', [CompetitionController::class, 'store'])
-        ->name('competitions.store');
+    Route::get('/competitions/create', [
+        CompetitionController::class,
+        'create'
+    ])->name('competitions.create');
 
-    // PIEVIENOŠANĀS UN IZSTĀŠANĀS
-    Route::get('/competitions/{competition}/join', [CompetitionController::class, 'join'])
-        ->name('competitions.join');
+    Route::post('/competitions', [
+        CompetitionController::class,
+        'store'
+    ])->name('competitions.store');
 
-    Route::post('/competitions/{competition}/join', [CompetitionController::class, 'storeJoin'])
-        ->name('competitions.join.store');
 
-    Route::post('/competitions/{competition}/leave', [CompetitionController::class, 'leave'])
-        ->name('competitions.leave');
+    // -------------------------------------------------
+    // PIEVIENOŠANĀS
+    // -------------------------------------------------
 
-    // REDIĢĒŠANA UN DZĒŠANA
-    Route::get('/competitions/{competition}/edit', [CompetitionController::class, 'edit'])
-        ->name('competitions.edit');
+    Route::get('/competitions/{competition}/join', [
+        CompetitionController::class,
+        'join'
+    ])->name('competitions.join');
 
-    Route::put('/competitions/{competition}', [CompetitionController::class, 'update'])
-        ->name('competitions.update');
+    Route::post('/competitions/{competition}/join', [
+        CompetitionController::class,
+        'storeJoin'
+    ])->name('competitions.join.store');
 
-    Route::delete('/competitions/{competition}', [CompetitionController::class, 'destroy'])
-        ->name('competitions.destroy');
 
+    // -------------------------------------------------
+    // IZSTĀŠANĀS
+    // -------------------------------------------------
+
+    Route::post('/competitions/{competition}/leave', [
+        CompetitionController::class,
+        'leave'
+    ])->name('competitions.leave');
+
+
+    // -------------------------------------------------
+    // REDIĢĒŠANA
+    // -------------------------------------------------
+
+    Route::get('/competitions/{competition}/edit', [
+        CompetitionController::class,
+        'edit'
+    ])->name('competitions.edit');
+
+    Route::put('/competitions/{competition}', [
+        CompetitionController::class,
+        'update'
+    ])->name('competitions.update');
+
+
+    // -------------------------------------------------
+    // DZĒŠANA
+    // -------------------------------------------------
+
+    Route::delete('/competitions/{competition}', [
+        CompetitionController::class,
+        'destroy'
+    ])->name('competitions.destroy');
+
+
+    // -------------------------------------------------
     // SCORECARD
-    Route::get('/competitions/{competition}/scorecard', [CompetitionController::class, 'scorecard'])
-        ->name('competitions.scorecard');
+    // -------------------------------------------------
 
-    Route::post('/competitions/{competition}/scorecard', [CompetitionController::class, 'storeHoleResult'])
-        ->name('competitions.scorecard.store');
+    Route::get('/competitions/{competition}/scorecard', [
+        CompetitionController::class,
+        'scorecard'
+    ])->name('competitions.scorecard');
 
+    Route::post('/competitions/{competition}/scorecard', [
+        CompetitionController::class,
+        'storeHoleResult'
+    ])->name('competitions.scorecard.store');
+
+
+    // -------------------------------------------------
     // PROFILS
-    Route::get('/profile', [ProfileController::class, 'index'])
-        ->name('profile');
+    // -------------------------------------------------
 
+    Route::get('/profile', [
+        ProfileController::class,
+        'index'
+    ])->name('profile');
+
+
+    // -------------------------------------------------
     // DISKI
-    Route::get('/profile/discs', [DiscController::class, 'index'])
-        ->name('profile.discs.index');
+    // -------------------------------------------------
 
-    Route::get('/profile/discs/create', [DiscController::class, 'create'])
-        ->name('profile.discs.create');
+    Route::get('/profile/discs', [
+        DiscController::class,
+        'index'
+    ])->name('profile.discs.index');
 
-    Route::post('/profile/discs', [DiscController::class, 'store'])
-        ->name('profile.discs.store');
+    Route::get('/profile/discs/create', [
+        DiscController::class,
+        'create'
+    ])->name('profile.discs.create');
 
-    Route::delete('/profile/discs/{disc}', [DiscController::class, 'destroy'])
-        ->name('profile.discs.destroy');
+    Route::post('/profile/discs', [
+        DiscController::class,
+        'store'
+    ])->name('profile.discs.store');
+
+    Route::delete('/profile/discs/{disc}', [
+        DiscController::class,
+        'destroy'
+    ])->name('profile.discs.destroy');
 });
 
 
 // =====================================================
-// SACENSĪBU SKATĪŠANA (JĀBŪT ZEM /competitions/create)
+// VIENAS SACENSĪBAS
 // =====================================================
 
-Route::get('/competitions/{competition}', [CompetitionController::class, 'show'])
-    ->name('competitions.show');
+Route::get('/competitions/{competition}', [
+    CompetitionController::class,
+    'show'
+])->name('competitions.show');
 
 
 // =====================================================
@@ -118,35 +185,63 @@ Route::get('/competitions/{competition}', [CompetitionController::class, 'show']
 
 Route::middleware(['auth', 'admin'])->group(function () {
 
-    Route::get('/admin', [AdminController::class, 'index'])
-        ->name('admin');
+    Route::get('/admin', [
+        AdminController::class,
+        'index'
+    ])->name('admin');
 
+
+    // -------------------------------------------------
     // LIETOTĀJI
-    Route::get('/admin/users', [AdminController::class, 'users'])
-        ->name('admin.users');
+    // -------------------------------------------------
 
-    Route::put('/admin/users/{user}', [AdminController::class, 'updateUser'])
-        ->name('admin.users.update');
+    Route::get('/admin/users', [
+        AdminController::class,
+        'users'
+    ])->name('admin.users');
 
-    Route::delete('/admin/users/{user}', [AdminController::class, 'destroyUser'])
-        ->name('admin.users.destroy');
+    Route::put('/admin/users/{user}', [
+        AdminController::class,
+        'updateUser'
+    ])->name('admin.users.update');
 
+    Route::delete('/admin/users/{user}', [
+        AdminController::class,
+        'destroyUser'
+    ])->name('admin.users.destroy');
+
+
+    // -------------------------------------------------
     // TRASES
-    Route::get('/courses', [CourseController::class, 'index'])
-        ->name('courses.index');
+    // -------------------------------------------------
 
-    Route::get('/courses/create', [CourseController::class, 'create'])
-        ->name('courses.create');
+    Route::get('/courses', [
+        CourseController::class,
+        'index'
+    ])->name('courses.index');
 
-    Route::post('/courses', [CourseController::class, 'store'])
-        ->name('courses.store');
+    Route::get('/courses/create', [
+        CourseController::class,
+        'create'
+    ])->name('courses.create');
 
-    Route::get('/courses/{course}/edit', [CourseController::class, 'edit'])
-        ->name('courses.edit');
+    Route::post('/courses', [
+        CourseController::class,
+        'store'
+    ])->name('courses.store');
 
-    Route::put('/courses/{course}', [CourseController::class, 'update'])
-        ->name('courses.update');
+    Route::get('/courses/{course}/edit', [
+        CourseController::class,
+        'edit'
+    ])->name('courses.edit');
 
-    Route::delete('/courses/{course}', [CourseController::class, 'destroy'])
-        ->name('courses.destroy');
+    Route::put('/courses/{course}', [
+        CourseController::class,
+        'update'
+    ])->name('courses.update');
+
+    Route::delete('/courses/{course}', [
+        CourseController::class,
+        'destroy'
+    ])->name('courses.destroy');
 });

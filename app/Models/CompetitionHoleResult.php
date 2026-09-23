@@ -10,14 +10,14 @@ class CompetitionHoleResult extends Model
         'competition_id',
         'user_id',
         'course_hole_id',
-        'score',
+        'throws',
     ];
 
     protected $casts = [
         'competition_id' => 'integer',
         'user_id' => 'integer',
         'course_hole_id' => 'integer',
-        'score' => 'integer',
+        'throws' => 'integer',
     ];
 
     public function competition()

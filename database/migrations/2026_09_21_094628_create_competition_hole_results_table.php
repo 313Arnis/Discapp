@@ -9,6 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('competition_hole_results', function (Blueprint $table) {
+
             $table->id();
 
             $table->foreignId('competition_id')
@@ -27,9 +28,12 @@ return new class extends Migration
 
             $table->timestamps();
 
-            // Viens rezultāts katram spēlētājam uz katru grozu konkrētajās sacensībās
             $table->unique(
-                ['competition_id', 'user_id', 'course_hole_id'],
+                [
+                    'competition_id',
+                    'user_id',
+                    'course_hole_id'
+                ],
                 'chr_comp_user_hole_unique'
             );
         });
@@ -37,6 +41,8 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('competition_hole_results');
+        Schema::dropIfExists(
+            'competition_hole_results'
+        );
     }
 };
