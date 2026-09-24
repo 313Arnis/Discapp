@@ -185,6 +185,10 @@ Route::get('/competitions/{competition}', [
 
 Route::middleware(['auth', 'admin'])->group(function () {
 
+    // -------------------------------------------------
+    // ADMIN SĀKUMLAPA
+    // -------------------------------------------------
+
     Route::get('/admin', [
         AdminController::class,
         'index'

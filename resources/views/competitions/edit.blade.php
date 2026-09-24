@@ -27,6 +27,7 @@
     </div>
 
     @auth
+
         <div class="nav-auth">
 
             <span>
@@ -42,6 +43,7 @@
             </form>
 
         </div>
+
     @endauth
 
 </nav>
@@ -51,12 +53,17 @@
 
     <h1>Rediģēt sacensības</h1>
 
+
     @if($errors->any())
 
         <div class="error">
 
             @foreach($errors->all() as $error)
-                <p>{{ $error }}</p>
+
+                <p>
+                    {{ $error }}
+                </p>
+
             @endforeach
 
         </div>
@@ -73,6 +80,8 @@
         @method('PUT')
 
 
+        {{-- SACENSĪBU NOSAUKUMS --}}
+
         <label for="name">
             Sacensību nosaukums
         </label>
@@ -86,6 +95,8 @@
         >
 
 
+        {{-- APRAKSTS --}}
+
         <label for="description">
             Apraksts
         </label>
@@ -96,6 +107,8 @@
         >{{ old('description', $competition->description) }}</textarea>
 
 
+        {{-- DATUMS --}}
+
         <label for="date">
             Datums
         </label>
@@ -104,23 +117,48 @@
             type="date"
             id="date"
             name="date"
-            value="{{ old('date', $competition->date) }}"
+            value="{{ old(
+                'date',
+                $competition->date?->format('Y-m-d')
+            ) }}"
             required
         >
 
 
-        <label for="location">
-            Vieta
+        {{-- TRASE --}}
+
+        <label for="course_id">
+            Trase
         </label>
 
-        <input
-            type="text"
-            id="location"
-            name="location"
-            value="{{ old('location', $competition->location) }}"
+        <select
+            id="course_id"
+            name="course_id"
             required
         >
 
+            <option value="">
+                -- Izvēlies trasi --
+            </option>
+
+            @foreach($courses as $course)
+
+                <option
+                    value="{{ $course->id }}"
+                    {{ old(
+                        'course_id',
+                        $competition->course_id
+                    ) == $course->id ? 'selected' : '' }}
+                >
+                    {{ $course->name }}
+                </option>
+
+            @endforeach
+
+        </select>
+
+
+        {{-- MAKSIMĀLAIS SPĒLĒTĀJU SKAITS --}}
 
         <label for="max_players">
             Maksimālais spēlētāju skaits
@@ -130,10 +168,15 @@
             type="number"
             id="max_players"
             name="max_players"
-            value="{{ old('max_players', $competition->max_players) }}"
+            value="{{ old(
+                'max_players',
+                $competition->max_players
+            ) }}"
             min="1"
         >
 
+
+        {{-- STATUSS --}}
 
         <label for="status">
             Statuss
@@ -144,20 +187,47 @@
             name="status"
             required
         >
-            <option value="planned"
-                {{ old('status', $competition->status ?? 'planned') == 'planned' ? 'selected' : '' }}>
+
+            <option
+                value="planned"
+                {{ old(
+                    'status',
+                    $competition->status
+                ) === 'planned' ? 'selected' : '' }}
+            >
                 Plānotas
             </option>
 
-            <option value="active"
-                {{ old('status', $competition->status ?? '') == 'active' ? 'selected' : '' }}>
+            <option
+                value="active"
+                {{ old(
+                    'status',
+                    $competition->status
+                ) === 'active' ? 'selected' : '' }}
+            >
                 Aktīvas
             </option>
 
-            <option value="finished"
-                {{ old('status', $competition->status ?? '') == 'finished' ? 'selected' : '' }}>
+            <option
+                value="finished"
+                {{ old(
+                    'status',
+                    $competition->status
+                ) === 'finished' ? 'selected' : '' }}
+            >
                 Pabeigtas
             </option>
+
+            <option
+                value="cancelled"
+                {{ old(
+                    'status',
+                    $competition->status
+                ) === 'cancelled' ? 'selected' : '' }}
+            >
+                Atceltas
+            </option>
+
         </select>
 
 
@@ -174,6 +244,7 @@
     >
         Atcelt
     </a>
+
 
 </main>
 

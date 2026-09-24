@@ -10,8 +10,7 @@ return new class extends Migration
     {
         Schema::table('competitions', function (Blueprint $table) {
             $table->unsignedBigInteger('course_id')
-                ->nullable()
-                ->after('location');
+                ->nullable();
 
             $table->foreign('course_id')
                 ->references('id')
