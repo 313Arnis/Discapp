@@ -206,10 +206,6 @@
         </div>
 
 
-        {{-- ======================================
-             VIETU AIZPILDĪJUMS
-        ====================================== --}}
-
         @if($competition->max_players)
 
             <div class="capacity-section">
@@ -275,7 +271,7 @@
                 @foreach(
                     $competition->users->groupBy(
                         fn($player) => $player->pivot->division ?? 'Bez divīzijas'
-                    ) as $division => $players
+                    ) as $division => $divisionPlayers
                 )
 
                     <div class="division-group">
@@ -296,9 +292,9 @@
 
                             <span class="division-count">
 
-                                {{ $players->count() }}
+                                {{ $divisionPlayers->count() }}
 
-                                @if($players->count() === 1)
+                                @if($divisionPlayers->count() === 1)
                                     spēlētājs
                                 @else
                                     spēlētāji
@@ -311,16 +307,12 @@
 
                         <div class="participants-grid">
 
-                            @foreach($players as $player)
+                            @foreach($divisionPlayers as $player)
 
                                 <div class="participant-card">
 
                                     <div class="participant-avatar">
-
-                                        {{ strtoupper(
-                                            substr($player->name ?? '?', 0, 1)
-                                        ) }}
-
+                                        {{ strtoupper(substr($player->name ?? '?', 0, 1)) }}
                                     </div>
 
                                     <div class="participant-info">
@@ -439,9 +431,7 @@
                             </span>
 
                             <strong>
-                                {{ $holesPlayed }}
-                                /
-                                {{ $totalHoles }}
+                                {{ $holesPlayed }}/{{ $totalHoles }}
                             </strong>
 
                         </div>
@@ -574,36 +564,56 @@
 
             @else
 
+                @php
+
+                    $courseHoles = $competition->course?->courseHoles
+                        ?->sortBy('hole_number')
+                        ?->values() ?? collect();
+
+                    $coursePar = $courseHoles->sum('par');
+
+                    $previousRelative = null;
+                    $previousPosition = 0;
+
+                @endphp
+
+
                 <div class="results-table-wrapper">
 
-                    <table class="results-table">
+                    <table class="metrix-table">
+
+                        {{-- GALVENE --}}
 
                         <thead>
 
                             <tr>
 
-                                <th>
-                                    Vieta
+                                <th class="col-position">
+                                    No
                                 </th>
 
-                                <th>
+                                <th class="col-name">
                                     Spēlētājs
                                 </th>
 
-                                <th>
-                                    Divīzija
+                                <th class="col-relative">
+                                    +/-
                                 </th>
 
-                                <th>
-                                    Grozi
+                                @foreach($courseHoles as $hole)
+
+                                    <th class="hole-heading">
+                                        {{ $hole->hole_number }}
+                                    </th>
+
+                                @endforeach
+
+                                <th class="col-relative">
+                                    +/-
                                 </th>
 
-                                <th>
-                                    Metieni
-                                </th>
-
-                                <th>
-                                    Pret PAR
+                                <th class="col-sum">
+                                    Sum
                                 </th>
 
                             </tr>
@@ -613,110 +623,266 @@
 
                         <tbody>
 
+                            {{-- PAR RINDA --}}
+
+                            <tr class="par-row">
+
+                                <td></td>
+
+                                <td class="par-title">
+                                    PAR
+                                </td>
+
+                                <td></td>
+
+                                @foreach($courseHoles as $hole)
+
+                                    <td class="par-cell">
+                                        {{ $hole->par }}
+                                    </td>
+
+                                @endforeach
+
+                                <td></td>
+
+                                <td class="par-total">
+                                    {{ $coursePar }}
+                                </td>
+
+                            </tr>
+
+
+                            {{-- SPĒLĒTĀJI --}}
+
                             @foreach($players as $index => $player)
 
                                 @php
+
                                     $playerUser = $player['user'] ?? null;
+
+                                    $playerResults = $playerUser
+                                        ? $competition->holeResults
+                                            ->where('user_id', $playerUser->id)
+                                        : collect();
+
+                                    $played = $playerResults->count();
+
+                                    $playerTotal = $playerResults->sum('score');
+
+                                    $playerPlayedPar = 0;
+
+                                    foreach($playerResults as $result) {
+
+                                        $resultHole = $courseHoles
+                                            ->firstWhere(
+                                                'id',
+                                                $result->course_hole_id
+                                            );
+
+                                        if($resultHole) {
+                                            $playerPlayedPar += $resultHole->par;
+                                        }
+                                    }
+
+                                    $playerRelative =
+                                        $playerTotal - $playerPlayedPar;
+
+
+                                    /*
+                                    |--------------------------------------------------------------------------
+                                    | VIETA AR NEIZŠĶIRTIEM REZULTĀTIEM
+                                    |--------------------------------------------------------------------------
+                                    */
+
+                                    if($played === 0) {
+
+                                        $displayPosition = '-';
+
+                                    } else {
+
+                                        if(
+                                            $previousRelative !== null &&
+                                            $previousRelative === $playerRelative
+                                        ) {
+
+                                            $displayPosition = $previousPosition;
+
+                                        } else {
+
+                                            $displayPosition = $index + 1;
+                                            $previousPosition = $displayPosition;
+
+                                        }
+
+                                        $previousRelative = $playerRelative;
+                                    }
+
                                 @endphp
+
 
                                 <tr>
 
                                     {{-- VIETA --}}
 
-                                    <td class="position">
-
-                                        {{ $index + 1 }}.
-
+                                    <td class="position-cell">
+                                        {{ $displayPosition }}
                                     </td>
 
 
                                     {{-- SPĒLĒTĀJS --}}
 
-                                    <td class="player">
+                                    <td class="player-name-cell">
 
-                                        @if($playerUser)
+                                        <strong>
+                                            {{ $playerUser?->name ?? 'Nezināms spēlētājs' }}
+                                        </strong>
 
-                                            <strong>
-                                                {{ $playerUser->name ?? 'Nezināms spēlētājs' }}
-                                            </strong>
+                                        @if(($player['division'] ?? null))
 
-                                        @else
-
-                                            <strong class="score-empty">
-                                                Nezināms spēlētājs
-                                            </strong>
+                                            <span class="player-division">
+                                                {{ $player['division'] }}
+                                            </span>
 
                                         @endif
 
                                     </td>
 
 
-                                    {{-- DIVĪZIJA --}}
+                                    {{-- +/- KREISAJĀ PUSĒ --}}
 
-                                    <td>
+                                    <td class="relative-cell">
 
-                                        <span class="division">
-                                            {{ $player['division'] ?? '-' }}
-                                        </span>
+                                        @if($played === 0)
+
+                                            -
+
+                                        @elseif($playerRelative > 0)
+
+                                            +{{ $playerRelative }}
+
+                                        @elseif($playerRelative < 0)
+
+                                            {{ $playerRelative }}
+
+                                        @else
+
+                                            E
+
+                                        @endif
 
                                     </td>
 
 
-                                    {{-- GROZI --}}
+                                    {{-- KATRS GROZS --}}
 
-                                    <td>
+                                    @foreach($courseHoles as $hole)
 
-                                        {{ $player['played'] ?? 0 }}
-                                        /
-                                        {{ $competition->course?->courseHoles?->count() ?? 0 }}
+                                        @php
+
+                                            $holeResult = $playerResults
+                                                ->firstWhere(
+                                                    'course_hole_id',
+                                                    $hole->id
+                                                );
+
+                                            $holeScore =
+                                                $holeResult?->score;
+
+                                            $difference =
+                                                $holeScore !== null
+                                                    ? $holeScore - $hole->par
+                                                    : null;
+
+
+                                            $scoreClass = '';
+
+                                            if($difference !== null) {
+
+                                                if($difference <= -2) {
+
+                                                    $scoreClass =
+                                                        'hole-double-under';
+
+                                                } elseif($difference === -1) {
+
+                                                    $scoreClass =
+                                                        'hole-under';
+
+                                                } elseif($difference === 0) {
+
+                                                    $scoreClass =
+                                                        'hole-par';
+
+                                                } elseif($difference === 1) {
+
+                                                    $scoreClass =
+                                                        'hole-over';
+
+                                                } else {
+
+                                                    $scoreClass =
+                                                        'hole-double-over';
+                                                }
+                                            }
+
+                                        @endphp
+
+
+                                        <td class="hole-score {{ $scoreClass }}">
+
+                                            @if($holeScore !== null)
+
+                                                {{ $holeScore }}
+
+                                            @else
+
+                                                <span class="no-score">
+                                                    -
+                                                </span>
+
+                                            @endif
+
+                                        </td>
+
+                                    @endforeach
+
+
+                                    {{-- +/- LABAJĀ PUSĒ --}}
+
+                                    <td class="relative-cell">
+
+                                        @if($played === 0)
+
+                                            -
+
+                                        @elseif($playerRelative > 0)
+
+                                            +{{ $playerRelative }}
+
+                                        @elseif($playerRelative < 0)
+
+                                            {{ $playerRelative }}
+
+                                        @else
+
+                                            E
+
+                                        @endif
 
                                     </td>
 
 
-                                    {{-- METIENI --}}
+                                    {{-- SUMMA --}}
 
-                                    <td class="total-score">
+                                    <td class="sum-cell">
 
-                                        @if(($player['played'] ?? 0) > 0)
+                                        @if($played > 0)
 
-                                            {{ $player['total_score'] ?? 0 }}
+                                            {{ $playerTotal }}
 
                                         @else
 
                                             -
-
-                                        @endif
-
-                                    </td>
-
-
-                                    {{-- PRET PAR --}}
-
-                                    <td class="relative">
-
-                                        @if(($player['played'] ?? 0) === 0)
-
-                                            <span class="score-empty">
-                                                -
-                                            </span>
-
-                                        @elseif(($player['relative'] ?? 0) < 0)
-
-                                            <span class="score-under">
-                                                {{ $player['relative'] }}
-                                            </span>
-
-                                        @elseif(($player['relative'] ?? 0) > 0)
-
-                                            <span class="score-over">
-                                                +{{ $player['relative'] }}
-                                            </span>
-
-                                        @else
-
-                                            <span class="score-even">
-                                                E
-                                            </span>
 
                                         @endif
 
@@ -875,11 +1041,17 @@
 
 <style>
 
+    /*
+    |--------------------------------------------------------------------------
+    | REZULTĀTU BLOKS
+    |--------------------------------------------------------------------------
+    */
+
     .competition-results {
         margin-top: 30px;
         background: #fff;
-        border: 1px solid #ddd;
-        border-radius: 6px;
+        border: 1px solid #dcdcdc;
+        border-radius: 8px;
         overflow: hidden;
     }
 
@@ -903,107 +1075,285 @@
     }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | HORIZONTĀLA SCROLLOŠANA
+    |--------------------------------------------------------------------------
+    */
+
     .results-table-wrapper {
         width: 100%;
         overflow-x: auto;
     }
 
 
-    .results-table {
+    /*
+    |--------------------------------------------------------------------------
+    | METRIX STILA TABULA
+    |--------------------------------------------------------------------------
+    */
+
+    .metrix-table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 650px;
+        min-width: 1150px;
+        background: white;
     }
 
 
-    .results-table th {
-        background: #f7f7f7;
-        color: #666;
-        font-size: 13px;
-        font-weight: 600;
-        text-align: left;
-        padding: 13px 15px;
-        border-bottom: 1px solid #ddd;
+    .metrix-table th,
+    .metrix-table td {
+        border-right: 1px solid #d9e0e0;
+        border-bottom: 1px solid #d9e0e0;
+        text-align: center;
+        padding: 0;
+        height: 42px;
+        font-size: 14px;
         white-space: nowrap;
     }
 
 
-    .results-table td {
-        padding: 15px;
-        border-bottom: 1px solid #eee;
-        font-size: 15px;
+    .metrix-table th:last-child,
+    .metrix-table td:last-child {
+        border-right: none;
     }
 
 
-    .results-table tbody tr:last-child td {
-        border-bottom: none;
-    }
+    /*
+    |--------------------------------------------------------------------------
+    | GALVENE
+    |--------------------------------------------------------------------------
+    */
 
-
-    .results-table tbody tr:hover {
+    .metrix-table thead th {
         background: #fafafa;
+        color: #111;
+        font-weight: 700;
+        padding: 10px 8px;
     }
 
 
-    .position {
-        width: 60px;
-        color: #777;
-        font-weight: bold;
+    .col-position {
+        width: 55px;
+        min-width: 55px;
     }
 
 
-    .player {
-        min-width: 160px;
+    .col-name {
+        min-width: 210px;
+        text-align: left !important;
+        padding-left: 12px !important;
     }
 
 
-    .player strong {
+    .col-relative {
+        min-width: 55px;
+    }
+
+
+    .col-sum {
+        min-width: 65px;
+    }
+
+
+    .hole-heading {
+        width: 45px;
+        min-width: 45px;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | PAR RINDA
+    |--------------------------------------------------------------------------
+    */
+
+    .par-row td {
+        background: #f8faf9;
+        font-weight: 500;
+        height: 40px;
+    }
+
+
+    .par-title {
+        text-align: right !important;
+        padding-right: 15px !important;
+        font-weight: 700 !important;
+    }
+
+
+    .par-cell {
+        font-weight: 600 !important;
+    }
+
+
+    .par-total {
+        font-weight: 700 !important;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | VIETA
+    |--------------------------------------------------------------------------
+    */
+
+    .position-cell {
+        font-weight: 700;
         color: #222;
     }
 
 
-    .division {
-        display: inline-block;
-        padding: 4px 8px;
-        background: #f1f1f1;
-        border-radius: 4px;
-        font-size: 12px;
-        font-weight: bold;
-        color: #555;
+    /*
+    |--------------------------------------------------------------------------
+    | SPĒLĒTĀJS
+    |--------------------------------------------------------------------------
+    */
+
+    .player-name-cell {
+        text-align: left !important;
+        min-width: 210px;
+        padding: 7px 12px !important;
     }
 
 
-    .total-score {
-        font-weight: bold;
-        font-size: 17px !important;
+    .player-name-cell strong {
+        display: block;
+        color: #111;
+        font-size: 14px;
     }
 
 
-    .relative {
-        font-weight: bold;
-        font-size: 16px !important;
+    .player-division {
+        display: block;
+        margin-top: 2px;
+        color: #888;
+        font-size: 10px;
+        font-weight: 600;
     }
 
 
-    .score-under {
-        color: #2e9d27;
+    /*
+    |--------------------------------------------------------------------------
+    | +/- UN SUMMA
+    |--------------------------------------------------------------------------
+    */
+
+    .relative-cell {
+        min-width: 55px;
+        font-weight: 700;
     }
 
 
-    .score-over {
-        color: #c0392b;
+    .sum-cell {
+        min-width: 65px;
+        font-weight: 700;
+        font-size: 15px !important;
     }
 
 
-    .score-even {
-        color: #555;
+    /*
+    |--------------------------------------------------------------------------
+    | GROZU REZULTĀTI
+    |--------------------------------------------------------------------------
+    */
+
+    .hole-score {
+        width: 45px;
+        min-width: 45px;
+        font-weight: 600;
+        position: relative;
     }
 
 
-    .score-empty {
-        color: #aaa;
+    /*
+    | Eagle vai labāk
+    */
+
+    .hole-double-under {
+        background: #83d96b;
+        color: #111;
     }
 
+
+    /*
+    | Birdie
+    */
+
+    .hole-under {
+        background: #b7eaa5;
+        color: #111;
+    }
+
+
+    /*
+    | Par
+    */
+
+    .hole-par {
+        background: #ffffff;
+        color: #111;
+    }
+
+
+    /*
+    | Bogey
+    */
+
+    .hole-over {
+        background: #f8ddd4;
+        color: #111;
+    }
+
+
+    /*
+    | Double bogey vai sliktāk
+    */
+
+    .hole-double-over {
+        background: #f3ae9c;
+        color: #111;
+    }
+
+
+    /*
+    | Sarkana līnija virs rezultāta, ja virs PAR
+    */
+
+    .hole-over::before,
+    .hole-double-over::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: #f04424;
+    }
+
+
+    .no-score {
+        color: #bbb;
+        font-weight: 400;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | HOVER
+    |--------------------------------------------------------------------------
+    */
+
+    .metrix-table tbody tr:not(.par-row):hover td {
+        filter: brightness(0.97);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | TUKŠI REZULTĀTI
+    |--------------------------------------------------------------------------
+    */
 
     .empty-results {
         padding: 30px 20px;
@@ -1012,15 +1362,35 @@
     }
 
 
-    @media (max-width: 600px) {
+    /*
+    |--------------------------------------------------------------------------
+    | MOBILĀ VERSIJA
+    |--------------------------------------------------------------------------
+    */
 
-        .results-table th,
-        .results-table td {
-            padding: 12px 10px;
-        }
+    @media (max-width: 900px) {
 
         .results-header {
             padding: 16px;
+        }
+
+
+        .metrix-table th,
+        .metrix-table td {
+            font-size: 12px;
+        }
+
+
+        .col-name,
+        .player-name-cell {
+            min-width: 160px;
+        }
+
+
+        .hole-heading,
+        .hole-score {
+            width: 38px;
+            min-width: 38px;
         }
 
     }

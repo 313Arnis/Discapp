@@ -162,6 +162,16 @@ Route::middleware('auth')->group(function () {
         'store'
     ])->name('profile.discs.store');
 
+    Route::get('/profile/discs/{disc}/edit', [
+        DiscController::class,
+        'edit'
+    ])->name('profile.discs.edit');
+
+    Route::put('/profile/discs/{disc}', [
+        DiscController::class,
+        'update'
+    ])->name('profile.discs.update');
+
     Route::delete('/profile/discs/{disc}', [
         DiscController::class,
         'destroy'

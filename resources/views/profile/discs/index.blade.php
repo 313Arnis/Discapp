@@ -43,8 +43,16 @@
             @foreach($discs as $disc)
 
                 <li>
+
                     <strong>{{ $disc->name }}</strong>
                     - {{ $disc->type }}
+
+                    <a
+                        href="{{ route('profile.discs.edit', $disc) }}"
+                        class="button"
+                    >
+                        Rediģēt
+                    </a>
 
                     <form
                         action="{{ route('profile.discs.destroy', $disc) }}"
@@ -61,6 +69,7 @@
                         </button>
 
                     </form>
+
                 </li>
 
             @endforeach

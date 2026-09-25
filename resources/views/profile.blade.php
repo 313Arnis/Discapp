@@ -97,7 +97,7 @@
             </span>
 
             <strong>
-                0
+                {{ $playedCompetitions }}
             </strong>
 
         </div>
@@ -110,7 +110,7 @@
             </span>
 
             <strong>
-                0
+                {{ $wins }}
             </strong>
 
         </div>
@@ -132,7 +132,6 @@
 
 
     <div class="profile-content">
-
 
         <!-- PAR SPĒLĒTĀJU -->
 
@@ -220,7 +219,6 @@
 
                         <div class="disc">
 
-
                             @if($disc->image)
 
                                 <img
@@ -257,7 +255,6 @@
 
 
                             <div class="flight-numbers">
-
 
                                 <div>
 
@@ -310,7 +307,6 @@
 
                                 </div>
 
-
                             </div>
 
                         </div>
@@ -318,7 +314,6 @@
                     @endforeach
 
                 </div>
-
 
             @else
 
