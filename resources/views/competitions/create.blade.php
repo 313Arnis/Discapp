@@ -1,170 +1,250 @@
 <!DOCTYPE html>
 <html lang="lv">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Jaunas sacensības</title>
+    <title>Izveidot sacensības - DiscGolf</title>
 
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 </head>
 
 <body>
 
+<nav>
+    <h2>
+        <a href="/">DiscGolf</a>
+    </h2>
+
+    <div>
+        <a href="/">Sākums</a>
+        <a href="{{ route('competitions.index') }}">Sacensības</a>
+        <a href="{{ route('profile') }}">Mans profils</a>
+    </div>
+</nav>
+
 <main>
 
-    <h1>Izveidot sacensības</h1>
+    <div class="card">
 
-    @if ($errors->any())
+        <h1>Izveidot sacensības</h1>
 
-        @foreach ($errors->all() as $error)
+        @if($errors->any())
+            <div class="error">
+                <ul>
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-            <p class="error">
-                {{ $error }}
-            </p>
-
-        @endforeach
-
-    @endif
-
-
-    <form method="POST" action="{{ route('competitions.store') }}">
-
-        @csrf
-
-
-        <label for="name">
-            Sacensību nosaukums
-        </label>
-
-        <input
-            type="text"
-            id="name"
-            name="name"
-            value="{{ old('name') }}"
-            placeholder="Sacensību nosaukums"
-            required
+        <form
+            method="POST"
+            action="{{ route('competitions.store') }}"
         >
+            @csrf
 
+            <div class="form-group">
+                <label for="name">Sacensību nosaukums</label>
 
-        <label for="description">
-            Apraksts
-        </label>
-
-        <textarea
-            id="description"
-            name="description"
-            placeholder="Apraksts"
-        >{{ old('description') }}</textarea>
-
-
-        <label for="date">
-            Datums
-        </label>
-
-        <input
-            type="date"
-            id="date"
-            name="date"
-            value="{{ old('date') }}"
-            required
-        >
-
-
-        <label for="course_id">
-            Norises vieta
-        </label>
-
-        <select
-            id="course_id"
-            name="course_id"
-            required
-        >
-            <option value="">
-                Izvēlies trasi
-            </option>
-
-            @foreach($courses as $course)
-
-                <option
-                    value="{{ $course->id }}"
-                    {{ old('course_id') == $course->id ? 'selected' : '' }}
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value="{{ old('name') }}"
+                    required
                 >
-                    {{ $course->name }}
-                </option>
+            </div>
 
-            @endforeach
+            <div class="form-group">
+                <label for="description">Apraksts</label>
 
-        </select>
+                <textarea
+                    id="description"
+                    name="description"
+                    rows="4"
+                >{{ old('description') }}</textarea>
+            </div>
 
+            <div class="form-group">
+                <label for="date">Sacensību datums</label>
 
-        <label for="max_players">
-            Maksimālais spēlētāju skaits
-        </label>
+                <input
+                    type="date"
+                    id="date"
+                    name="date"
+                    value="{{ old('date') }}"
+                    required
+                >
+            </div>
 
-        <input
-            type="number"
-            id="max_players"
-            name="max_players"
-            value="{{ old('max_players') }}"
-            placeholder="Maksimālais spēlētāju skaits"
-            min="1"
-        >
+            <div class="form-group">
+                <label for="course_id">Trase</label>
 
+                <select id="course_id" name="course_id" required>
+                    <option value="">Izvēlies trasi</option>
 
-        <label for="status">
-            Statuss
-        </label>
+                    @foreach($courses as $course)
+                        <option
+                            value="{{ $course->id }}"
+                            @selected(old('course_id') == $course->id)
+                        >
+                            {{ $course->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
-        <select
-            id="status"
-            name="status"
-            required
-        >
-            <option
-                value="planned"
-                {{ old('status', 'planned') === 'planned' ? 'selected' : '' }}
-            >
-                Plānotas
-            </option>
+            <div class="form-group">
+                <label for="max_players">
+                    Maksimālais dalībnieku skaits
+                </label>
 
-            <option
-                value="active"
-                {{ old('status') === 'active' ? 'selected' : '' }}
-            >
-                Aktīvas
-            </option>
+                <input
+                    type="number"
+                    id="max_players"
+                    name="max_players"
+                    min="1"
+                    value="{{ old('max_players') }}"
+                >
+            </div>
 
-            <option
-                value="finished"
-                {{ old('status') === 'finished' ? 'selected' : '' }}
-            >
-                Pabeigtas
-            </option>
+            <div class="form-group">
+                <label for="status">Sacensību statuss</label>
 
-            <option
-                value="cancelled"
-                {{ old('status') === 'cancelled' ? 'selected' : '' }}
-            >
-                Atceltas
-            </option>
-        </select>
+                <select id="status" name="status" required>
+                    <option
+                        value="planned"
+                        @selected(old('status', 'planned') === 'planned')
+                    >
+                        Plānotas
+                    </option>
 
+                    <option
+                        value="active"
+                        @selected(old('status') === 'active')
+                    >
+                        Notiek
+                    </option>
 
-        <button type="submit">
-            Izveidot
-        </button>
+                    <option
+                        value="finished"
+                        @selected(old('status') === 'finished')
+                    >
+                        Pabeigtas
+                    </option>
 
-    </form>
+                    <option
+                        value="cancelled"
+                        @selected(old('status') === 'cancelled')
+                    >
+                        Atceltas
+                    </option>
+                </select>
+            </div>
 
+            <div class="registration-section">
 
-    <br>
+                <h2>Reģistrācijas periods</h2>
 
-    <a href="{{ route('competitions.index') }}">
-        Atpakaļ
-    </a>
+                <p>
+                    Norādi, no kura datuma un laika spēlētāji
+                    varēs pieteikties sacensībām.
+                </p>
+
+                <div class="registration-fields">
+
+                    <div class="form-group">
+                        <label for="registration_starts_at">
+                            Reģistrācijas sākums
+                        </label>
+
+                        <input
+                            type="datetime-local"
+                            id="registration_starts_at"
+                            name="registration_starts_at"
+                            value="{{ old('registration_starts_at') }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registration_ends_at">
+                            Reģistrācijas beigas
+                        </label>
+
+                        <input
+                            type="datetime-local"
+                            id="registration_ends_at"
+                            name="registration_ends_at"
+                            value="{{ old('registration_ends_at') }}"
+                            required
+                        >
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+
+                <button type="submit" class="button">
+                    Izveidot sacensības
+                </button>
+
+                <a
+                    href="{{ route('competitions.index') }}"
+                    class="secondary-button"
+                >
+                    Atpakaļ
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
 
 </main>
+
+<style>
+    .registration-section {
+        margin: 28px 0;
+        padding: 22px;
+        border: 1px solid #dce5dd;
+        border-radius: 8px;
+        background: #f7faf7;
+    }
+
+    .registration-section h2 {
+        margin: 0 0 8px;
+        font-size: 20px;
+    }
+
+    .registration-section p {
+        margin: 0 0 20px;
+        color: #666;
+    }
+
+    .registration-fields {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    .registration-fields input {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    @media (max-width: 600px) {
+        .registration-fields {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
 
 </body>
 </html>

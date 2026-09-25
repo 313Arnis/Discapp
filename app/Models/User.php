@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\CompetitionResult;
-
 use App\Models\Disc;
 use App\Models\Competition;
 
@@ -18,7 +17,8 @@ use App\Models\Competition;
     'email',
     'password',
     'role',
-    'rating'
+    'rating',
+    'profile_picture'
 ])]
 
 #[Hidden([
@@ -57,20 +57,30 @@ class User extends Authenticatable
 
 
     /**
-     * Lietotāja sacensības
+     * Lietotāja izveidotās sacensības
      */
     public function createdCompetitions()
     {
         return $this->hasMany(Competition::class, 'user_id');
     }
-    
+
+
+    /**
+     * Sacensības, kurās lietotājs piedalās
+     */
     public function competitions()
-    {  // Pivot: Jo divīzija pieder nevis lietotājam vai sacensībām atsevišķi, bet konkrētā lietotāja dalībai konkrētajās sacensībās.
+    {
+        // Divīzija pieder konkrētā lietotāja dalībai
+        // konkrētajās sacensībās.
         return $this->belongsToMany(Competition::class)
             ->withPivot('division')
             ->withTimestamps();
     }
-    
+
+
+    /**
+     * Lietotāja sacensību rezultāti
+     */
     public function results()
     {
         return $this->hasMany(CompetitionResult::class);

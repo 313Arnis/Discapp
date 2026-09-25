@@ -144,6 +144,21 @@ Route::middleware('auth')->group(function () {
 
 
     // -------------------------------------------------
+    // PROFILA BILDE
+    // -------------------------------------------------
+
+    Route::put('/profile/picture', [
+        ProfileController::class,
+        'updateProfilePicture'
+    ])->name('profile.picture.update');
+
+    Route::delete('/profile/picture', [
+        ProfileController::class,
+        'deleteProfilePicture'
+    ])->name('profile.picture.delete');
+
+
+    // -------------------------------------------------
     // DISKI
     // -------------------------------------------------
 
