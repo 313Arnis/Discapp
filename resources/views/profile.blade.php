@@ -11,17 +11,25 @@
 
     <style>
 
-        /*
-        |--------------------------------------------------------------------------
-        | PROFILA BILDE
-        |--------------------------------------------------------------------------
-        */
+        /* =====================================================
+           PROFILA GALVENE
+        ===================================================== */
+
+        .profile-user {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+
+        /* =====================================================
+           PROFILA BILDE
+        ===================================================== */
 
         .profile-picture-wrapper {
             position: relative;
             flex-shrink: 0;
         }
-
 
         .profile-picture {
             width: 95px;
@@ -33,79 +41,47 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
         }
 
-
         .profile-avatar {
             width: 95px;
             height: 95px;
             border-radius: 50%;
+
             display: flex;
             justify-content: center;
             align-items: center;
+
+            background: #e8e8e8;
+            color: #333;
+
             font-size: 35px;
             font-weight: bold;
+
+            border: 3px solid #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
         }
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | BILDES REDIĢĒŠANAS POGA
-        |--------------------------------------------------------------------------
-        */
+        /* =====================================================
+           PROFILA INFORMĀCIJA + BILDES POGAS
+        ===================================================== */
 
-        .profile-picture-edit {
-            position: absolute;
-            right: -3px;
-            bottom: -3px;
-
-            width: 34px;
-            height: 34px;
-
+        .profile-user-info {
             display: flex;
-            align-items: center;
+            flex-direction: column;
             justify-content: center;
-
-            border: 3px solid white;
-            border-radius: 50%;
-
-            background: #222;
-            color: white;
-
-            font-size: 15px;
-            cursor: pointer;
         }
 
-
-        .profile-picture-edit:hover {
-            background: #000;
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | PROFILA BILDES FORMA
-        |--------------------------------------------------------------------------
-        */
-
-        .profile-picture-settings {
-            margin-top: 20px;
-            padding: 18px;
-            background: #f8f8f8;
-            border: 1px solid #e3e3e3;
-            border-radius: 7px;
-        }
-
-
-        .profile-picture-settings h3 {
+        .profile-user-info h1 {
             margin: 0 0 5px;
         }
 
-
-        .profile-picture-settings p {
-            margin: 0 0 15px;
-            color: #666;
-            font-size: 14px;
+        .profile-user-info p {
+            margin: 0 0 8px;
         }
 
+        .profile-picture-form {
+            margin-top: 12px;
+        }
 
         .profile-picture-actions {
             display: flex;
@@ -114,62 +90,151 @@
             flex-wrap: wrap;
         }
 
-
         .profile-picture-input {
             display: none;
         }
 
 
+        /* =====================================================
+           IZVĒLĒTIES BILDI
+        ===================================================== */
+
         .choose-picture-button {
-            display: inline-block;
-            padding: 10px 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 9px 15px;
+
             background: #222;
             color: white;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
 
+            border: none;
+            border-radius: 5px;
+
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+
+            text-decoration: none;
+        }
 
         .choose-picture-button:hover {
             background: #000;
         }
 
 
-        .selected-file {
-            color: #666;
+        /* =====================================================
+           SAGLABĀT BILDI
+        ===================================================== */
+
+        .save-picture-button {
+            display: none;
+
+            padding: 9px 15px;
+
+            background: #ff6500;
+            color: white;
+
+            border: none;
+            border-radius: 5px;
+
+            cursor: pointer;
             font-size: 14px;
+            font-weight: bold;
         }
 
+        .save-picture-button:hover {
+            background: #e95700;
+        }
+
+        .save-picture-button.visible {
+            display: inline-block;
+        }
+
+
+        /* =====================================================
+           FAILA NOSAUKUMS
+        ===================================================== */
+
+        .selected-file {
+            display: none;
+            max-width: 180px;
+
+            color: #666;
+            font-size: 13px;
+
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .selected-file.visible {
+            display: inline-block;
+        }
+
+
+        /* =====================================================
+           NOŅEMT PROFILA BILDI
+        ===================================================== */
+
+        .remove-picture-form {
+            margin: 0;
+        }
 
         .remove-picture-button {
-            border: none;
+            padding: 9px 12px;
+
             background: transparent;
             color: #c0392b;
-            cursor: pointer;
-            font-weight: bold;
-            padding: 10px;
-        }
 
+            border: none;
+
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+        }
 
         .remove-picture-button:hover {
             text-decoration: underline;
         }
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | PRIEKŠSKATĪJUMS
-        |--------------------------------------------------------------------------
-        */
+        /* =====================================================
+           MOBILE
+        ===================================================== */
 
-        .profile-preview {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 15px;
-            display: none;
+        @media (max-width: 650px) {
+
+            .profile-user {
+                align-items: flex-start;
+            }
+
+            .profile-picture {
+                width: 80px;
+                height: 80px;
+            }
+
+            .profile-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 30px;
+            }
+
+            .profile-picture-actions {
+                gap: 6px;
+            }
+
+            .choose-picture-button,
+            .save-picture-button {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+
+            .selected-file {
+                max-width: 120px;
+            }
+
         }
 
     </style>
@@ -184,7 +249,10 @@
     </h2>
 
     <div>
-        <a href="/">Sākums</a>
+
+        <a href="/">
+            Sākums
+        </a>
 
         <a href="{{ route('competitions.index') }}">
             Sacensības
@@ -193,6 +261,7 @@
         <a href="{{ route('profile') }}">
             Mans profils
         </a>
+
     </div>
 
 
@@ -207,6 +276,7 @@
             method="POST"
             action="{{ route('logout') }}"
         >
+
             @csrf
 
             <button type="submit">
@@ -223,9 +293,9 @@
 <main class="profile-page">
 
 
-    {{-- ======================================
+    {{-- =====================================================
          PAZIŅOJUMI
-    ====================================== --}}
+    ===================================================== --}}
 
     @if(session('success'))
 
@@ -253,61 +323,58 @@
     @endif
 
 
-    {{-- ======================================
+    {{-- =====================================================
          PROFILA GALVENE
-    ====================================== --}}
+    ===================================================== --}}
 
     <div class="profile-header">
+
 
         <div class="profile-user">
 
 
-            {{-- PROFILA BILDE --}}
+            {{-- =================================================
+                 PROFILA BILDE
+            ================================================= --}}
 
             <div class="profile-picture-wrapper">
 
                 @if($user->profile_picture)
 
                     <img
-                        src="{{ asset(
-                            'storage/' .
-                            $user->profile_picture
-                        ) }}"
+                        src="{{ asset('storage/' . $user->profile_picture) }}"
                         alt="{{ $user->name }}"
                         class="profile-picture"
-                        id="mainProfilePicture"
+                        id="profileImage"
                     >
 
                 @else
 
                     <div
                         class="profile-avatar"
-                        id="mainProfileAvatar"
+                        id="profileAvatar"
                     >
-                        {{ strtoupper(
-                            substr(
-                                $user->name,
-                                0,
-                                1
-                            )
-                        ) }}
+                        {{ strtoupper(substr($user->name, 0, 1)) }}
                     </div>
 
+                    <img
+                        src=""
+                        alt="{{ $user->name }}"
+                        class="profile-picture"
+                        id="profileImage"
+                        style="display: none;"
+                    >
+
                 @endif
-
-
-                <label
-                    for="profile_picture"
-                    class="profile-picture-edit"
-                    title="Mainīt profila bildi"
-                >
-                    ✎
-                </label>
 
             </div>
 
 
-            <div>
+            {{-- =================================================
+                 VĀRDS + BILDES PIEVIENOŠANA
+            ================================================= --}}
+
+            <div class="profile-user-info">
 
                 <h1>
                     {{ $user->name }}
@@ -321,10 +388,105 @@
                     Spēlētājs
                 </span>
 
+
+                {{-- =============================================
+                     BILDES FORMA
+                ============================================= --}}
+
+                <form
+                    method="POST"
+                    action="{{ route('profile.picture.update') }}"
+                    enctype="multipart/form-data"
+                    class="profile-picture-form"
+                    id="profilePictureForm"
+                >
+
+                    @csrf
+
+                    @method('PUT')
+
+
+                    <div class="profile-picture-actions">
+
+                        <input
+                            type="file"
+                            id="profile_picture"
+                            name="profile_picture"
+                            class="profile-picture-input"
+                            accept=".jpg,.jpeg,.png,.webp"
+                            required
+                        >
+
+
+                        <label
+                            for="profile_picture"
+                            class="choose-picture-button"
+                        >
+                            Mainīt bildi
+                        </label>
+
+
+                        <span
+                            id="selectedFile"
+                            class="selected-file"
+                        >
+                        </span>
+
+
+                        <button
+                            type="submit"
+                            id="savePictureButton"
+                            class="save-picture-button"
+                        >
+                            Saglabāt
+                        </button>
+
+                    </div>
+
+                </form>
+
+
+                {{-- =============================================
+                     BILDES DZĒŠANA
+                ============================================= --}}
+
+                @if($user->profile_picture)
+
+                    <form
+                        method="POST"
+                        action="{{ route('profile.picture.delete') }}"
+                        class="remove-picture-form"
+                        onsubmit="
+                            return confirm(
+                                'Vai tiešām vēlies noņemt profila bildi?'
+                            );
+                        "
+                    >
+
+                        @csrf
+
+                        @method('DELETE')
+
+
+                        <button
+                            type="submit"
+                            class="remove-picture-button"
+                        >
+                            Noņemt bildi
+                        </button>
+
+                    </form>
+
+                @endif
+
             </div>
 
         </div>
 
+
+        {{-- =================================================
+             REITINGS
+        ================================================= --}}
 
         <div class="profile-rating">
 
@@ -341,118 +503,9 @@
     </div>
 
 
-    {{-- ======================================
-         PROFILA BILDES IESTATĪJUMI
-    ====================================== --}}
-
-    <div class="profile-picture-settings">
-
-        <h3>
-            Profila bilde
-        </h3>
-
-        <p>
-            Izvēlies JPG, PNG vai WEBP attēlu.
-            Maksimālais izmērs ir 5 MB.
-        </p>
-
-
-        <form
-            method="POST"
-            action="{{ route(
-                'profile.picture.update'
-            ) }}"
-            enctype="multipart/form-data"
-        >
-
-            @csrf
-
-            @method('PUT')
-
-
-            <img
-                id="profilePreview"
-                class="profile-preview"
-                alt="Profila bildes priekšskatījums"
-            >
-
-
-            <div class="profile-picture-actions">
-
-                <input
-                    type="file"
-                    id="profile_picture"
-                    name="profile_picture"
-                    class="profile-picture-input"
-                    accept=".jpg,.jpeg,.png,.webp"
-                    required
-                >
-
-
-                <label
-                    for="profile_picture"
-                    class="choose-picture-button"
-                >
-                    Izvēlēties bildi
-                </label>
-
-
-                <span
-                    id="selectedFile"
-                    class="selected-file"
-                >
-                    Bilde nav izvēlēta
-                </span>
-
-
-                <button
-                    type="submit"
-                    class="button"
-                >
-                    Saglabāt bildi
-                </button>
-
-            </div>
-
-        </form>
-
-
-        @if($user->profile_picture)
-
-            <form
-                method="POST"
-                action="{{ route(
-                    'profile.picture.delete'
-                ) }}"
-                onsubmit="
-                    return confirm(
-                        'Vai tiešām vēlies noņemt profila bildi?'
-                    );
-                "
-            >
-
-                @csrf
-
-                @method('DELETE')
-
-
-                <button
-                    type="submit"
-                    class="remove-picture-button"
-                >
-                    Noņemt profila bildi
-                </button>
-
-            </form>
-
-        @endif
-
-    </div>
-
-
-    {{-- ======================================
+    {{-- =====================================================
          STATISTIKA
-    ====================================== --}}
+    ===================================================== --}}
 
     <div class="profile-stats">
 
@@ -513,9 +566,9 @@
     <div class="profile-content">
 
 
-        {{-- ======================================
+        {{-- =====================================================
              PAR SPĒLĒTĀJU
-        ====================================== --}}
+        ===================================================== --}}
 
         <div class="profile-section">
 
@@ -573,9 +626,9 @@
         </div>
 
 
-        {{-- ======================================
+        {{-- =====================================================
              DISKU SOMA
-        ====================================== --}}
+        ===================================================== --}}
 
         <div class="profile-section">
 
@@ -586,9 +639,7 @@
                 </h2>
 
                 <a
-                    href="{{ route(
-                        'profile.discs.index'
-                    ) }}"
+                    href="{{ route('profile.discs.index') }}"
                     class="button"
                 >
                     Pārvaldīt diskus
@@ -605,13 +656,11 @@
 
                         <div class="disc">
 
+
                             @if($disc->image)
 
                                 <img
-                                    src="{{ asset(
-                                        'storage/' .
-                                        $disc->image
-                                    ) }}"
+                                    src="{{ asset('storage/' . $disc->image) }}"
                                     alt="{{ $disc->name }}"
                                     class="disc-image"
                                 >
@@ -633,17 +682,20 @@
                             @if($disc->type)
 
                                 <p>
+
                                     <strong>
                                         Tips:
                                     </strong>
 
                                     {{ $disc->type }}
+
                                 </p>
 
                             @endif
 
 
                             <div class="flight-numbers">
+
 
                                 <div>
 
@@ -696,6 +748,7 @@
 
                                 </div>
 
+
                             </div>
 
                         </div>
@@ -712,9 +765,11 @@
                         🥏
                     </div>
 
+
                     <h3>
                         Disku soma vēl ir tukša
                     </h3>
+
 
                     <p>
                         Pievieno savus diskus profilam,
@@ -722,10 +777,9 @@
                         disku golfa somas saturu.
                     </p>
 
+
                     <a
-                        href="{{ route(
-                            'profile.discs.index'
-                        ) }}"
+                        href="{{ route('profile.discs.index') }}"
                         class="button"
                     >
                         Pievienot diskus
@@ -749,19 +803,19 @@
         function () {
 
             const input =
-                document.getElementById(
-                    'profile_picture'
-                );
+                document.getElementById('profile_picture');
 
-            const preview =
-                document.getElementById(
-                    'profilePreview'
-                );
+            const profileImage =
+                document.getElementById('profileImage');
+
+            const profileAvatar =
+                document.getElementById('profileAvatar');
 
             const selectedFile =
-                document.getElementById(
-                    'selectedFile'
-                );
+                document.getElementById('selectedFile');
+
+            const saveButton =
+                document.getElementById('savePictureButton');
 
 
             if (!input) {
@@ -773,27 +827,55 @@
                 'change',
                 function () {
 
-                    const file =
-                        this.files[0];
+                    const file = this.files[0];
 
 
                     if (!file) {
 
-                        selectedFile.textContent =
-                            'Bilde nav izvēlēta';
+                        selectedFile.textContent = '';
 
-                        preview.style.display =
-                            'none';
+                        selectedFile.classList.remove(
+                            'visible'
+                        );
 
-                        preview.src = '';
+                        saveButton.classList.remove(
+                            'visible'
+                        );
 
                         return;
                     }
 
 
+                    /*
+                    |--------------------------------------------------------------------------
+                    | PARĀDĀM FAILA NOSAUKUMU
+                    |--------------------------------------------------------------------------
+                    */
+
                     selectedFile.textContent =
                         file.name;
 
+                    selectedFile.classList.add(
+                        'visible'
+                    );
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | PARĀDĀM SAGLABĀŠANAS POGU
+                    |--------------------------------------------------------------------------
+                    */
+
+                    saveButton.classList.add(
+                        'visible'
+                    );
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | PROFILA BILDES PRIEKŠSKATĪJUMS
+                    |--------------------------------------------------------------------------
+                    */
 
                     const reader =
                         new FileReader();
@@ -802,10 +884,18 @@
                     reader.onload =
                         function (event) {
 
-                            preview.src =
+                            if (profileAvatar) {
+
+                                profileAvatar.style.display =
+                                    'none';
+
+                            }
+
+
+                            profileImage.src =
                                 event.target.result;
 
-                            preview.style.display =
+                            profileImage.style.display =
                                 'block';
 
                         };
@@ -821,7 +911,5 @@
 
 </script>
 
-
 </body>
-
 </html>
