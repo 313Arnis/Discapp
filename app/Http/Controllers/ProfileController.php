@@ -15,6 +15,19 @@ class ProfileController extends Controller
     {
         $user = auth()->user();
 
+        /*
+        |--------------------------------------------------------------------------
+        | LIETOTĀJA REZULTĀTI
+        |--------------------------------------------------------------------------
+        */
+
+        $userResults = CompetitionResult::with([
+            'competition.course.courseHoles',
+            'competition.users',
+            'competition.results',
+        ])
+            ->where('user_id', $user->id)
+            ->get();
 
         /*
         |--------------------------------------------------------------------------
@@ -22,11 +35,7 @@ class ProfileController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $playedCompetitions = CompetitionResult::where(
-            'user_id',
-            $user->id
-        )->count();
-
+        $playedCompetitions = $userResults->count();
 
         /*
         |--------------------------------------------------------------------------
@@ -36,36 +45,131 @@ class ProfileController extends Controller
 
         $wins = 0;
 
-        $userResults = CompetitionResult::where(
-            'user_id',
-            $user->id
-        )->get();
-
-
         foreach ($userResults as $userResult) {
-
             $bestScore = CompetitionResult::where(
                 'competition_id',
                 $userResult->competition_id
             )->min('score');
-
 
             if ($userResult->score === $bestScore) {
                 $wins++;
             }
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | SACENSĪBU VĒSTURE
+        |--------------------------------------------------------------------------
+        */
+
+        $competitionHistory = $userResults
+            ->map(function ($result) use ($user) {
+                $competition = $result->competition;
+
+                if (!$competition) {
+                    return null;
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | LIETOTĀJA DIVĪZIJA
+                |--------------------------------------------------------------------------
+                */
+
+                $participant = $competition->users
+                    ->firstWhere('id', $user->id);
+
+                $division =
+                    $participant?->pivot?->division ?? '-';
+
+                /*
+                |--------------------------------------------------------------------------
+                | TRASES KOPĒJAIS PAR
+                |--------------------------------------------------------------------------
+                */
+
+                $coursePar = $competition->course
+                    ? $competition->course->courseHoles->sum('par')
+                    : 0;
+
+                /*
+                |--------------------------------------------------------------------------
+                | REZULTĀTS PRET PAR
+                |--------------------------------------------------------------------------
+                */
+
+                $relativeToPar = $coursePar > 0
+                    ? $result->score - $coursePar
+                    : 0;
+
+                /*
+                |--------------------------------------------------------------------------
+                | SPĒLĒTĀJI TAJĀ PAŠĀ DIVĪZIJĀ
+                |--------------------------------------------------------------------------
+                */
+
+                $divisionUserIds = $competition->users
+                    ->filter(
+                        function ($competitionUser) use ($division) {
+                            return (
+                                $competitionUser->pivot->division ?? '-'
+                            ) === $division;
+                        }
+                    )
+                    ->pluck('id');
+
+                /*
+                |--------------------------------------------------------------------------
+                | VIETA DIVĪZIJĀ
+                |--------------------------------------------------------------------------
+                */
+
+                $betterResults = $competition->results
+                    ->whereIn(
+                        'user_id',
+                        $divisionUserIds
+                    )
+                    ->where(
+                        'score',
+                        '<',
+                        $result->score
+                    )
+                    ->count();
+
+                $place = $betterResults + 1;
+
+                return [
+                    'competition' => $competition,
+                    'division' => $division,
+                    'score' => $result->score,
+                    'relative_to_par' => $relativeToPar,
+                    'place' => $place,
+                ];
+            })
+            ->filter()
+            ->sortByDesc(
+                function ($history) {
+                    return $history['competition']->date;
+                }
+            )
+            ->values();
+
+        /*
+        |--------------------------------------------------------------------------
+        | PROFILA SKATS
+        |--------------------------------------------------------------------------
+        */
 
         return view(
             'profile',
             compact(
                 'user',
                 'playedCompetitions',
-                'wins'
+                'wins',
+                'competitionHistory'
             )
         );
     }
-
 
     /**
      * Profila bildes atjaunošana
@@ -77,25 +181,7 @@ class ProfileController extends Controller
                 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
-
         $user = auth()->user();
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | IZDZĒŠAM VECO BILDI
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            $user->profile_picture &&
-            Storage::disk('public')->exists($user->profile_picture)
-        ) {
-            Storage::disk('public')->delete(
-                $user->profile_picture
-            );
-        }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -110,6 +196,22 @@ class ProfileController extends Controller
                 'public'
             );
 
+        /*
+        |--------------------------------------------------------------------------
+        | IZDZĒŠAM VECO BILDI
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            $user->profile_picture &&
+            Storage::disk('public')->exists(
+                $user->profile_picture
+            )
+        ) {
+            Storage::disk('public')->delete(
+                $user->profile_picture
+            );
+        }
 
         /*
         |--------------------------------------------------------------------------
@@ -121,7 +223,6 @@ class ProfileController extends Controller
 
         $user->save();
 
-
         return redirect()
             ->route('profile')
             ->with(
@@ -130,7 +231,6 @@ class ProfileController extends Controller
             );
     }
 
-
     /**
      * Profila bildes dzēšana
      */
@@ -138,21 +238,32 @@ class ProfileController extends Controller
     {
         $user = auth()->user();
 
+        /*
+        |--------------------------------------------------------------------------
+        | IZDZĒŠAM BILDI
+        |--------------------------------------------------------------------------
+        */
 
         if (
             $user->profile_picture &&
-            Storage::disk('public')->exists($user->profile_picture)
+            Storage::disk('public')->exists(
+                $user->profile_picture
+            )
         ) {
             Storage::disk('public')->delete(
                 $user->profile_picture
             );
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | NOŅEMAM BILDI NO LIETOTĀJA
+        |--------------------------------------------------------------------------
+        */
 
         $user->profile_picture = null;
 
         $user->save();
-
 
         return redirect()
             ->route('profile')

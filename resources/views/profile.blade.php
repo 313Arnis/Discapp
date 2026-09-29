@@ -2,12 +2,20 @@
 <html lang="lv">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Mans profils - DiscGolf</title>
 
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link
+        rel="stylesheet"
+        href="{{ asset('css/style.css') }}"
+    >
 
     <style>
 
@@ -34,16 +42,22 @@
         .profile-picture {
             width: 95px;
             height: 95px;
+
             border-radius: 50%;
+
             object-fit: cover;
             display: block;
+
             border: 3px solid #fff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+
+            box-shadow:
+                0 2px 10px rgba(0, 0, 0, 0.12);
         }
 
         .profile-avatar {
             width: 95px;
             height: 95px;
+
             border-radius: 50%;
 
             display: flex;
@@ -57,12 +71,14 @@
             font-weight: bold;
 
             border: 3px solid #fff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+
+            box-shadow:
+                0 2px 10px rgba(0, 0, 0, 0.12);
         }
 
 
         /* =====================================================
-           PROFILA INFORMĀCIJA + BILDES POGAS
+           PROFILA INFORMĀCIJA
         ===================================================== */
 
         .profile-user-info {
@@ -86,7 +102,9 @@
         .profile-picture-actions {
             display: flex;
             align-items: center;
+
             gap: 10px;
+
             flex-wrap: wrap;
         }
 
@@ -113,6 +131,7 @@
             border-radius: 5px;
 
             cursor: pointer;
+
             font-size: 14px;
             font-weight: bold;
 
@@ -140,6 +159,7 @@
             border-radius: 5px;
 
             cursor: pointer;
+
             font-size: 14px;
             font-weight: bold;
         }
@@ -159,9 +179,11 @@
 
         .selected-file {
             display: none;
+
             max-width: 180px;
 
             color: #666;
+
             font-size: 13px;
 
             overflow: hidden;
@@ -191,12 +213,101 @@
             border: none;
 
             cursor: pointer;
+
             font-size: 13px;
             font-weight: bold;
         }
 
         .remove-picture-button:hover {
             text-decoration: underline;
+        }
+
+
+        /* =====================================================
+           SACENSĪBU VĒSTURE
+        ===================================================== */
+
+        .competition-history-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .competition-history-table {
+            width: 100%;
+
+            border-collapse: collapse;
+        }
+
+        .competition-history-table th {
+            padding: 13px 16px;
+
+            background: #f8f8f8;
+
+            border-bottom: 1px solid #ddd;
+
+            color: #666;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            text-align: left;
+        }
+
+        .competition-history-table td {
+            padding: 15px 16px;
+
+            border-bottom: 1px solid #eee;
+
+            vertical-align: middle;
+        }
+
+        .competition-history-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .competition-history-table tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .competition-history-name {
+            color: #222;
+
+            font-weight: 600;
+
+            text-decoration: none;
+        }
+
+        .competition-history-name:hover {
+            text-decoration: underline;
+        }
+
+        .history-division {
+            display: inline-block;
+
+            padding: 4px 9px;
+
+            background: #eee;
+
+            border-radius: 4px;
+
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .history-score {
+            font-weight: bold;
+        }
+
+        .history-place {
+            font-weight: bold;
+        }
+
+        .history-empty {
+            padding: 30px 20px;
+
+            color: #777;
+
+            text-align: center;
         }
 
 
@@ -218,6 +329,7 @@
             .profile-avatar {
                 width: 80px;
                 height: 80px;
+
                 font-size: 30px;
             }
 
@@ -228,6 +340,7 @@
             .choose-picture-button,
             .save-picture-button {
                 padding: 8px 10px;
+
                 font-size: 12px;
             }
 
@@ -235,12 +348,18 @@
                 max-width: 120px;
             }
 
+            .competition-history-table {
+                min-width: 650px;
+            }
+
         }
 
     </style>
+
 </head>
 
 <body>
+
 
 <nav>
 
@@ -270,7 +389,6 @@
         <span>
             Sveiks, {{ $user->name }}!
         </span>
-
 
         <form
             method="POST"
@@ -333,16 +451,17 @@
         <div class="profile-user">
 
 
-            {{-- =================================================
-                 PROFILA BILDE
-            ================================================= --}}
+            {{-- PROFILA BILDE --}}
 
             <div class="profile-picture-wrapper">
 
                 @if($user->profile_picture)
 
                     <img
-                        src="{{ asset('storage/' . $user->profile_picture) }}"
+                        src="{{ asset(
+                            'storage/' .
+                            $user->profile_picture
+                        ) }}"
                         alt="{{ $user->name }}"
                         class="profile-picture"
                         id="profileImage"
@@ -354,7 +473,13 @@
                         class="profile-avatar"
                         id="profileAvatar"
                     >
-                        {{ strtoupper(substr($user->name, 0, 1)) }}
+                        {{ strtoupper(
+                            substr(
+                                $user->name,
+                                0,
+                                1
+                            )
+                        ) }}
                     </div>
 
                     <img
@@ -370,9 +495,7 @@
             </div>
 
 
-            {{-- =================================================
-                 VĀRDS + BILDES PIEVIENOŠANA
-            ================================================= --}}
+            {{-- VĀRDS + BILDES PIEVIENOŠANA --}}
 
             <div class="profile-user-info">
 
@@ -389,22 +512,20 @@
                 </span>
 
 
-                {{-- =============================================
-                     BILDES FORMA
-                ============================================= --}}
+                {{-- BILDES FORMA --}}
 
                 <form
                     method="POST"
-                    action="{{ route('profile.picture.update') }}"
+                    action="{{ route(
+                        'profile.picture.update'
+                    ) }}"
                     enctype="multipart/form-data"
                     class="profile-picture-form"
                     id="profilePictureForm"
                 >
 
                     @csrf
-
                     @method('PUT')
-
 
                     <div class="profile-picture-actions">
 
@@ -417,7 +538,6 @@
                             required
                         >
 
-
                         <label
                             for="profile_picture"
                             class="choose-picture-button"
@@ -425,13 +545,10 @@
                             Mainīt bildi
                         </label>
 
-
                         <span
                             id="selectedFile"
                             class="selected-file"
-                        >
-                        </span>
-
+                        ></span>
 
                         <button
                             type="submit"
@@ -446,15 +563,13 @@
                 </form>
 
 
-                {{-- =============================================
-                     BILDES DZĒŠANA
-                ============================================= --}}
-
                 @if($user->profile_picture)
 
                     <form
                         method="POST"
-                        action="{{ route('profile.picture.delete') }}"
+                        action="{{ route(
+                            'profile.picture.delete'
+                        ) }}"
                         class="remove-picture-form"
                         onsubmit="
                             return confirm(
@@ -464,9 +579,7 @@
                     >
 
                         @csrf
-
                         @method('DELETE')
-
 
                         <button
                             type="submit"
@@ -484,9 +597,7 @@
         </div>
 
 
-        {{-- =================================================
-             REITINGS
-        ================================================= --}}
+        {{-- REITINGS --}}
 
         <div class="profile-rating">
 
@@ -627,6 +738,201 @@
 
 
         {{-- =====================================================
+             SACENSĪBU VĒSTURE
+        ===================================================== --}}
+
+        <div class="profile-section">
+
+            <div class="section-header">
+
+                <h2>
+                    Sacensību vēsture
+                </h2>
+
+                <span>
+                    {{ $competitionHistory->count() }}
+                </span>
+
+            </div>
+
+
+            @if($competitionHistory->count() > 0)
+
+                <div class="competition-history-table-wrapper">
+
+                    <table class="competition-history-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Sacensības
+                                </th>
+
+                                <th>
+                                    Datums
+                                </th>
+
+                                <th>
+                                    Divīzija
+                                </th>
+
+                                <th>
+                                    Rezultāts
+                                </th>
+
+                                <th>
+                                    Vieta
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            @foreach(
+                                $competitionHistory
+                                as $history
+                            )
+
+                                <tr>
+
+                                    <td>
+
+                                        <a
+                                            href="{{ route(
+                                                'competitions.show',
+                                                $history[
+                                                    'competition'
+                                                ]
+                                            ) }}"
+                                            class="competition-history-name"
+                                        >
+                                            {{
+                                                $history[
+                                                    'competition'
+                                                ]->name
+                                            }}
+                                        </a>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {{
+                                            $history[
+                                                'competition'
+                                            ]->date
+                                                ? \Carbon\Carbon::parse(
+                                                    $history[
+                                                        'competition'
+                                                    ]->date
+                                                )->format(
+                                                    'd.m.Y'
+                                                )
+                                                : '-'
+                                        }}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <span class="history-division">
+
+                                            {{
+                                                $history[
+                                                    'division'
+                                                ]
+                                            }}
+
+                                        </span>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <span class="history-score">
+
+                                            @if(
+                                                $history[
+                                                    'relative_to_par'
+                                                ] === 0
+                                            )
+
+                                                E
+
+                                            @elseif(
+                                                $history[
+                                                    'relative_to_par'
+                                                ] > 0
+                                            )
+
+                                                +{{
+                                                    $history[
+                                                        'relative_to_par'
+                                                    ]
+                                                }}
+
+                                            @else
+
+                                                {{
+                                                    $history[
+                                                        'relative_to_par'
+                                                    ]
+                                                }}
+
+                                            @endif
+
+                                        </span>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <span class="history-place">
+
+                                            {{
+                                                $history[
+                                                    'place'
+                                                ]
+                                            }}.
+
+                                        </span>
+
+                                    </td>
+
+                                </tr>
+
+                            @endforeach
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            @else
+
+                <div class="history-empty">
+
+                    Tu vēl neesi pabeidzis nevienas
+                    sacensības.
+
+                </div>
+
+            @endif
+
+        </div>
+
+
+        {{-- =====================================================
              DISKU SOMA
         ===================================================== --}}
 
@@ -639,7 +945,9 @@
                 </h2>
 
                 <a
-                    href="{{ route('profile.discs.index') }}"
+                    href="{{ route(
+                        'profile.discs.index'
+                    ) }}"
                     class="button"
                 >
                     Pārvaldīt diskus
@@ -660,7 +968,10 @@
                             @if($disc->image)
 
                                 <img
-                                    src="{{ asset('storage/' . $disc->image) }}"
+                                    src="{{ asset(
+                                        'storage/' .
+                                        $disc->image
+                                    ) }}"
                                     alt="{{ $disc->name }}"
                                     class="disc-image"
                                 >
@@ -765,11 +1076,9 @@
                         🥏
                     </div>
 
-
                     <h3>
                         Disku soma vēl ir tukša
                     </h3>
-
 
                     <p>
                         Pievieno savus diskus profilam,
@@ -777,9 +1086,10 @@
                         disku golfa somas saturu.
                     </p>
 
-
                     <a
-                        href="{{ route('profile.discs.index') }}"
+                        href="{{ route(
+                            'profile.discs.index'
+                        ) }}"
                         class="button"
                     >
                         Pievienot diskus
@@ -803,19 +1113,29 @@
         function () {
 
             const input =
-                document.getElementById('profile_picture');
+                document.getElementById(
+                    'profile_picture'
+                );
 
             const profileImage =
-                document.getElementById('profileImage');
+                document.getElementById(
+                    'profileImage'
+                );
 
             const profileAvatar =
-                document.getElementById('profileAvatar');
+                document.getElementById(
+                    'profileAvatar'
+                );
 
             const selectedFile =
-                document.getElementById('selectedFile');
+                document.getElementById(
+                    'selectedFile'
+                );
 
             const saveButton =
-                document.getElementById('savePictureButton');
+                document.getElementById(
+                    'savePictureButton'
+                );
 
 
             if (!input) {
@@ -827,7 +1147,8 @@
                 'change',
                 function () {
 
-                    const file = this.files[0];
+                    const file =
+                        this.files[0];
 
 
                     if (!file) {
@@ -880,7 +1201,6 @@
                     const reader =
                         new FileReader();
 
-
                     reader.onload =
                         function (event) {
 
@@ -890,7 +1210,6 @@
                                     'none';
 
                             }
-
 
                             profileImage.src =
                                 event.target.result;

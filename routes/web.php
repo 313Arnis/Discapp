@@ -9,32 +9,62 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DiscController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\PlayerController;
 
 
 // =====================================================
 // SĀKUMLAPA
 // =====================================================
 
-Route::get('/', [HomeController::class, 'index'])
-    ->name('home');
+Route::get('/', [
+    HomeController::class,
+    'index'
+])->name('home');
 
 
 // =====================================================
 // AUTORIZĀCIJA
 // =====================================================
 
-Route::get('/register', [AuthController::class, 'showRegister'])
-    ->name('register');
+Route::get('/register', [
+    AuthController::class,
+    'showRegister'
+])->name('register');
 
-Route::post('/register', [AuthController::class, 'register']);
+Route::post('/register', [
+    AuthController::class,
+    'register'
+]);
 
-Route::get('/login', [AuthController::class, 'showLogin'])
-    ->name('login');
+Route::get('/login', [
+    AuthController::class,
+    'showLogin'
+])->name('login');
 
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [
+    AuthController::class,
+    'login'
+]);
 
-Route::post('/logout', [AuthController::class, 'logout'])
-    ->name('logout');
+Route::post('/logout', [
+    AuthController::class,
+    'logout'
+])->name('logout');
+
+
+// =====================================================
+// SPĒLĒTĀJI
+// =====================================================
+
+Route::get('/players', [
+    PlayerController::class,
+    'index'
+])->name('players.index');
+
+Route::get('/players/{user}', [
+    PlayerController::class,
+    'show'
+])->name('players.show');
 
 
 // =====================================================
