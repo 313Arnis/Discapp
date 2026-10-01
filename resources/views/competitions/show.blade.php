@@ -3,11 +3,19 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <title>{{ $competition->name }} - DiscGolf</title>
+    <title>
+        {{ $competition->name }} - DiscGolf
+    </title>
 
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link
+        rel="stylesheet"
+        href="{{ asset('css/style.css') }}"
+    >
 </head>
 
 <body>
@@ -22,26 +30,39 @@
 
     <div>
         <a href="/">Sākums</a>
-        <a href="{{ route('competitions.index') }}">Sacensības</a>
-        <a href="{{ route('profile') }}">Mans profils</a>
+
+        <a href="{{ route('competitions.index') }}">
+            Sacensības
+        </a>
+
+        <a href="{{ route('profile') }}">
+            Mans profils
+        </a>
     </div>
 
     @auth
+
         <div class="nav-auth">
 
             <span>
                 Sveiks, {{ auth()->user()->name }}!
             </span>
 
-            <form method="POST" action="{{ route('logout') }}">
+            <form
+                method="POST"
+                action="{{ route('logout') }}"
+            >
+
                 @csrf
 
                 <button type="submit">
                     Iziet
                 </button>
+
             </form>
 
         </div>
+
     @endauth
 
 </nav>
@@ -50,24 +71,24 @@
 <main>
 
     @if(session('success'))
+
         <div class="success">
             {{ session('success') }}
         </div>
+
     @endif
 
 
     @if(session('error'))
+
         <div class="error">
             {{ session('error') }}
         </div>
+
     @endif
 
 
     <div class="competition-card">
-
-        {{-- ======================================
-             SACENSĪBU INFORMĀCIJA
-        ====================================== --}}
 
         <div class="competition-header">
 
@@ -90,8 +111,16 @@
                     ];
                 @endphp
 
-                <span class="competition-status status-{{ $competition->status }}">
-                    {{ $statusNames[$competition->status] ?? 'Nezināms statuss' }}
+                <span
+                    class="
+                        competition-status
+                        status-{{ $competition->status }}
+                    "
+                >
+                    {{
+                        $statusNames[$competition->status]
+                        ?? 'Nezināms statuss'
+                    }}
                 </span>
 
 
@@ -109,31 +138,95 @@
             @if($competition->max_players)
 
                 @php
-                    $participantsCount = $competition->users->count();
 
-                    $percent = $competition->max_players > 0
-                        ? min(
-                            100,
-                            round(
-                                ($participantsCount / $competition->max_players) * 100
+                    $participantsCount =
+                        $competition->users->count();
+
+                    $percent =
+                        $competition->max_players > 0
+                            ? min(
+                                100,
+                                round(
+                                    (
+                                        $participantsCount /
+                                        $competition->max_players
+                                    ) * 100
+                                )
                             )
-                        )
-                        : 0;
+                            : 0;
+
                 @endphp
 
-                <div class="competition-capacity">
 
-                    <span>
-                        Pieteikušies
-                    </span>
+                <div class="competition-header-actions">
 
-                    <strong>
-                        {{ $participantsCount }}
+                    @auth
 
-                        <small>
-                            / {{ $competition->max_players }}
-                        </small>
-                    </strong>
+                        @if(
+                            $competition->users
+                                ->contains(
+                                    'id',
+                                    auth()->id()
+                                )
+                        )
+
+                            @if(
+                                $competition->status
+                                !== 'cancelled'
+                            )
+
+                                <a
+                                    href="{{
+                                        route(
+                                            'competitions.scorecard',
+                                            $competition
+                                        )
+                                    }}"
+                                    class="
+                                        scorecard-top-button
+                                    "
+                                >
+
+                                    @if(
+                                        $competition->status
+                                        === 'finished'
+                                    )
+
+                                        Skatīt rezultātu
+
+                                    @else
+
+                                        Ievadīt rezultātu
+
+                                    @endif
+
+                                </a>
+
+                            @endif
+
+                        @endif
+
+                    @endauth
+
+
+                    <div class="competition-capacity">
+
+                        <span>
+                            Pieteikušies
+                        </span>
+
+                        <strong>
+
+                            {{ $participantsCount }}
+
+                            <small>
+                                /
+                                {{ $competition->max_players }}
+                            </small>
+
+                        </strong>
+
+                    </div>
 
                 </div>
 
@@ -141,10 +234,6 @@
 
         </div>
 
-
-        {{-- ======================================
-             PAMATINFORMĀCIJA
-        ====================================== --}}
 
         <div class="meta-grid">
 
@@ -155,7 +244,12 @@
                 </span>
 
                 <strong>
-                    {{ $competition->date?->format('d.m.Y') ?? $competition->date }}
+                    {{
+                        $competition->date?->format(
+                            'd.m.Y'
+                        )
+                        ?? $competition->date
+                    }}
                 </strong>
 
             </div>
@@ -168,7 +262,10 @@
                 </span>
 
                 <strong>
-                    {{ $competition->course?->name ?? 'Nav norādīta' }}
+                    {{
+                        $competition->course?->name
+                        ?? 'Nav norādīta'
+                    }}
                 </strong>
 
             </div>
@@ -226,7 +323,10 @@
 
                     <div
                         class="progress-bar"
-                        style="width: {{ $percent }}%;"
+                        style="
+                            width:
+                            {{ $percent }}%;
+                        "
                     ></div>
 
                 </div>
@@ -238,10 +338,6 @@
 
         <hr class="divider">
 
-
-        {{-- ======================================
-             DALĪBNIEKI
-        ====================================== --}}
 
         <div class="section-title-wrapper">
 
@@ -264,14 +360,20 @@
         </div>
 
 
-        @if($competition->users->count() > 0)
+        @if(
+            $competition->users->count() > 0
+        )
 
             <div class="participants">
 
                 @foreach(
-                    $competition->users->groupBy(
-                        fn($player) => $player->pivot->division ?? 'Bez divīzijas'
-                    ) as $division => $divisionPlayers
+                    $competition->users
+                        ->groupBy(
+                            fn($player) =>
+                                $player->pivot->division
+                                ?? 'Bez divīzijas'
+                        )
+                    as $division => $divisionPlayers
                 )
 
                     <div class="division-group">
@@ -292,12 +394,21 @@
 
                             <span class="division-count">
 
-                                {{ $divisionPlayers->count() }}
+                                {{
+                                    $divisionPlayers->count()
+                                }}
 
-                                @if($divisionPlayers->count() === 1)
+                                @if(
+                                    $divisionPlayers->count()
+                                    === 1
+                                )
+
                                     spēlētājs
+
                                 @else
+
                                     spēlētāji
+
                                 @endif
 
                             </span>
@@ -307,22 +418,54 @@
 
                         <div class="participants-grid">
 
-                            @foreach($divisionPlayers as $player)
+                            @foreach(
+                                $divisionPlayers
+                                as $player
+                            )
 
                                 <div class="participant-card">
 
-                                    <div class="participant-avatar">
-                                        {{ strtoupper(substr($player->name ?? '?', 0, 1)) }}
+                                    <div
+                                        class="
+                                            participant-avatar
+                                        "
+                                    >
+                                        {{
+                                            strtoupper(
+                                                substr(
+                                                    $player->name
+                                                        ?? '?',
+                                                    0,
+                                                    1
+                                                )
+                                            )
+                                        }}
                                     </div>
 
-                                    <div class="participant-info">
+                                    <div
+                                        class="
+                                            participant-info
+                                        "
+                                    >
 
                                         <strong>
-                                            {{ $player->name ?? 'Nezināms spēlētājs' }}
+                                            {{
+                                                $player->name
+                                                ?? 'Nezināms spēlētājs'
+                                            }}
                                         </strong>
 
-                                        <span class="participant-division-tag">
-                                            {{ $player->pivot->division ?? '-' }}
+                                        <span
+                                            class="
+                                                participant-division-tag
+                                            "
+                                        >
+                                            {{
+                                                $player
+                                                    ->pivot
+                                                    ->division
+                                                ?? '-'
+                                            }}
                                         </span>
 
                                     </div>
@@ -352,7 +495,8 @@
                 </h3>
 
                 <p>
-                    Šobrīd šīm sacensībām neviens nav pieteicies.
+                    Šobrīd šīm sacensībām
+                    neviens nav pieteicies.
                 </p>
 
             </div>
@@ -363,53 +507,86 @@
         <hr class="divider">
 
 
-        {{-- ======================================
-             MANS REZULTĀTS
-        ====================================== --}}
-
         @auth
 
-            @if($competition->users->contains('id', auth()->id()))
+            @if(
+                $competition->users
+                    ->contains(
+                        'id',
+                        auth()->id()
+                    )
+            )
 
                 @php
 
-                    $myHoleResults = $competition->holeResults
-                        ->where('user_id', auth()->id());
+                    $myHoleResults =
+                        $competition
+                            ->holeResults
+                            ->where(
+                                'user_id',
+                                auth()->id()
+                            );
 
-                    $totalScore = $myHoleResults->sum('score');
+                    $totalScore =
+                        $myHoleResults->sum(
+                            'score'
+                        );
 
-                    $holesPlayed = $myHoleResults->count();
+                    $holesPlayed =
+                        $myHoleResults->count();
 
                     $playedPar = 0;
 
-                    foreach($myHoleResults as $holeResult) {
+                    foreach(
+                        $myHoleResults
+                        as $holeResult
+                    ) {
 
-                        $hole = $competition->course?->courseHoles
-                            ?->firstWhere(
-                                'id',
-                                $holeResult->course_hole_id
-                            );
+                        $hole =
+                            $competition
+                                ->course
+                                ?->courseHoles
+                                ?->firstWhere(
+                                    'id',
+                                    $holeResult
+                                        ->course_hole_id
+                                );
 
                         if($hole) {
-                            $playedPar += $hole->par;
+                            $playedPar +=
+                                $hole->par;
                         }
                     }
 
-                    $scoreToPar = $totalScore - $playedPar;
+                    $scoreToPar =
+                        $totalScore -
+                        $playedPar;
 
                     $totalHoles =
-                        $competition->course?->courseHoles?->count() ?? 0;
+                        $competition
+                            ->course
+                            ?->courseHoles
+                            ?->count()
+                        ?? 0;
 
                 @endphp
 
 
                 <div class="card">
 
-                    <div class="section-title-wrapper">
+                    <div
+                        class="
+                            section-title-wrapper
+                        "
+                    >
 
                         <div>
 
-                            <span class="section-label">
+                            <span
+                                class="
+                                    section-label
+                                "
+                            >
                                 MANS REZULTĀTS
                             </span>
 
@@ -424,20 +601,30 @@
 
                     <div class="my-score-summary">
 
-                        <div class="score-summary-card">
+                        <div
+                            class="
+                                score-summary-card
+                            "
+                        >
 
                             <span>
                                 Izspēlēti grozi
                             </span>
 
                             <strong>
-                                {{ $holesPlayed }}/{{ $totalHoles }}
+                                {{
+                                    $holesPlayed
+                                }}/{{ $totalHoles }}
                             </strong>
 
                         </div>
 
 
-                        <div class="score-summary-card">
+                        <div
+                            class="
+                                score-summary-card
+                            "
+                        >
 
                             <span>
                                 Metieni
@@ -450,7 +637,11 @@
                         </div>
 
 
-                        <div class="score-summary-card">
+                        <div
+                            class="
+                                score-summary-card
+                            "
+                        >
 
                             <span>
                                 Pret PAR
@@ -458,15 +649,21 @@
 
                             <strong>
 
-                                @if($holesPlayed === 0)
+                                @if(
+                                    $holesPlayed === 0
+                                )
 
                                     -
 
-                                @elseif($scoreToPar > 0)
+                                @elseif(
+                                    $scoreToPar > 0
+                                )
 
                                     +{{ $scoreToPar }}
 
-                                @elseif($scoreToPar < 0)
+                                @elseif(
+                                    $scoreToPar < 0
+                                )
 
                                     {{ $scoreToPar }}
 
@@ -484,30 +681,49 @@
 
 
                     @if(
-                        $competition->status !== 'finished' &&
-                        $competition->status !== 'cancelled'
+                        $competition->status
+                            !== 'finished'
+                        &&
+                        $competition->status
+                            !== 'cancelled'
                     )
 
-                        <div style="margin-top: 20px;">
+                        <div
+                            style="
+                                margin-top: 20px;
+                            "
+                        >
 
                             <a
-                                href="{{ route(
-                                    'competitions.scorecard',
-                                    $competition
-                                ) }}"
+                                href="{{
+                                    route(
+                                        'competitions.scorecard',
+                                        $competition
+                                    )
+                                }}"
                                 class="button"
                             >
-                                Ievadīt / labot rezultātu
+                                Ievadīt / labot
+                                rezultātu
                             </a>
 
                         </div>
 
                     @else
 
-                        <div style="margin-top: 20px;">
+                        <div
+                            style="
+                                margin-top: 20px;
+                            "
+                        >
 
-                            <span class="result-not-entered">
-                                Rezultātu labošana ir slēgta.
+                            <span
+                                class="
+                                    result-not-entered
+                                "
+                            >
+                                Rezultātu labošana
+                                ir slēgta.
                             </span>
 
                         </div>
@@ -523,10 +739,6 @@
 
         <hr class="divider">
 
-
-        {{-- ======================================
-             PILNIE SACENSĪBU REZULTĀTI
-        ====================================== --}}
 
         <div class="competition-results">
 
@@ -544,7 +756,12 @@
 
                     <p>
                         {{ $players->count() }}
-                        {{ $players->count() === 1 ? 'dalībnieks' : 'dalībnieki' }}
+
+                        {{
+                            $players->count() === 1
+                                ? 'dalībnieks'
+                                : 'dalībnieki'
+                        }}
                     </p>
 
                 </div>
@@ -557,7 +774,8 @@
                 <div class="empty-results">
 
                     <p>
-                        Šajās sacensībās vēl nav pieteicies neviens spēlētājs.
+                        Šajās sacensībās vēl nav
+                        pieteicies neviens spēlētājs.
                     </p>
 
                 </div>
@@ -566,14 +784,26 @@
 
                 @php
 
-                    $courseHoles = $competition->course?->courseHoles
-                        ?->sortBy('hole_number')
-                        ?->values() ?? collect();
+                    $courseHoles =
+                        $competition
+                            ->course
+                            ?->courseHoles
+                            ?->sortBy(
+                                'hole_number'
+                            )
+                            ?->values()
+                        ?? collect();
 
-                    $coursePar = $courseHoles->sum('par');
+                    $coursePar =
+                        $courseHoles->sum(
+                            'par'
+                        );
 
-                    $previousRelative = null;
-                    $previousPosition = 0;
+                    $previousRelative =
+                        null;
+
+                    $previousPosition =
+                        0;
 
                 @endphp
 
@@ -581,8 +811,6 @@
                 <div class="results-table-wrapper">
 
                     <table class="metrix-table">
-
-                        {{-- GALVENE --}}
 
                         <thead>
 
@@ -600,10 +828,20 @@
                                     +/-
                                 </th>
 
-                                @foreach($courseHoles as $hole)
+                                @foreach(
+                                    $courseHoles
+                                    as $hole
+                                )
 
-                                    <th class="hole-heading">
-                                        {{ $hole->hole_number }}
+                                    <th
+                                        class="
+                                            hole-heading
+                                        "
+                                    >
+                                        {{
+                                            $hole
+                                                ->hole_number
+                                        }}
                                     </th>
 
                                 @endforeach
@@ -623,8 +861,6 @@
 
                         <tbody>
 
-                            {{-- PAR RINDA --}}
-
                             <tr class="par-row">
 
                                 <td></td>
@@ -635,7 +871,10 @@
 
                                 <td></td>
 
-                                @foreach($courseHoles as $hole)
+                                @foreach(
+                                    $courseHoles
+                                    as $hole
+                                )
 
                                     <td class="par-cell">
                                         {{ $hole->par }}
@@ -652,69 +891,95 @@
                             </tr>
 
 
-                            {{-- SPĒLĒTĀJI --}}
-
-                            @foreach($players as $index => $player)
+                            @foreach(
+                                $players
+                                as $index => $player
+                            )
 
                                 @php
 
-                                    $playerUser = $player['user'] ?? null;
+                                    $playerUser =
+                                        $player['user']
+                                        ?? null;
 
-                                    $playerResults = $playerUser
-                                        ? $competition->holeResults
-                                            ->where('user_id', $playerUser->id)
-                                        : collect();
+                                    $playerResults =
+                                        $playerUser
+                                            ? $competition
+                                                ->holeResults
+                                                ->where(
+                                                    'user_id',
+                                                    $playerUser->id
+                                                )
+                                            : collect();
 
-                                    $played = $playerResults->count();
+                                    $played =
+                                        $playerResults
+                                            ->count();
 
-                                    $playerTotal = $playerResults->sum('score');
-
-                                    $playerPlayedPar = 0;
-
-                                    foreach($playerResults as $result) {
-
-                                        $resultHole = $courseHoles
-                                            ->firstWhere(
-                                                'id',
-                                                $result->course_hole_id
+                                    $playerTotal =
+                                        $playerResults
+                                            ->sum(
+                                                'score'
                                             );
 
+                                    $playerPlayedPar =
+                                        0;
+
+                                    foreach(
+                                        $playerResults
+                                        as $result
+                                    ) {
+
+                                        $resultHole =
+                                            $courseHoles
+                                                ->firstWhere(
+                                                    'id',
+                                                    $result
+                                                        ->course_hole_id
+                                                );
+
                                         if($resultHole) {
-                                            $playerPlayedPar += $resultHole->par;
+
+                                            $playerPlayedPar +=
+                                                $resultHole
+                                                    ->par;
                                         }
                                     }
 
                                     $playerRelative =
-                                        $playerTotal - $playerPlayedPar;
+                                        $playerTotal -
+                                        $playerPlayedPar;
 
-
-                                    /*
-                                    |--------------------------------------------------------------------------
-                                    | VIETA AR NEIZŠĶIRTIEM REZULTĀTIEM
-                                    |--------------------------------------------------------------------------
-                                    */
 
                                     if($played === 0) {
 
-                                        $displayPosition = '-';
+                                        $displayPosition =
+                                            '-';
 
                                     } else {
 
                                         if(
-                                            $previousRelative !== null &&
-                                            $previousRelative === $playerRelative
+                                            $previousRelative
+                                                !== null
+                                            &&
+                                            $previousRelative
+                                                === $playerRelative
                                         ) {
 
-                                            $displayPosition = $previousPosition;
+                                            $displayPosition =
+                                                $previousPosition;
 
                                         } else {
 
-                                            $displayPosition = $index + 1;
-                                            $previousPosition = $displayPosition;
+                                            $displayPosition =
+                                                $index + 1;
 
+                                            $previousPosition =
+                                                $displayPosition;
                                         }
 
-                                        $previousRelative = $playerRelative;
+                                        $previousRelative =
+                                            $playerRelative;
                                     }
 
                                 @endphp
@@ -722,25 +987,47 @@
 
                                 <tr>
 
-                                    {{-- VIETA --}}
-
-                                    <td class="position-cell">
-                                        {{ $displayPosition }}
+                                    <td
+                                        class="
+                                            position-cell
+                                        "
+                                    >
+                                        {{
+                                            $displayPosition
+                                        }}
                                     </td>
 
 
-                                    {{-- SPĒLĒTĀJS --}}
-
-                                    <td class="player-name-cell">
+                                    <td
+                                        class="
+                                            player-name-cell
+                                        "
+                                    >
 
                                         <strong>
-                                            {{ $playerUser?->name ?? 'Nezināms spēlētājs' }}
+                                            {{
+                                                $playerUser
+                                                    ?->name
+                                                ?? 'Nezināms spēlētājs'
+                                            }}
                                         </strong>
 
-                                        @if(($player['division'] ?? null))
+                                        @if(
+                                            $player[
+                                                'division'
+                                            ] ?? null
+                                        )
 
-                                            <span class="player-division">
-                                                {{ $player['division'] }}
+                                            <span
+                                                class="
+                                                    player-division
+                                                "
+                                            >
+                                                {{
+                                                    $player[
+                                                        'division'
+                                                    ]
+                                                }}
                                             </span>
 
                                         @endif
@@ -748,19 +1035,25 @@
                                     </td>
 
 
-                                    {{-- +/- KREISAJĀ PUSĒ --}}
-
-                                    <td class="relative-cell">
+                                    <td
+                                        class="
+                                            relative-cell
+                                        "
+                                    >
 
                                         @if($played === 0)
 
                                             -
 
-                                        @elseif($playerRelative > 0)
+                                        @elseif(
+                                            $playerRelative > 0
+                                        )
 
                                             +{{ $playerRelative }}
 
-                                        @elseif($playerRelative < 0)
+                                        @elseif(
+                                            $playerRelative < 0
+                                        )
 
                                             {{ $playerRelative }}
 
@@ -773,47 +1066,67 @@
                                     </td>
 
 
-                                    {{-- KATRS GROZS --}}
-
-                                    @foreach($courseHoles as $hole)
+                                    @foreach(
+                                        $courseHoles
+                                        as $hole
+                                    )
 
                                         @php
 
-                                            $holeResult = $playerResults
-                                                ->firstWhere(
-                                                    'course_hole_id',
-                                                    $hole->id
-                                                );
+                                            $holeResult =
+                                                $playerResults
+                                                    ->firstWhere(
+                                                        'course_hole_id',
+                                                        $hole->id
+                                                    );
 
                                             $holeScore =
-                                                $holeResult?->score;
+                                                $holeResult
+                                                    ?->score;
 
                                             $difference =
-                                                $holeScore !== null
-                                                    ? $holeScore - $hole->par
+                                                $holeScore
+                                                    !== null
+                                                    ? $holeScore
+                                                        - $hole->par
                                                     : null;
 
+                                            $scoreClass =
+                                                '';
 
-                                            $scoreClass = '';
+                                            if(
+                                                $difference
+                                                !== null
+                                            ) {
 
-                                            if($difference !== null) {
-
-                                                if($difference <= -2) {
+                                                if(
+                                                    $difference
+                                                    <= -2
+                                                ) {
 
                                                     $scoreClass =
                                                         'hole-double-under';
 
-                                                } elseif($difference === -1) {
+                                                } elseif(
+                                                    $difference
+                                                    === -1
+                                                ) {
 
                                                     $scoreClass =
                                                         'hole-under';
 
-                                                } elseif($difference === 0) {
+                                                } elseif(
+                                                    $difference
+                                                    === 0
+                                                ) {
 
                                                     $scoreClass =
                                                         'hole-par';
 
-                                                } elseif($difference === 1) {
+                                                } elseif(
+                                                    $difference
+                                                    === 1
+                                                ) {
 
                                                     $scoreClass =
                                                         'hole-over';
@@ -828,15 +1141,27 @@
                                         @endphp
 
 
-                                        <td class="hole-score {{ $scoreClass }}">
+                                        <td
+                                            class="
+                                                hole-score
+                                                {{ $scoreClass }}
+                                            "
+                                        >
 
-                                            @if($holeScore !== null)
+                                            @if(
+                                                $holeScore
+                                                !== null
+                                            )
 
                                                 {{ $holeScore }}
 
                                             @else
 
-                                                <span class="no-score">
+                                                <span
+                                                    class="
+                                                        no-score
+                                                    "
+                                                >
                                                     -
                                                 </span>
 
@@ -847,19 +1172,25 @@
                                     @endforeach
 
 
-                                    {{-- +/- LABAJĀ PUSĒ --}}
-
-                                    <td class="relative-cell">
+                                    <td
+                                        class="
+                                            relative-cell
+                                        "
+                                    >
 
                                         @if($played === 0)
 
                                             -
 
-                                        @elseif($playerRelative > 0)
+                                        @elseif(
+                                            $playerRelative > 0
+                                        )
 
                                             +{{ $playerRelative }}
 
-                                        @elseif($playerRelative < 0)
+                                        @elseif(
+                                            $playerRelative < 0
+                                        )
 
                                             {{ $playerRelative }}
 
@@ -871,8 +1202,6 @@
 
                                     </td>
 
-
-                                    {{-- SUMMA --}}
 
                                     <td class="sum-cell">
 
@@ -903,34 +1232,43 @@
         </div>
 
 
-        {{-- ======================================
-             DARBĪBAS
-        ====================================== --}}
-
         <div class="competition-actions">
 
             @auth
 
-                @if($competition->user_id === auth()->id())
+                @if(
+                    $competition->user_id
+                    === auth()->id()
+                )
 
                     <div class="creator-status">
                         Tu esi šo sacensību veidotājs.
                     </div>
 
-
-                @elseif($competition->users->contains('id', auth()->id()))
+                @elseif(
+                    $competition->users
+                        ->contains(
+                            'id',
+                            auth()->id()
+                        )
+                )
 
                     @if(
-                        $competition->status !== 'finished' &&
-                        $competition->status !== 'cancelled'
+                        $competition->status
+                            !== 'finished'
+                        &&
+                        $competition->status
+                            !== 'cancelled'
                     )
 
                         <form
                             method="POST"
-                            action="{{ route(
-                                'competitions.leave',
-                                $competition
-                            ) }}"
+                            action="{{
+                                route(
+                                    'competitions.leave',
+                                    $competition
+                                )
+                            }}"
                         >
 
                             @csrf
@@ -946,19 +1284,23 @@
 
                     @endif
 
-
                 @else
 
                     @if(
-                        $competition->status !== 'finished' &&
-                        $competition->status !== 'cancelled'
+                        $competition->status
+                            !== 'finished'
+                        &&
+                        $competition->status
+                            !== 'cancelled'
                     )
 
                         <a
-                            href="{{ route(
-                                'competitions.join',
-                                $competition
-                            ) }}"
+                            href="{{
+                                route(
+                                    'competitions.join',
+                                    $competition
+                                )
+                            }}"
                             class="button"
                         >
                             Pievienoties sacensībām
@@ -972,7 +1314,11 @@
 
 
             <a
-                href="{{ route('competitions.index') }}"
+                href="{{
+                    route(
+                        'competitions.index'
+                    )
+                }}"
                 class="secondary-button"
             >
                 Atpakaļ
@@ -981,21 +1327,26 @@
         </div>
 
 
-        {{-- ======================================
-             PĀRVALDĪBA
-        ====================================== --}}
-
         @auth
 
-            @if($competition->user_id === auth()->id())
+            @if(
+                $competition->user_id
+                === auth()->id()
+            )
 
-                <div class="competition-admin-actions">
+                <div
+                    class="
+                        competition-admin-actions
+                    "
+                >
 
                     <a
-                        href="{{ route(
-                            'competitions.edit',
-                            $competition
-                        ) }}"
+                        href="{{
+                            route(
+                                'competitions.edit',
+                                $competition
+                            )
+                        }}"
                         class="edit-link"
                     >
                         Rediģēt sacensības
@@ -1004,10 +1355,12 @@
 
                     <form
                         method="POST"
-                        action="{{ route(
-                            'competitions.destroy',
-                            $competition
-                        ) }}"
+                        action="{{
+                            route(
+                                'competitions.destroy',
+                                $competition
+                            )
+                        }}"
                         onsubmit="
                             return confirm(
                                 'Vai tiešām vēlies dzēst šīs sacensības?'
@@ -1016,7 +1369,6 @@
                     >
 
                         @csrf
-
                         @method('DELETE')
 
                         <button
@@ -1040,12 +1392,6 @@
 
 
 <style>
-
-    /*
-    |--------------------------------------------------------------------------
-    | REZULTĀTU BLOKS
-    |--------------------------------------------------------------------------
-    */
 
     .competition-results {
         margin-top: 30px;
@@ -1075,23 +1421,11 @@
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | HORIZONTĀLA SCROLLOŠANA
-    |--------------------------------------------------------------------------
-    */
-
     .results-table-wrapper {
         width: 100%;
         overflow-x: auto;
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | METRIX STILA TABULA
-    |--------------------------------------------------------------------------
-    */
 
     .metrix-table {
         width: 100%;
@@ -1118,12 +1452,6 @@
         border-right: none;
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | GALVENE
-    |--------------------------------------------------------------------------
-    */
 
     .metrix-table thead th {
         background: #fafafa;
@@ -1162,12 +1490,6 @@
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | PAR RINDA
-    |--------------------------------------------------------------------------
-    */
-
     .par-row td {
         background: #f8faf9;
         font-weight: 500;
@@ -1192,23 +1514,11 @@
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | VIETA
-    |--------------------------------------------------------------------------
-    */
-
     .position-cell {
         font-weight: 700;
         color: #222;
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | SPĒLĒTĀJS
-    |--------------------------------------------------------------------------
-    */
 
     .player-name-cell {
         text-align: left !important;
@@ -1233,12 +1543,6 @@
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | +/- UN SUMMA
-    |--------------------------------------------------------------------------
-    */
-
     .relative-cell {
         min-width: 55px;
         font-weight: 700;
@@ -1252,12 +1556,6 @@
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | GROZU REZULTĀTI
-    |--------------------------------------------------------------------------
-    */
-
     .hole-score {
         width: 45px;
         min-width: 45px;
@@ -1266,19 +1564,11 @@
     }
 
 
-    /*
-    | Eagle vai labāk
-    */
-
     .hole-double-under {
         background: #83d96b;
         color: #111;
     }
 
-
-    /*
-    | Birdie
-    */
 
     .hole-under {
         background: #b7eaa5;
@@ -1286,19 +1576,11 @@
     }
 
 
-    /*
-    | Par
-    */
-
     .hole-par {
         background: #ffffff;
         color: #111;
     }
 
-
-    /*
-    | Bogey
-    */
 
     .hole-over {
         background: #f8ddd4;
@@ -1306,19 +1588,11 @@
     }
 
 
-    /*
-    | Double bogey vai sliktāk
-    */
-
     .hole-double-over {
         background: #f3ae9c;
         color: #111;
     }
 
-
-    /*
-    | Sarkana līnija virs rezultāta, ja virs PAR
-    */
 
     .hole-over::before,
     .hole-double-over::before {
@@ -1338,22 +1612,13 @@
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | HOVER
-    |--------------------------------------------------------------------------
-    */
-
-    .metrix-table tbody tr:not(.par-row):hover td {
+    .metrix-table
+    tbody
+    tr:not(.par-row):hover
+    td {
         filter: brightness(0.97);
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | TUKŠI REZULTĀTI
-    |--------------------------------------------------------------------------
-    */
 
     .empty-results {
         padding: 30px 20px;
@@ -1364,9 +1629,52 @@
 
     /*
     |--------------------------------------------------------------------------
-    | MOBILĀ VERSIJA
+    | AUGŠĒJĀ REZULTĀTU POGA
     |--------------------------------------------------------------------------
     */
+
+    .competition-header-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        min-width: 150px;
+    }
+
+
+    .scorecard-top-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 100%;
+        box-sizing: border-box;
+
+        padding: 11px 14px;
+
+        background: #ff6500;
+        color: #ffffff !important;
+
+        border-radius: 6px;
+
+        font-size: 14px;
+        font-weight: 700;
+
+        text-decoration: none !important;
+        white-space: nowrap;
+
+        transition:
+            background 0.2s ease,
+            transform 0.2s ease;
+    }
+
+
+    .scorecard-top-button:hover {
+        background: #e95700;
+        color: #ffffff !important;
+        transform: translateY(-1px);
+    }
+
 
     @media (max-width: 900px) {
 
@@ -1395,8 +1703,21 @@
 
     }
 
-</style>
 
+    @media (max-width: 650px) {
+
+        .competition-header-actions {
+            width: 100%;
+        }
+
+
+        .scorecard-top-button {
+            width: 100%;
+        }
+
+    }
+
+</style>
 
 </body>
 </html>

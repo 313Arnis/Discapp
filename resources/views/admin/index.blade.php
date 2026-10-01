@@ -2,11 +2,17 @@
 <html lang="lv">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Admin panelis - Discapp</title>
 
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link
+        rel="stylesheet"
+        href="{{ asset('css/style.css') }}"
+    >
 </head>
 
 <body>
@@ -14,18 +20,37 @@
 <nav>
 
     <div>
-        <a href="{{ route('home') }}">
-            Discapp
+        <a href="{{ route('admin') }}">
+            Discapp Admin
         </a>
+    </div>
+
+    <div>
+
+        <a href="{{ route('admin') }}">
+            Dashboard
+        </a>
+
+        <a href="{{ route('admin.users') }}">
+            Lietotāji
+        </a>
+
+        <a href="{{ route('courses.index') }}">
+            Trases
+        </a>
+
     </div>
 
     <div class="nav-auth">
 
-        <a href="{{ route('profile') }}">
-            Profils
-        </a>
+        <span>
+            Admin: {{ auth()->user()->name }}
+        </span>
 
-        <form method="POST" action="{{ route('logout') }}">
+        <form
+            method="POST"
+            action="{{ route('logout') }}"
+        >
             @csrf
 
             <button type="submit">
@@ -43,11 +68,15 @@
     <div class="profile-header">
 
         <div>
-            <h1>Admin panelis</h1>
+
+            <h1>
+                Admin panelis
+            </h1>
 
             <p>
                 Sveiks, {{ auth()->user()->name }}!
             </p>
+
         </div>
 
     </div>
@@ -59,45 +88,62 @@
         class="profile-stats"
         style="
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns:
+                repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-bottom: 30px;
         "
     >
 
         <div>
-            <strong>Lietotāji</strong>
+
+            <strong>
+                Lietotāji
+            </strong>
 
             <span>
                 {{ $usersCount }}
             </span>
+
         </div>
 
 
         <div>
-            <strong>Trases</strong>
+
+            <strong>
+                Trases
+            </strong>
 
             <span>
                 {{ $coursesCount }}
             </span>
+
         </div>
 
 
         <div>
-            <strong>Sacensības</strong>
+
+            <strong>
+                Sacensības
+            </strong>
 
             <span>
                 {{ $competitionsCount }}
             </span>
+
         </div>
 
 
         <div>
-            <strong>Vidējais reitings</strong>
+
+            <strong>
+                Vidējais reitings
+            </strong>
 
             <span>
                 {{ $averageRating }}
             </span>
+
         </div>
 
     </section>

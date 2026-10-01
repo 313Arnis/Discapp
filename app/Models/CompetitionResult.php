@@ -10,12 +10,14 @@ class CompetitionResult extends Model
         'competition_id',
         'user_id',
         'score',
+        'round_rating',
     ];
 
     protected $casts = [
         'competition_id' => 'integer',
         'user_id' => 'integer',
         'score' => 'integer',
+        'round_rating' => 'integer',
     ];
 
     public function competition()

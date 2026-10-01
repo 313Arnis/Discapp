@@ -78,10 +78,10 @@ Route::get('/competitions', [
 
 
 // =====================================================
-// IESLOGOTI LIETOTĀJI
+// PARASTIE IESLOGOTIE LIETOTĀJI
 // =====================================================
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'user'])->group(function () {
 
     // -------------------------------------------------
     // SACENSĪBU IZVEIDE
@@ -238,69 +238,71 @@ Route::get('/competitions/{competition}', [
 // ADMIN PANELIS
 // =====================================================
 
-Route::middleware(['auth', 'admin'])->group(function () {
+Route::middleware(['auth', 'admin'])
+    ->prefix('admin')
+    ->group(function () {
 
-    // -------------------------------------------------
-    // ADMIN SĀKUMLAPA
-    // -------------------------------------------------
+        // -------------------------------------------------
+        // ADMIN SĀKUMLAPA
+        // -------------------------------------------------
 
-    Route::get('/admin', [
-        AdminController::class,
-        'index'
-    ])->name('admin');
-
-
-    // -------------------------------------------------
-    // LIETOTĀJI
-    // -------------------------------------------------
-
-    Route::get('/admin/users', [
-        AdminController::class,
-        'users'
-    ])->name('admin.users');
-
-    Route::put('/admin/users/{user}', [
-        AdminController::class,
-        'updateUser'
-    ])->name('admin.users.update');
-
-    Route::delete('/admin/users/{user}', [
-        AdminController::class,
-        'destroyUser'
-    ])->name('admin.users.destroy');
+        Route::get('/', [
+            AdminController::class,
+            'index'
+        ])->name('admin');
 
 
-    // -------------------------------------------------
-    // TRASES
-    // -------------------------------------------------
+        // -------------------------------------------------
+        // LIETOTĀJI
+        // -------------------------------------------------
 
-    Route::get('/courses', [
-        CourseController::class,
-        'index'
-    ])->name('courses.index');
+        Route::get('/users', [
+            AdminController::class,
+            'users'
+        ])->name('admin.users');
 
-    Route::get('/courses/create', [
-        CourseController::class,
-        'create'
-    ])->name('courses.create');
+        Route::put('/users/{user}', [
+            AdminController::class,
+            'updateUser'
+        ])->name('admin.users.update');
 
-    Route::post('/courses', [
-        CourseController::class,
-        'store'
-    ])->name('courses.store');
+        Route::delete('/users/{user}', [
+            AdminController::class,
+            'destroyUser'
+        ])->name('admin.users.destroy');
 
-    Route::get('/courses/{course}/edit', [
-        CourseController::class,
-        'edit'
-    ])->name('courses.edit');
 
-    Route::put('/courses/{course}', [
-        CourseController::class,
-        'update'
-    ])->name('courses.update');
+        // -------------------------------------------------
+        // TRASES
+        // -------------------------------------------------
 
-    Route::delete('/courses/{course}', [
-        CourseController::class,
-        'destroy'
-    ])->name('courses.destroy');
-});
+        Route::get('/courses', [
+            CourseController::class,
+            'index'
+        ])->name('courses.index');
+
+        Route::get('/courses/create', [
+            CourseController::class,
+            'create'
+        ])->name('courses.create');
+
+        Route::post('/courses', [
+            CourseController::class,
+            'store'
+        ])->name('courses.store');
+
+        Route::get('/courses/{course}/edit', [
+            CourseController::class,
+            'edit'
+        ])->name('courses.edit');
+
+        Route::put('/courses/{course}', [
+            CourseController::class,
+            'update'
+        ])->name('courses.update');
+
+        Route::delete('/courses/{course}', [
+            CourseController::class,
+            'destroy'
+        ])->name('courses.destroy');
+    });

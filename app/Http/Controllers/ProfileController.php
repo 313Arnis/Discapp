@@ -41,17 +41,77 @@ class ProfileController extends Controller
         |--------------------------------------------------------------------------
         | UZVARAS
         |--------------------------------------------------------------------------
+        |
+        | Uzvara tiek skaitīta savā divīzijā.
+        |
         */
 
         $wins = 0;
 
         foreach ($userResults as $userResult) {
-            $bestScore = CompetitionResult::where(
-                'competition_id',
-                $userResult->competition_id
-            )->min('score');
 
-            if ($userResult->score === $bestScore) {
+            $competition = $userResult->competition;
+
+            if (!$competition) {
+                continue;
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | ATRODAM LIETOTĀJA DIVĪZIJU
+            |--------------------------------------------------------------------------
+            */
+
+            $participant = $competition->users
+                ->firstWhere(
+                    'id',
+                    $user->id
+                );
+
+            $division =
+                $participant?->pivot?->division
+                ?? '-';
+
+            /*
+            |--------------------------------------------------------------------------
+            | ATRODAM VISUS TĀS PAŠAS DIVĪZIJAS SPĒLĒTĀJUS
+            |--------------------------------------------------------------------------
+            */
+
+            $divisionUserIds = $competition->users
+                ->filter(
+                    function ($competitionUser) use ($division) {
+                        return (
+                            $competitionUser->pivot->division
+                            ?? '-'
+                        ) === $division;
+                    }
+                )
+                ->pluck('id');
+
+            /*
+            |--------------------------------------------------------------------------
+            | LABĀKAIS REZULTĀTS DIVĪZIJĀ
+            |--------------------------------------------------------------------------
+            */
+
+            $bestDivisionScore = $competition->results
+                ->whereIn(
+                    'user_id',
+                    $divisionUserIds
+                )
+                ->min('score');
+
+            /*
+            |--------------------------------------------------------------------------
+            | JA LIETOTĀJAM IR LABĀKAIS REZULTĀTS
+            |--------------------------------------------------------------------------
+            */
+
+            if (
+                $bestDivisionScore !== null &&
+                $userResult->score === $bestDivisionScore
+            ) {
                 $wins++;
             }
         }
@@ -64,6 +124,7 @@ class ProfileController extends Controller
 
         $competitionHistory = $userResults
             ->map(function ($result) use ($user) {
+
                 $competition = $result->competition;
 
                 if (!$competition) {
@@ -77,10 +138,14 @@ class ProfileController extends Controller
                 */
 
                 $participant = $competition->users
-                    ->firstWhere('id', $user->id);
+                    ->firstWhere(
+                        'id',
+                        $user->id
+                    );
 
                 $division =
-                    $participant?->pivot?->division ?? '-';
+                    $participant?->pivot?->division
+                    ?? '-';
 
                 /*
                 |--------------------------------------------------------------------------
@@ -89,7 +154,10 @@ class ProfileController extends Controller
                 */
 
                 $coursePar = $competition->course
-                    ? $competition->course->courseHoles->sum('par')
+                    ? $competition
+                        ->course
+                        ->courseHoles
+                        ->sum('par')
                     : 0;
 
                 /*
@@ -100,7 +168,7 @@ class ProfileController extends Controller
 
                 $relativeToPar = $coursePar > 0
                     ? $result->score - $coursePar
-                    : 0;
+                    : null;
 
                 /*
                 |--------------------------------------------------------------------------
@@ -111,9 +179,12 @@ class ProfileController extends Controller
                 $divisionUserIds = $competition->users
                     ->filter(
                         function ($competitionUser) use ($division) {
+
                             return (
-                                $competitionUser->pivot->division ?? '-'
+                                $competitionUser->pivot->division
+                                ?? '-'
                             ) === $division;
+
                         }
                     )
                     ->pluck('id');
@@ -136,20 +207,40 @@ class ProfileController extends Controller
                     )
                     ->count();
 
-                $place = $betterResults + 1;
+                $place =
+                    $betterResults + 1;
+
+                /*
+                |--------------------------------------------------------------------------
+                | SACENSĪBU VĒSTURES IERAKSTS
+                |--------------------------------------------------------------------------
+                */
 
                 return [
-                    'competition' => $competition,
-                    'division' => $division,
-                    'score' => $result->score,
-                    'relative_to_par' => $relativeToPar,
-                    'place' => $place,
+                    'competition' =>
+                        $competition,
+
+                    'division' =>
+                        $division,
+
+                    'score' =>
+                        $result->score,
+
+                    'relative_to_par' =>
+                        $relativeToPar,
+
+                    'round_rating' =>
+                        $result->round_rating,
+
+                    'place' =>
+                        $place,
                 ];
             })
             ->filter()
             ->sortByDesc(
                 function ($history) {
-                    return $history['competition']->date;
+                    return
+                        $history['competition']->date;
                 }
             )
             ->values();
@@ -171,11 +262,13 @@ class ProfileController extends Controller
         );
     }
 
+
     /**
      * Profila bildes atjaunošana
      */
-    public function updateProfilePicture(Request $request)
-    {
+    public function updateProfilePicture(
+        Request $request
+    ) {
         $request->validate([
             'profile_picture' =>
                 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
@@ -219,7 +312,8 @@ class ProfileController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $user->profile_picture = $path;
+        $user->profile_picture =
+            $path;
 
         $user->save();
 
@@ -230,6 +324,7 @@ class ProfileController extends Controller
                 'Profila bilde veiksmīgi nomainīta!'
             );
     }
+
 
     /**
      * Profila bildes dzēšana
