@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\CompetitionHoleResult;
+use App\Models\PracticeHoleResult;
 
 class CourseHole extends Model
 {
@@ -19,12 +20,27 @@ class CourseHole extends Model
         'par' => 'integer',
     ];
 
+
     public function course()
     {
-        return $this->belongsTo(Course::class);
+        return $this->belongsTo(
+            Course::class
+        );
     }
+
+
     public function results()
     {
-    return $this->hasMany(CompetitionHoleResult::class);
+        return $this->hasMany(
+            CompetitionHoleResult::class
+        );
+    }
+
+
+    public function practiceResults()
+    {
+        return $this->hasMany(
+            PracticeHoleResult::class
+        );
     }
 }

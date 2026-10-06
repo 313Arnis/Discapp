@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Competition;
-use App\Models\CompetitionResult;
-use App\Models\CompetitionHoleResult;
 use App\Models\Course;
+use Illuminate\Http\Request;
 
 class CompetitionController extends Controller
 {
@@ -18,19 +16,23 @@ class CompetitionController extends Controller
 
     public function index()
     {
-        $competitions = Competition::with([
-            'course',
-            'creator',
-            'users',
-        ])
-            ->latest('date')
-            ->get();
+        $competitions =
+            Competition::with([
+                'course',
+                'creator',
+                'users',
+            ])
+                ->latest('date')
+                ->get();
 
         return view(
             'competitions.index',
-            compact('competitions')
+            compact(
+                'competitions'
+            )
         );
     }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -40,66 +42,90 @@ class CompetitionController extends Controller
 
     public function create()
     {
-        $courses = Course::orderBy('name')->get();
+        $courses =
+            Course::orderBy('name')
+                ->get();
 
         return view(
             'competitions.create',
-            compact('courses')
+            compact(
+                'courses'
+            )
         );
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' =>
-                'required|max:255',
 
-            'description' =>
-                'nullable',
+    public function store(
+        Request $request
+    ) {
+        $validated =
+            $request->validate([
+                'name' => [
+                    'required',
+                    'max:255',
+                ],
 
-            'date' =>
-                'required|date',
+                'description' => [
+                    'nullable',
+                ],
 
-            'course_id' =>
-                'required|exists:courses,id',
+                'date' => [
+                    'required',
+                    'date',
+                ],
 
-            'max_players' =>
-                'nullable|integer|min:1',
+                'course_id' => [
+                    'required',
+                    'exists:courses,id',
+                ],
 
-            'status' =>
-                'required|in:planned,active,finished,cancelled',
-        ]);
+                'max_players' => [
+                    'nullable',
+                    'integer',
+                    'min:1',
+                ],
+
+                'status' => [
+                    'required',
+                    'in:planned,active,finished,cancelled',
+                ],
+            ]);
 
         Competition::create([
             'name' =>
-                $request->name,
+                $validated['name'],
 
             'description' =>
-                $request->description,
+                $validated['description']
+                ?? null,
 
             'date' =>
-                $request->date,
+                $validated['date'],
 
             'course_id' =>
-                $request->course_id,
+                $validated['course_id'],
 
             'max_players' =>
-                $request->max_players,
+                $validated['max_players']
+                ?? null,
 
             'status' =>
-                $request->status,
+                $validated['status'],
 
             'user_id' =>
                 auth()->id(),
         ]);
 
         return redirect()
-            ->route('competitions.index')
+            ->route(
+                'competitions.index'
+            )
             ->with(
                 'success',
                 'Sacensības veiksmīgi izveidotas!'
             );
     }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -107,8 +133,9 @@ class CompetitionController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function show(Competition $competition)
-    {
+    public function show(
+        Competition $competition
+    ) {
         $competition->load([
             'users',
             'creator',
@@ -117,105 +144,121 @@ class CompetitionController extends Controller
             'holeResults.courseHole',
         ]);
 
-        $players = $competition->users
-            ->map(function ($user) use ($competition) {
+        $players =
+            $competition
+                ->users
+                ->map(
+                    function ($user) use (
+                        $competition
+                    ) {
+                        $results =
+                            $competition
+                                ->holeResults
+                                ->where(
+                                    'user_id',
+                                    $user->id
+                                );
 
-                $results =
-                    $competition->holeResults
-                        ->where(
-                            'user_id',
-                            $user->id
-                        );
+                        $totalScore =
+                            $results->sum(
+                                'score'
+                            );
 
-                $totalScore =
-                    $results->sum('score');
+                        $totalPar = 0;
 
-                $totalPar = 0;
+                        foreach (
+                            $results as $result
+                        ) {
+                            if (
+                                $result->courseHole
+                            ) {
+                                $totalPar +=
+                                    $result
+                                        ->courseHole
+                                        ->par;
+                            }
+                        }
 
-                foreach ($results as $result) {
+                        $relative =
+                            $totalScore -
+                            $totalPar;
 
-                    if ($result->courseHole) {
+                        return [
+                            'user' =>
+                                $user,
 
-                        $totalPar +=
-                            $result
-                                ->courseHole
-                                ->par;
+                            'division' =>
+                                $user
+                                    ->pivot
+                                    ->division
+                                ?? '-',
+
+                            'played' =>
+                                $results
+                                    ->count(),
+
+                            'total_score' =>
+                                $totalScore,
+
+                            'total_par' =>
+                                $totalPar,
+
+                            'relative' =>
+                                $relative,
+                        ];
                     }
-                }
+                )
+                ->filter(
+                    function ($player) {
+                        return
+                            $player['user']
+                            !== null;
+                    }
+                )
+                ->sort(
+                    function ($a, $b) {
 
-                $relative =
-                    $totalScore - $totalPar;
+                        if (
+                            $a['played'] === 0 &&
+                            $b['played'] > 0
+                        ) {
+                            return 1;
+                        }
 
-                return [
-                    'user' =>
-                        $user,
+                        if (
+                            $a['played'] > 0 &&
+                            $b['played'] === 0
+                        ) {
+                            return -1;
+                        }
 
-                    'division' =>
-                        $user->pivot->division
-                        ?? '-',
+                        if (
+                            $a['relative'] !==
+                            $b['relative']
+                        ) {
+                            return
+                                $a['relative']
+                                <=>
+                                $b['relative'];
+                        }
 
-                    'played' =>
-                        $results->count(),
+                        if (
+                            $a['total_score'] !==
+                            $b['total_score']
+                        ) {
+                            return
+                                $a['total_score']
+                                <=>
+                                $b['total_score'];
+                        }
 
-                    'total_score' =>
-                        $totalScore,
-
-                    'total_par' =>
-                        $totalPar,
-
-                    'relative' =>
-                        $relative,
-                ];
-            })
-
-            ->filter(function ($player) {
-                return
-                    $player['user'] !== null;
-            })
-
-            ->sort(function ($a, $b) {
-
-                if (
-                    $a['played'] === 0 &&
-                    $b['played'] > 0
-                ) {
-                    return 1;
-                }
-
-                if (
-                    $a['played'] > 0 &&
-                    $b['played'] === 0
-                ) {
-                    return -1;
-                }
-
-                if (
-                    $a['relative'] !==
-                    $b['relative']
-                ) {
-                    return
-                        $a['relative']
-                        <=>
-                        $b['relative'];
-                }
-
-                if (
-                    $a['total_score'] !==
-                    $b['total_score']
-                ) {
-                    return
-                        $a['total_score']
-                        <=>
-                        $b['total_score'];
-                }
-
-                return strcasecmp(
-                    $a['user']->name,
-                    $b['user']->name
-                );
-            })
-
-            ->values();
+                        return strcasecmp(
+                            $a['user']->name,
+                            $b['user']->name
+                        );
+                    }
+                )
+                ->values();
 
         return view(
             'competitions.show',
@@ -226,175 +269,96 @@ class CompetitionController extends Controller
         );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | DZĒŠANA
-    |--------------------------------------------------------------------------
-    */
-
-    public function destroy(
-        Competition $competition
-    ) {
-        if (
-            $competition->user_id !==
-            auth()->id()
-        ) {
-            abort(
-                403,
-                'Tev nav tiesību dzēst šīs sacensības.'
-            );
-        }
-
-        $competition->delete();
-
-        return redirect()
-            ->route('competitions.index')
-            ->with(
-                'success',
-                'Sacensības izdzēstas!'
-            );
-    }
 
     /*
     |--------------------------------------------------------------------------
-    | PIETEIKŠANĀS SACENSĪBĀM
+    | SACENSĪBU REDIĢĒŠANA
     |--------------------------------------------------------------------------
     */
 
-    public function join(
+    public function edit(
         Competition $competition
     ) {
-        if (
-            $competition->status ===
-            'finished'
-        ) {
-            return back()->with(
-                'error',
-                'Pabeigtām sacensībām vairs nevar pieteikties.'
-            );
-        }
+        $this->checkOwner(
+            $competition
+        );
 
-        if (
-            $competition->status ===
-            'cancelled'
-        ) {
-            return back()->with(
-                'error',
-                'Atceltām sacensībām nevar pieteikties.'
-            );
-        }
-
-        $rating =
-            auth()->user()->rating;
-
-        $divisions =
-            $this->getAvailableDivisions(
-                $rating
-            );
-
-        if (count($divisions) === 0) {
-
-            return back()->with(
-                'error',
-                'Tev nav pieejama neviena divīzija.'
-            );
-        }
+        $courses =
+            Course::orderBy('name')
+                ->get();
 
         return view(
-            'competitions.join',
+            'competitions.edit',
             compact(
                 'competition',
-                'divisions',
-                'rating'
+                'courses'
             )
         );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | PIETEIKŠANĀS SAGLABĀŠANA
-    |--------------------------------------------------------------------------
-    */
 
-    public function storeJoin(
+    public function update(
         Request $request,
         Competition $competition
     ) {
-        if (
-            $competition->status ===
-            'finished'
-        ) {
-            return back()->with(
-                'error',
-                'Pabeigtām sacensībām vairs nevar pieteikties.'
-            );
-        }
+        $this->checkOwner(
+            $competition
+        );
 
-        if (
-            $competition->status ===
-            'cancelled'
-        ) {
-            return back()->with(
-                'error',
-                'Atceltām sacensībām nevar pieteikties.'
-            );
-        }
+        $validated =
+            $request->validate([
+                'name' => [
+                    'required',
+                    'max:255',
+                ],
 
-        $rating =
-            auth()->user()->rating;
+                'description' => [
+                    'nullable',
+                ],
 
-        $divisions =
-            $this->getAvailableDivisions(
-                $rating
-            );
+                'date' => [
+                    'required',
+                    'date',
+                ],
 
-        $request->validate([
-            'division' =>
-                'required|in:' .
-                implode(
-                    ',',
-                    array_keys($divisions)
-                ),
+                'course_id' => [
+                    'required',
+                    'exists:courses,id',
+                ],
+
+                'max_players' => [
+                    'nullable',
+                    'integer',
+                    'min:1',
+                ],
+
+                'status' => [
+                    'required',
+                    'in:planned,active,finished,cancelled',
+                ],
+            ]);
+
+        $competition->update([
+            'name' =>
+                $validated['name'],
+
+            'description' =>
+                $validated['description']
+                ?? null,
+
+            'date' =>
+                $validated['date'],
+
+            'course_id' =>
+                $validated['course_id'],
+
+            'max_players' =>
+                $validated['max_players']
+                ?? null,
+
+            'status' =>
+                $validated['status'],
         ]);
-
-        if (
-            $competition
-                ->users()
-                ->where(
-                    'user_id',
-                    auth()->id()
-                )
-                ->exists()
-        ) {
-            return back()->with(
-                'error',
-                'Tu jau esi pieteicies šīm sacensībām.'
-            );
-        }
-
-        if (
-            $competition->max_players &&
-            $competition
-                ->users()
-                ->count()
-            >=
-            $competition->max_players
-        ) {
-            return back()->with(
-                'error',
-                'Šīs sacensības jau ir pilnas.'
-            );
-        }
-
-        $competition
-            ->users()
-            ->attach(
-                auth()->id(),
-                [
-                    'division' =>
-                        $request->division,
-                ]
-            );
 
         return redirect()
             ->route(
@@ -403,649 +367,54 @@ class CompetitionController extends Controller
             )
             ->with(
                 'success',
-                'Tu veiksmīgi pieteicies sacensībām!'
+                'Sacensības veiksmīgi atjauninātas!'
             );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | PIEEJAMĀS DIVĪZIJAS
-    |--------------------------------------------------------------------------
-    */
-
-    private function getAvailableDivisions(
-        $rating
-    ) {
-        $divisions = [
-            'MA1' =>
-                'MA1 - Mixed Amateur 1',
-        ];
-
-        if ($rating <= 934) {
-
-            $divisions['MA2'] =
-                'MA2 - Mixed Amateur 2';
-        }
-
-        if ($rating <= 899) {
-
-            $divisions['MA3'] =
-                'MA3 - Mixed Amateur 3';
-        }
-
-        if ($rating <= 849) {
-
-            $divisions['MA4'] =
-                'MA4 - Mixed Amateur 4';
-        }
-
-        return $divisions;
-    }
 
     /*
     |--------------------------------------------------------------------------
-    | IZSTĀŠANĀS
+    | SACENSĪBU DZĒŠANA
     |--------------------------------------------------------------------------
     */
 
-    public function leave(
+    public function destroy(
         Competition $competition
     ) {
-        if (
-            $competition->user_id ===
-            auth()->id()
-        ) {
-            return back()->with(
-                'error',
-                'Sacensību veidotājs nevar izstāties no savām sacensībām.'
-            );
-        }
-
-        if (
-            $competition->status ===
-            'finished'
-        ) {
-            return back()->with(
-                'error',
-                'No pabeigtām sacensībām vairs nevar izstāties.'
-            );
-        }
-
-        $competition
-            ->users()
-            ->detach(
-                auth()->id()
-            );
-
-        CompetitionResult::where(
-            'competition_id',
-            $competition->id
-        )
-            ->where(
-                'user_id',
-                auth()->id()
-            )
-            ->delete();
-
-        CompetitionHoleResult::where(
-            'competition_id',
-            $competition->id
-        )
-            ->where(
-                'user_id',
-                auth()->id()
-            )
-            ->delete();
-
-        /*
-        |--------------------------------------------------------------------------
-        | PĀRRĒĶINĀM REITINGU
-        |--------------------------------------------------------------------------
-        */
-
-        $this->updateUserRating(
-            auth()->user()
-        );
-
-        return back()->with(
-            'success',
-            'Tu vairs nepiedalies šajās sacensībās.'
-        );
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | SCORECARD
-    |--------------------------------------------------------------------------
-    */
-
-    public function scorecard(
-        Request $request,
-        Competition $competition
-    ) {
-        if (
-            !$competition
-                ->users()
-                ->where(
-                    'user_id',
-                    auth()->id()
-                )
-                ->exists()
-        ) {
-            abort(
-                403,
-                'Tev nav tiesību apskatīt šo scorecard.'
-            );
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Pabeigtām sacensībām scorecard drīkst apskatīt.
-        | Vienīgais aizliegums ir rezultātu rediģēšana.
-        |--------------------------------------------------------------------------
-        */
-
-        $competition->load([
-            'course.courseHoles',
-            'users',
-        ]);
-
-        if (!$competition->course) {
-
-            abort(
-                400,
-                'Šīm sacensībām nav piesaistīta trase.'
-            );
-        }
-
-        $courseHoles =
+        $this->checkOwner(
             $competition
-                ->course
-                ->courseHoles
-                ->sortBy('hole_number')
-                ->values();
-
-        if (
-            $courseHoles->count() === 0
-        ) {
-            abort(
-                400,
-                'Šai trasei nav pievienoti grozi.'
-            );
-        }
-
-        $holeNumber =
-            (int) $request->get(
-                'hole',
-                1
-            );
-
-        if ($holeNumber < 1) {
-            $holeNumber = 1;
-        }
-
-        if (
-            $holeNumber >
-            $courseHoles->count()
-        ) {
-            $holeNumber =
-                $courseHoles->count();
-        }
-
-        $currentHole =
-            $courseHoles->firstWhere(
-                'hole_number',
-                $holeNumber
-            );
-
-        $results =
-            CompetitionHoleResult::where(
-                'competition_id',
-                $competition->id
-            )
-                ->where(
-                    'user_id',
-                    auth()->id()
-                )
-                ->get()
-                ->keyBy(
-                    'course_hole_id'
-                );
-
-        return view(
-            'competitions.scorecard',
-            compact(
-                'competition',
-                'courseHoles',
-                'results',
-                'currentHole'
-            )
-        );
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | VIENA GROZA REZULTĀTA SAGLABĀŠANA
-    |--------------------------------------------------------------------------
-    */
-
-    public function storeHoleResult(
-        Request $request,
-        Competition $competition
-    ) {
-        if (
-            !$competition
-                ->users()
-                ->where(
-                    'user_id',
-                    auth()->id()
-                )
-                ->exists()
-        ) {
-            abort(
-                403,
-                'Tev nav tiesību ievadīt rezultātus šajās sacensībās.'
-            );
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | PABEIGTAS SACENSĪBAS NEVAR REDIĢĒT
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            $competition->status ===
-            'finished'
-        ) {
-            return redirect()
-                ->route(
-                    'competitions.show',
-                    $competition
-                )
-                ->with(
-                    'error',
-                    'Pabeigtu sacensību rezultātus vairs nevar mainīt.'
-                );
-        }
-
-        if (
-            $competition->status ===
-            'cancelled'
-        ) {
-            return redirect()
-                ->route(
-                    'competitions.show',
-                    $competition
-                )
-                ->with(
-                    'error',
-                    'Atceltām sacensībām rezultātus ievadīt nevar.'
-                );
-        }
-
-        $request->validate([
-            'course_hole_id' =>
-                'required|exists:course_holes,id',
-
-            'score' =>
-                'required|integer|min:1|max:100',
-        ]);
-
-        $competition->load(
-            'course'
         );
 
-        if (!$competition->course) {
-
-            abort(
-                400,
-                'Šīm sacensībām nav piesaistīta trase.'
-            );
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | PĀRBAUDĀM GROZU
-        |--------------------------------------------------------------------------
-        */
-
-        $courseHole =
-            $competition
-                ->course
-                ->courseHoles()
-                ->where(
-                    'id',
-                    $request->course_hole_id
-                )
-                ->first();
-
-        if (!$courseHole) {
-
-            abort(
-                403,
-                'Šis grozs nepieder sacensību trasei.'
-            );
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | SAGLABĀJAM GROZA REZULTĀTU
-        |--------------------------------------------------------------------------
-        */
-
-        CompetitionHoleResult::updateOrCreate(
-            [
-                'competition_id' =>
-                    $competition->id,
-
-                'user_id' =>
-                    auth()->id(),
-
-                'course_hole_id' =>
-                    $courseHole->id,
-            ],
-            [
-                'score' =>
-                    $request->score,
-            ]
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | GROZU SKAITS
-        |--------------------------------------------------------------------------
-        */
-
-        $holeCount =
-            $competition
-                ->course
-                ->courseHoles()
-                ->count();
-
-        $playedHoleCount =
-            CompetitionHoleResult::where(
-                'competition_id',
-                $competition->id
-            )
-                ->where(
-                    'user_id',
-                    auth()->id()
-                )
-                ->count();
-
-        /*
-        |--------------------------------------------------------------------------
-        | VISI GROZI PABEIGTI
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            $playedHoleCount ===
-            $holeCount
-        ) {
-
-            /*
-            |--------------------------------------------------------------------------
-            | KOPĒJAIS METIENU SKAITS
-            |--------------------------------------------------------------------------
-            */
-
-            $totalScore =
-                CompetitionHoleResult::where(
-                    'competition_id',
-                    $competition->id
-                )
-                    ->where(
-                        'user_id',
-                        auth()->id()
-                    )
-                    ->sum('score');
-
-            /*
-            |--------------------------------------------------------------------------
-            | DISCAPP RAUNDA REITINGA APRĒĶINS
-            |--------------------------------------------------------------------------
-            |
-            | Discapp vienkāršotā reitinga sistēma:
-            |
-            | 1000-rated rezultāts = trases PAR - 5
-            | 1 metiens = 10 reitinga punkti
-            |
-            | Piemērs PAR 54:
-            |
-            | 44 metieni = 1050
-            | 47 metieni = 1020
-            | 49 metieni = 1000
-            | 54 metieni = 950
-            | 59 metieni = 900
-            |
-            */
-
-            $coursePar =
-                (int) $competition
-                    ->course
-                    ->courseHoles()
-                    ->sum('par');
-
-            $rating1000Score =
-                $coursePar - 5;
-
-            $ratingPerThrow =
-                10;
-
-            $roundRating =
-                1000 +
-                (
-                    (
-                        $rating1000Score -
-                        $totalScore
-                    )
-                    *
-                    $ratingPerThrow
-                );
-
-            /*
-            |--------------------------------------------------------------------------
-            | REITINGU NOAPAĻOJAM LĪDZ VESELAM SKAITLIM
-            |--------------------------------------------------------------------------
-            */
-
-            $roundRating =
-                (int) round(
-                    $roundRating
-                );
-
-            /*
-            |--------------------------------------------------------------------------
-            | SAGLABĀJAM GALA REZULTĀTU
-            |--------------------------------------------------------------------------
-            */
-
-            CompetitionResult::updateOrCreate(
-                [
-                    'competition_id' =>
-                        $competition->id,
-
-                    'user_id' =>
-                        auth()->id(),
-                ],
-                [
-                    'score' =>
-                        $totalScore,
-
-                    'round_rating' =>
-                        $roundRating,
-                ]
-            );
-
-            /*
-            |--------------------------------------------------------------------------
-            | ATJAUNOJAM SPĒLĒTĀJA KOPĒJO REITINGU
-            |--------------------------------------------------------------------------
-            */
-
-            $this->updateUserRating(
-                auth()->user()
-            );
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | NĀKAMAIS GROZS
-        |--------------------------------------------------------------------------
-        */
-
-        $nextHole =
-            $courseHole->hole_number + 1;
-
-        /*
-        |--------------------------------------------------------------------------
-        | JA PABEIGTS PĒDĒJAIS GROZS
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            $playedHoleCount ===
-            $holeCount
-        ) {
-            return redirect()
-                ->route(
-                    'competitions.show',
-                    $competition
-                )
-                ->with(
-                    'success',
-                    'Scorecard pabeigts! Gala rezultāts un reitings saglabāts.'
-                );
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | CITĀDI EJAM UZ NĀKAMO GROZU
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            $nextHole >
-            $holeCount
-        ) {
-            $nextHole =
-                $courseHole->hole_number;
-        }
+        $competition->delete();
 
         return redirect()
             ->route(
-                'competitions.scorecard',
-                [
-                    'competition' =>
-                        $competition,
-
-                    'hole' =>
-                        $nextHole,
-                ]
+                'competitions.index'
             )
             ->with(
                 'success',
-                'Rezultāts saglabāts!'
+                'Sacensības izdzēstas!'
             );
     }
 
+
     /*
     |--------------------------------------------------------------------------
-    | LIETOTĀJA KOPĒJĀ REITINGA PĀRRĒĶINĀŠANA
+    | SACENSĪBU ĪPAŠNIEKA PĀRBAUDE
     |--------------------------------------------------------------------------
     */
 
-    private function updateUserRating(
-        $user
-    ) {
-        $ratings =
-            CompetitionResult::where(
-                'user_id',
-                $user->id
-            )
-                ->whereNotNull(
-                    'round_rating'
-                )
-                ->orderBy(
-                    'created_at'
-                )
-                ->pluck(
-                    'round_rating'
-                )
-                ->map(
-                    fn ($rating) => (int) $rating
-                )
-                ->values();
-
-        /*
-        |--------------------------------------------------------------------------
-        | JA NAV NEVIENA REITĒTA RAUNDA
-        |--------------------------------------------------------------------------
-        */
-
-        if ($ratings->isEmpty()) {
-            return;
+    private function checkOwner(
+        Competition $competition
+    ): void {
+        if (
+            $competition->user_id !==
+            auth()->id()
+        ) {
+            abort(
+                403,
+                'Tev nav tiesību veikt šo darbību.'
+            );
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | LĪDZ 8 RAUNDIEM
-        |--------------------------------------------------------------------------
-        |
-        | Izmantojam visu raundu parasto vidējo.
-        |
-        */
-
-        if ($ratings->count() < 9) {
-
-            $user->rating =
-                (int) round(
-                    $ratings->avg()
-                );
-
-            $user->save();
-
-            return;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | 9 VAI VAIRĀK RAUNDI
-        |--------------------------------------------------------------------------
-        |
-        | Jaunākajiem 25% raundu dodam dubultu svaru.
-        |
-        */
-
-        $recentCount =
-            max(
-                1,
-                (int) ceil(
-                    $ratings->count() * 0.25
-                )
-            );
-
-        $recentRatings =
-            $ratings->take(
-                -$recentCount
-            );
-
-        $weightedSum =
-            $ratings->sum() +
-            $recentRatings->sum();
-
-        $weightedCount =
-            $ratings->count() +
-            $recentRatings->count();
-
-        $user->rating =
-            (int) round(
-                $weightedSum /
-                $weightedCount
-            );
-
-        $user->save();
     }
 }

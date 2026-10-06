@@ -5,11 +5,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CompetitionController;
+use App\Http\Controllers\CompetitionScorecardController;
+use App\Http\Controllers\CompetitionRegistrationController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DiscController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\PlayerController;
+use App\Http\Controllers\PracticeController;
 
 
 // =====================================================
@@ -81,7 +84,10 @@ Route::get('/competitions', [
 // PARASTIE IESLOGOTIE LIETOTĀJI
 // =====================================================
 
-Route::middleware(['auth', 'user'])->group(function () {
+Route::middleware([
+    'auth',
+    'user',
+])->group(function () {
 
     // -------------------------------------------------
     // SACENSĪBU IZVEIDE
@@ -99,32 +105,32 @@ Route::middleware(['auth', 'user'])->group(function () {
 
 
     // -------------------------------------------------
-    // PIEVIENOŠANĀS
+    // PIETEIKŠANĀS SACENSĪBĀM
     // -------------------------------------------------
 
     Route::get('/competitions/{competition}/join', [
-        CompetitionController::class,
-        'join'
+        CompetitionRegistrationController::class,
+        'create'
     ])->name('competitions.join');
 
     Route::post('/competitions/{competition}/join', [
-        CompetitionController::class,
-        'storeJoin'
+        CompetitionRegistrationController::class,
+        'store'
     ])->name('competitions.join.store');
 
 
     // -------------------------------------------------
-    // IZSTĀŠANĀS
+    // IZSTĀŠANĀS NO SACENSĪBĀM
     // -------------------------------------------------
 
     Route::post('/competitions/{competition}/leave', [
-        CompetitionController::class,
-        'leave'
+        CompetitionRegistrationController::class,
+        'destroy'
     ])->name('competitions.leave');
 
 
     // -------------------------------------------------
-    // REDIĢĒŠANA
+    // SACENSĪBU REDIĢĒŠANA
     // -------------------------------------------------
 
     Route::get('/competitions/{competition}/edit', [
@@ -139,7 +145,7 @@ Route::middleware(['auth', 'user'])->group(function () {
 
 
     // -------------------------------------------------
-    // DZĒŠANA
+    // SACENSĪBU DZĒŠANA
     // -------------------------------------------------
 
     Route::delete('/competitions/{competition}', [
@@ -149,18 +155,53 @@ Route::middleware(['auth', 'user'])->group(function () {
 
 
     // -------------------------------------------------
-    // SCORECARD
+    // SACENSĪBU SCORECARD
     // -------------------------------------------------
 
     Route::get('/competitions/{competition}/scorecard', [
-        CompetitionController::class,
-        'scorecard'
+        CompetitionScorecardController::class,
+        'show'
     ])->name('competitions.scorecard');
 
     Route::post('/competitions/{competition}/scorecard', [
-        CompetitionController::class,
-        'storeHoleResult'
+        CompetitionScorecardController::class,
+        'store'
     ])->name('competitions.scorecard.store');
+
+
+    // =================================================
+    // PRACTICE APĻI
+    // =================================================
+
+    Route::get('/practice', [
+        PracticeController::class,
+        'index'
+    ])->name('practice.index');
+
+    Route::post('/practice', [
+        PracticeController::class,
+        'store'
+    ])->name('practice.store');
+
+    Route::get('/practice/{practiceRound}/scorecard', [
+        PracticeController::class,
+        'scorecard'
+    ])->name('practice.scorecard');
+
+    Route::post('/practice/{practiceRound}/scorecard', [
+        PracticeController::class,
+        'storeHoleResult'
+    ])->name('practice.scorecard.store');
+
+    Route::post('/practice/{practiceRound}/finish', [
+        PracticeController::class,
+        'finish'
+    ])->name('practice.finish');
+
+    Route::delete('/practice/{practiceRound}', [
+        PracticeController::class,
+        'destroy'
+    ])->name('practice.destroy');
 
 
     // -------------------------------------------------
@@ -238,23 +279,17 @@ Route::get('/competitions/{competition}', [
 // ADMIN PANELIS
 // =====================================================
 
-Route::middleware(['auth', 'admin'])
+Route::middleware([
+    'auth',
+    'admin',
+])
     ->prefix('admin')
     ->group(function () {
-
-        // -------------------------------------------------
-        // ADMIN SĀKUMLAPA
-        // -------------------------------------------------
 
         Route::get('/', [
             AdminController::class,
             'index'
         ])->name('admin');
-
-
-        // -------------------------------------------------
-        // LIETOTĀJI
-        // -------------------------------------------------
 
         Route::get('/users', [
             AdminController::class,
@@ -272,9 +307,9 @@ Route::middleware(['auth', 'admin'])
         ])->name('admin.users.destroy');
 
 
-        // -------------------------------------------------
+        // ---------------------------------------------
         // TRASES
-        // -------------------------------------------------
+        // ---------------------------------------------
 
         Route::get('/courses', [
             CourseController::class,

@@ -23,8 +23,9 @@
   --transition: all 0.2s ease-in-out;
 }
 
+
 /* =========================
-   PAMATSTILS
+ PAMATSTILS
 ========================= */
 
 *,
@@ -57,8 +58,9 @@ textarea {
   font-family: inherit;
 }
 
+
 /* =========================
-   NAVIGĀCIJA
+ NAVIGĀCIJA
 ========================= */
 
 nav {
@@ -121,8 +123,9 @@ nav a:hover {
   background: var(--danger-btn-hover);
 }
 
+
 /* =========================
-   GALVENAIS SATURS
+ GALVENAIS SATURS
 ========================= */
 
 main {
@@ -142,8 +145,9 @@ main > p {
   font-size: 17px;
 }
 
+
 /* =========================
-   POGAS
+ POGAS
 ========================= */
 
 .button {
@@ -184,8 +188,9 @@ main > p {
   text-decoration: none;
 }
 
+
 /* =========================
-   DZĒŠANAS POGA
+ DZĒŠANAS POGA
 ========================= */
 
 .delete-button {
@@ -204,8 +209,9 @@ main > p {
   background: var(--danger-btn-hover);
 }
 
+
 /* =========================
-   PROFILS
+ PROFILS
 ========================= */
 
 .profile-page {
@@ -357,8 +363,9 @@ main > p {
   font-size: 16px;
 }
 
+
 /* =========================
-   DISKU SOMA
+ DISKU SOMA
 ========================= */
 
 .bag-empty {
@@ -386,8 +393,9 @@ main > p {
   margin-top: 20px;
 }
 
+
 /* =========================
-   DISKI
+ DISKI
 ========================= */
 
 .discs {
@@ -432,8 +440,9 @@ main > p {
   margin-bottom: 15px;
 }
 
+
 /* =========================
-   FLIGHT NUMBERS
+ FLIGHT NUMBERS
 ========================= */
 
 .flight-numbers {
@@ -462,8 +471,9 @@ main > p {
   color: var(--text-primary);
 }
 
+
 /* =========================
-   SACENSĪBU SARAKSTS
+ SACENSĪBU SARAKSTS
 ========================= */
 
 .competitions {
@@ -489,8 +499,9 @@ main > p {
   color: var(--text-muted);
 }
 
+
 /* =========================
-   VIENAS SACENSĪBAS SKATS
+ VIENAS SACENSĪBAS SKATS
 ========================= */
 
 .competition-card {
@@ -503,8 +514,6 @@ main > p {
   overflow: hidden;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
 }
-
-/* Sacensību galvene */
 
 .competition-header {
   padding: 35px;
@@ -571,7 +580,10 @@ main > p {
   font-size: 14px;
 }
 
-/* Informācijas kartītes */
+
+/* =========================
+ INFORMĀCIJAS KARTĪTES
+========================= */
 
 .meta-grid {
   display: grid;
@@ -604,7 +616,10 @@ main > p {
   word-break: break-word;
 }
 
-/* Aizpildījums */
+
+/* =========================
+ AIZPILDĪJUMS
+========================= */
 
 .capacity-section {
   padding: 25px 35px 0;
@@ -639,7 +654,10 @@ main > p {
   transition: width 0.4s ease;
 }
 
-/* Dalībnieku sadaļas virsraksts */
+
+/* =========================
+ DALĪBNIEKU SADAĻA
+========================= */
 
 .section-title-wrapper {
   padding: 0 35px;
@@ -677,15 +695,16 @@ main > p {
   font-weight: bold;
 }
 
-/* Atdalītājs */
-
 .divider {
   border: 0;
   border-top: 1px solid var(--border-color);
   margin: 30px 35px;
 }
 
-/* Divīzijas */
+
+/* =========================
+ DIVĪZIJAS
+========================= */
 
 .participants {
   padding: 0 35px;
@@ -728,8 +747,6 @@ main > p {
   font-size: 13px;
   white-space: nowrap;
 }
-
-/* Spēlētāju kartītes */
 
 .participants-grid {
   display: grid;
@@ -789,7 +806,10 @@ main > p {
   text-transform: uppercase;
 }
 
-/* Navienam dalībniekam */
+
+/* =========================
+ EMPTY STATE
+========================= */
 
 .empty-state {
   margin: 0 35px;
@@ -816,8 +836,9 @@ main > p {
   font-size: 14px;
 }
 
+
 /* =========================
-   SACENSĪBU DARBĪBAS
+ SACENSĪBU DARBĪBAS
 ========================= */
 
 .competition-actions {
@@ -841,8 +862,6 @@ main > p {
 .competition-actions .secondary-button {
   margin: 0;
 }
-
-/* Admin darbības */
 
 .competition-admin-actions {
   display: flex;
@@ -888,8 +907,9 @@ main > p {
   text-decoration: underline;
 }
 
+
 /* =========================
-   SARAKSTI
+ SARAKSTI
 ========================= */
 
 main ul {
@@ -911,11 +931,18 @@ main ul li {
   gap: 15px;
 }
 
+
 /* =========================
-   FORMAS
+ FORMAS
 ========================= */
 
-main form:not(.nav-auth form) {
+/*
+ .player-search ir izslēgts no globālajiem formu stiliem,
+ lai spēlētāju meklēšanas joslai netiktu uzlikts
+ parastās formas dizains.
+*/
+
+main form:not(.nav-auth form):not(.player-search) {
   width: 100%;
   max-width: 500px;
   margin: 30px auto;
@@ -926,7 +953,7 @@ main form:not(.nav-auth form) {
   text-align: left;
 }
 
-main form h2 {
+main form:not(.player-search) h2 {
   margin-top: 0;
   margin-bottom: 20px;
   font-size: 24px;
@@ -934,21 +961,21 @@ main form h2 {
   text-align: center;
 }
 
-main form label {
+main form:not(.player-search) label {
   display: block;
   margin-bottom: 8px;
   font-weight: bold;
   color: var(--text-muted);
 }
 
-main form input[type="text"],
-main form input[type="email"],
-main form input[type="password"],
-main form input[type="date"],
-main form input[type="number"],
-main form input[type="file"],
-main form select,
-main form textarea {
+main form:not(.player-search) input[type="text"],
+main form:not(.player-search) input[type="email"],
+main form:not(.player-search) input[type="password"],
+main form:not(.player-search) input[type="date"],
+main form:not(.player-search) input[type="number"],
+main form:not(.player-search) input[type="file"],
+main form:not(.player-search) select,
+main form:not(.player-search) textarea {
   width: 100%;
   padding: 11px;
   margin-bottom: 18px;
@@ -959,19 +986,19 @@ main form textarea {
   transition: var(--transition);
 }
 
-main form textarea {
+main form:not(.player-search) textarea {
   min-height: 120px;
   resize: vertical;
 }
 
-main form input:focus,
-main form select:focus,
-main form textarea:focus {
+main form:not(.player-search) input:focus,
+main form:not(.player-search) select:focus,
+main form:not(.player-search) textarea:focus {
   border-color: var(--text-primary);
   outline: 2px solid rgba(34, 34, 34, 0.1);
 }
 
-main form button:not(.delete-button):not(.delete-link) {
+main form:not(.player-search) button:not(.delete-button):not(.delete-link) {
   width: 100%;
   padding: 12px;
   background: var(--primary-btn);
@@ -983,12 +1010,125 @@ main form button:not(.delete-button):not(.delete-link) {
   transition: var(--transition);
 }
 
-main form button:not(.delete-button):not(.delete-link):hover {
+main form:not(.player-search) button:not(.delete-button):not(.delete-link):hover {
   background: var(--primary-btn-hover);
 }
 
+
 /* =========================
-   AUTH FORM
+ PLAYER SEARCH
+========================= */
+
+.player-search {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  max-width: 720px;
+  height: 56px;
+
+  margin: 0;
+  padding: 5px;
+
+  background: #ffffff;
+  border: 1px solid #deded9;
+  border-radius: 14px;
+
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.04);
+
+  transition: var(--transition);
+}
+
+.player-search:focus-within {
+  border-color: #e86f2d;
+  box-shadow: 0 0 0 3px rgba(232, 111, 45, 0.1);
+}
+
+.player-search .search-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  color: #999999;
+}
+
+.player-search .search-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.player-search input[type="text"] {
+  display: block;
+
+  flex: 1;
+
+  width: auto;
+  min-width: 0;
+  height: 44px;
+
+  margin: 0;
+  padding: 0 10px;
+
+  border: none;
+  border-radius: 0;
+  outline: none;
+
+  background: transparent;
+
+  color: var(--text-primary);
+
+  font-size: 15px;
+
+  box-shadow: none;
+}
+
+.player-search input[type="text"]:focus {
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+.player-search input[type="text"]::placeholder {
+  color: #aaaaaa;
+}
+
+.player-search button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: auto;
+  height: 44px;
+
+  margin: 0;
+  padding: 0 22px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #e86f2d;
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: var(--transition);
+}
+
+.player-search button:hover {
+  background: #d96124;
+}
+
+
+/* =========================
+ AUTH FORM
 ========================= */
 
 .auth-form {
@@ -1021,8 +1161,9 @@ main form button:not(.delete-button):not(.delete-link):hover {
   text-decoration: underline;
 }
 
+
 /* =========================
-   PAZIŅOJUMI
+ PAZIŅOJUMI
 ========================= */
 
 .success {
@@ -1045,226 +1186,9 @@ main form button:not(.delete-button):not(.delete-link):hover {
   margin: 5px 0;
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width: 800px) {
-  nav {
-    flex-wrap: wrap;
-    padding: 15px 20px;
-  }
-
-  nav h2 {
-    width: 100%;
-    margin-bottom: 10px;
-  }
-
-  nav a {
-    margin-left: 0;
-    margin-right: 15px;
-  }
-
-  .nav-auth {
-    width: 100%;
-    justify-content: space-between;
-    margin-top: 10px;
-  }
-
-  main {
-    margin: 30px auto;
-  }
-
-  main h1 {
-    font-size: 30px;
-  }
-
-  .competition-header {
-    flex-direction: column;
-    padding: 25px;
-  }
-
-  .competition-capacity {
-    width: 100%;
-  }
-
-  .meta-grid {
-    grid-template-columns: repeat(2, 1fr);
-    padding-left: 25px;
-    padding-right: 25px;
-  }
-
-  .capacity-section {
-    padding-left: 25px;
-    padding-right: 25px;
-  }
-
-  .divider {
-    margin-left: 25px;
-    margin-right: 25px;
-  }
-
-  .section-title-wrapper {
-    padding-left: 25px;
-    padding-right: 25px;
-  }
-
-  .participants {
-    padding-left: 25px;
-    padding-right: 25px;
-  }
-
-  .competition-actions {
-    padding-left: 25px;
-    padding-right: 25px;
-  }
-
-  .competition-admin-actions {
-    padding-left: 25px;
-    padding-right: 25px;
-  }
-
-  .empty-state {
-    margin-left: 25px;
-    margin-right: 25px;
-  }
-
-  .participants-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .profile-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 20px;
-  }
-
-  .profile-rating {
-    border-left: none;
-    border-top: 1px solid var(--border-color);
-    padding-left: 0;
-    padding-top: 15px;
-    width: 100%;
-    text-align: left;
-  }
-
-  .profile-stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .profile-info {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 500px) {
-  nav {
-    padding: 15px;
-  }
-
-  nav div {
-    width: 100%;
-  }
-
-  nav a {
-    display: inline-block;
-    margin-bottom: 8px;
-  }
-
-  main,
-  .profile-page {
-    padding: 0 15px;
-  }
-
-  main h1 {
-    font-size: 26px;
-  }
-
-  .competition-card {
-    margin-top: 15px;
-  }
-
-  .competition-header {
-    padding: 20px;
-  }
-
-  .competition-header h1 {
-    font-size: 25px;
-  }
-
-  .competition-description {
-    font-size: 15px;
-  }
-
-  .meta-grid {
-    grid-template-columns: 1fr;
-    padding: 20px;
-  }
-
-  .capacity-section {
-    padding: 20px;
-  }
-
-  .divider {
-    margin: 25px 20px;
-  }
-
-  .section-title-wrapper {
-    padding: 0 20px;
-    align-items: center;
-  }
-
-  .section-title-wrapper h2 {
-    font-size: 21px;
-  }
-
-  .participants {
-    padding: 0 20px;
-  }
-
-  .participants-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .division-header {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 3px;
-  }
-
-  .competition-actions {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 0 20px;
-  }
-
-  .competition-actions .button,
-  .competition-actions .secondary-button {
-    width: 100%;
-  }
-
-  .competition-admin-actions {
-    flex-direction: column;
-    align-items: flex-end;
-    padding: 20px;
-  }
-
-  .empty-state {
-    margin-left: 20px;
-    margin-right: 20px;
-  }
-
-  .participant-card {
-    padding: 11px 12px;
-  }
-  
-  .profile-header {
-    padding: 20px;
-  }
-}
 
 /* =========================
-   REZULTĀTI
+ REZULTĀTI
 ========================= */
 
 .results-division {
@@ -1286,14 +1210,10 @@ main form button:not(.delete-button):not(.delete-link):hover {
   display: flex;
   align-items: center;
   gap: 15px;
-
   padding: 12px 15px;
-
   background: var(--bg-subtle);
-
   border: 1px solid var(--border-color);
   border-radius: var(--radius);
-
   transition: var(--transition);
 }
 
@@ -1303,14 +1223,10 @@ main form button:not(.delete-button):not(.delete-link):hover {
 
 .result-place {
   width: 35px;
-
   text-align: center;
-
   font-size: 16px;
   font-weight: bold;
-
   color: var(--text-light);
-
   flex-shrink: 0;
 }
 
@@ -1318,56 +1234,45 @@ main form button:not(.delete-button):not(.delete-link):hover {
   display: flex;
   align-items: center;
   gap: 12px;
-
   flex: 1;
-
   min-width: 0;
 }
 
 .result-player-info {
   display: flex;
   flex-direction: column;
-
   min-width: 0;
 }
 
 .result-player-info strong {
   overflow: hidden;
-
   white-space: nowrap;
-
   text-overflow: ellipsis;
 }
 
 .result-player-info span {
   color: var(--text-light);
-
   font-size: 11px;
-
   text-transform: uppercase;
 }
 
 .result-score {
   min-width: 100px;
-
   text-align: right;
 }
 
 .result-score strong {
   display: block;
-
   font-size: 20px;
 }
 
 .result-score span {
   color: var(--text-light);
-
   font-size: 11px;
 }
 
 .result-not-entered {
   color: var(--text-light) !important;
-
   font-size: 13px !important;
 }
 
@@ -1378,43 +1283,30 @@ main form button:not(.delete-button):not(.delete-link):hover {
 
 .result-form-section {
   margin: 25px 35px 0;
-
   padding: 20px;
-
   background: var(--bg-subtle);
-
   border: 1px solid var(--border-color);
-
   border-radius: var(--radius);
 }
 
 .result-form-section h3 {
   margin: 0 0 5px;
-
   font-size: 18px;
 }
 
 .result-form-section > p {
   margin: 0 0 18px;
-
   color: var(--text-light);
-
   font-size: 14px;
 }
 
 .result-form-section form {
   width: 100% !important;
-
   max-width: none !important;
-
   margin: 0 !important;
-
   padding: 0 !important;
-
   background: transparent !important;
-
   border: none !important;
-
   box-shadow: none !important;
 }
 
@@ -1424,24 +1316,19 @@ main form button:not(.delete-button):not(.delete-link):hover {
 
 .result-form-section button {
   width: auto !important;
-
   display: inline-block;
-
   margin-top: 5px;
 }
+
 .creator-status {
   padding: 10px 15px;
-
   background: var(--bg-subtle);
-
   border: 1px solid var(--border-color);
-
   border-radius: var(--radius-sm);
-
   color: var(--text-muted);
-
   font-size: 14px;
 }
+
 .competition-status {
   display: inline-block;
   margin-top: 10px;
@@ -1471,8 +1358,10 @@ main form button:not(.delete-button):not(.delete-link):hover {
   color: #999;
   text-decoration: line-through;
 }
+
+
 /* =========================
-   GROZU REZULTĀTI
+ GROZU REZULTĀTI
 ========================= */
 
 .my-score-summary {
@@ -1560,6 +1449,129 @@ main form button:not(.delete-button):not(.delete-link):hover {
   margin: 0;
 }
 
+.save-all-results {
+  width: 100%;
+  margin-top: 25px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+
+/* =========================
+ RESPONSIVE
+========================= */
+
+@media (max-width: 800px) {
+
+  nav {
+      flex-wrap: wrap;
+      padding: 15px 20px;
+  }
+
+  nav h2 {
+      width: 100%;
+      margin-bottom: 10px;
+  }
+
+  nav a {
+      margin-left: 0;
+      margin-right: 15px;
+  }
+
+  .nav-auth {
+      width: 100%;
+      justify-content: space-between;
+      margin-top: 10px;
+  }
+
+  main {
+      margin: 30px auto;
+  }
+
+  main h1 {
+      font-size: 30px;
+  }
+
+  .competition-header {
+      flex-direction: column;
+      padding: 25px;
+  }
+
+  .competition-capacity {
+      width: 100%;
+  }
+
+  .meta-grid {
+      grid-template-columns: repeat(2, 1fr);
+      padding-left: 25px;
+      padding-right: 25px;
+  }
+
+  .capacity-section {
+      padding-left: 25px;
+      padding-right: 25px;
+  }
+
+  .divider {
+      margin-left: 25px;
+      margin-right: 25px;
+  }
+
+  .section-title-wrapper {
+      padding-left: 25px;
+      padding-right: 25px;
+  }
+
+  .participants {
+      padding-left: 25px;
+      padding-right: 25px;
+  }
+
+  .competition-actions {
+      padding-left: 25px;
+      padding-right: 25px;
+  }
+
+  .competition-admin-actions {
+      padding-left: 25px;
+      padding-right: 25px;
+  }
+
+  .empty-state {
+      margin-left: 25px;
+      margin-right: 25px;
+  }
+
+  .participants-grid {
+      grid-template-columns: 1fr;
+  }
+
+  .profile-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+  }
+
+  .profile-rating {
+      border-left: none;
+      border-top: 1px solid var(--border-color);
+      padding-left: 0;
+      padding-top: 15px;
+      width: 100%;
+      text-align: left;
+  }
+
+  .profile-stats {
+      grid-template-columns: repeat(2, 1fr);
+  }
+
+  .profile-info {
+      grid-template-columns: 1fr;
+  }
+}
+
+
 @media (max-width: 700px) {
 
   .my-score-summary {
@@ -1583,10 +1595,125 @@ main form button:not(.delete-button):not(.delete-link):hover {
       width: 100%;
   }
 }
-.save-all-results {
-  width: 100%;
-  margin-top: 25px;
-  padding: 14px;
-  font-size: 16px;
-  font-weight: bold;
+
+
+@media (max-width: 500px) {
+
+  nav {
+      padding: 15px;
+  }
+
+  nav div {
+      width: 100%;
+  }
+
+  nav a {
+      display: inline-block;
+      margin-bottom: 8px;
+  }
+
+  main,
+  .profile-page {
+      padding: 0 15px;
+  }
+
+  main h1 {
+      font-size: 26px;
+  }
+
+  .competition-card {
+      margin-top: 15px;
+  }
+
+  .competition-header {
+      padding: 20px;
+  }
+
+  .competition-header h1 {
+      font-size: 25px;
+  }
+
+  .competition-description {
+      font-size: 15px;
+  }
+
+  .meta-grid {
+      grid-template-columns: 1fr;
+      padding: 20px;
+  }
+
+  .capacity-section {
+      padding: 20px;
+  }
+
+  .divider {
+      margin: 25px 20px;
+  }
+
+  .section-title-wrapper {
+      padding: 0 20px;
+      align-items: center;
+  }
+
+  .section-title-wrapper h2 {
+      font-size: 21px;
+  }
+
+  .participants {
+      padding: 0 20px;
+  }
+
+  .participants-grid {
+      grid-template-columns: 1fr;
+  }
+
+  .division-header {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 3px;
+  }
+
+  .competition-actions {
+      flex-direction: column;
+      align-items: stretch;
+      padding: 0 20px;
+  }
+
+  .competition-actions .button,
+  .competition-actions .secondary-button {
+      width: 100%;
+  }
+
+  .competition-admin-actions {
+      flex-direction: column;
+      align-items: flex-end;
+      padding: 20px;
+  }
+
+  .empty-state {
+      margin-left: 20px;
+      margin-right: 20px;
+  }
+
+  .participant-card {
+      padding: 11px 12px;
+  }
+
+  .profile-header {
+      padding: 20px;
+  }
+
+  .player-search {
+      max-width: 100%;
+      height: 54px;
+  }
+
+  .player-search .search-icon {
+      width: 36px;
+  }
+
+  .player-search button {
+      height: 42px;
+      padding: 0 15px;
+  }
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\CourseHole;
+use App\Models\PracticeRound;
 
 class Course extends Model
 {
@@ -20,12 +21,26 @@ class Course extends Model
         'rating_per_throw' => 'decimal:2',
     ];
 
+
     /**
      * Visi konkrētās trases grozi.
      */
     public function courseHoles()
     {
-        return $this->hasMany(CourseHole::class)
+        return $this->hasMany(
+            CourseHole::class
+        )
             ->orderBy('hole_number');
+    }
+
+
+    /**
+     * Practice apļi šajā trasē.
+     */
+    public function practiceRounds()
+    {
+        return $this->hasMany(
+            PracticeRound::class
+        );
     }
 }

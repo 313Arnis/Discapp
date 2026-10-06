@@ -8,12 +8,15 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+
 use App\Models\CompetitionResult;
 use App\Models\Disc;
 use App\Models\Competition;
+use App\Models\PracticeRound;
 
 #[Fillable([
     'name',
+    'surname',
     'email',
     'password',
     'role',
@@ -32,11 +35,6 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -61,7 +59,10 @@ class User extends Authenticatable
      */
     public function createdCompetitions()
     {
-        return $this->hasMany(Competition::class, 'user_id');
+        return $this->hasMany(
+            Competition::class,
+            'user_id'
+        );
     }
 
 
@@ -70,9 +71,9 @@ class User extends Authenticatable
      */
     public function competitions()
     {
-        // Divīzija pieder konkrētā lietotāja dalībai
-        // konkrētajās sacensībās.
-        return $this->belongsToMany(Competition::class)
+        return $this->belongsToMany(
+            Competition::class
+        )
             ->withPivot('division')
             ->withTimestamps();
     }
@@ -83,6 +84,19 @@ class User extends Authenticatable
      */
     public function results()
     {
-        return $this->hasMany(CompetitionResult::class);
+        return $this->hasMany(
+            CompetitionResult::class
+        );
+    }
+
+
+    /**
+     * Lietotāja Practice apļi
+     */
+    public function practiceRounds()
+    {
+        return $this->hasMany(
+            PracticeRound::class
+        );
     }
 }
