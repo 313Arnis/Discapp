@@ -13,11 +13,20 @@ return new class extends Migration
 
             $table->string('name');
 
-            $table->integer('holes')->default(18);
+            $table->unsignedInteger('holes')
+                ->default(18);
 
-            $table->decimal('rating_1000_score', 6, 2);
+            $table->decimal(
+                'rating_1000_score',
+                6,
+                2
+            );
 
-            $table->decimal('rating_per_throw', 6, 2);
+            $table->decimal(
+                'rating_per_throw',
+                6,
+                2
+            );
 
             $table->timestamps();
         });
