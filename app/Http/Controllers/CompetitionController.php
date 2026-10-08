@@ -5,137 +5,47 @@ namespace App\Http\Controllers;
 use App\Models\Competition;
 use App\Models\Course;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class CompetitionController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | SACENSĪBU SARAKSTS
-    |--------------------------------------------------------------------------
-    */
-
     public function index()
     {
-        $competitions =
-            Competition::with([
-                'course',
-                'creator',
-                'users',
-            ])
-                ->latest('date')
-                ->get();
+        $competitions = Competition::with([
+            'course',
+            'creator',
+            'users',
+        ])
+            ->latest('date')
+            ->get();
 
-        return view(
-            'competitions.index',
-            compact(
-                'competitions'
-            )
-        );
+        return view('competitions.index', compact('competitions'));
     }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | SACENSĪBU IZVEIDE
-    |--------------------------------------------------------------------------
-    */
 
     public function create()
     {
-        $courses =
-            Course::orderBy('name')
-                ->get();
+        $courses = Course::orderBy('name')->get();
 
-        return view(
-            'competitions.create',
-            compact(
-                'courses'
-            )
-        );
+        return view('competitions.create', compact('courses'));
     }
 
-
-    public function store(
-        Request $request
-    ) {
-        $validated =
-            $request->validate([
-                'name' => [
-                    'required',
-                    'max:255',
-                ],
-
-                'description' => [
-                    'nullable',
-                ],
-
-                'date' => [
-                    'required',
-                    'date',
-                ],
-
-                'course_id' => [
-                    'required',
-                    'exists:courses,id',
-                ],
-
-                'max_players' => [
-                    'nullable',
-                    'integer',
-                    'min:1',
-                ],
-
-                'status' => [
-                    'required',
-                    'in:planned,active,finished,cancelled',
-                ],
-            ]);
+    public function store(Request $request)
+    {
+        $validated = $this->validateCompetition($request);
 
         Competition::create([
-            'name' =>
-                $validated['name'],
-
-            'description' =>
-                $validated['description']
-                ?? null,
-
-            'date' =>
-                $validated['date'],
-
-            'course_id' =>
-                $validated['course_id'],
-
-            'max_players' =>
-                $validated['max_players']
-                ?? null,
-
-            'status' =>
-                $validated['status'],
-
-            'user_id' =>
-                auth()->id(),
+            ...$validated,
+            'user_id' => auth()->id(),
         ]);
 
         return redirect()
-            ->route(
-                'competitions.index'
-            )
-            ->with(
-                'success',
-                'Sacensības veiksmīgi izveidotas!'
-            );
+            ->route('competitions.index')
+            ->with('success', 'Sacensības veiksmīgi izveidotas!');
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | SACENSĪBU SKATS
-    |--------------------------------------------------------------------------
-    */
-
-    public function show(
-        Competition $competition
-    ) {
+    public function show(Competition $competition)
+    {
         $competition->load([
             'users',
             'creator',
@@ -144,277 +54,190 @@ class CompetitionController extends Controller
             'holeResults.courseHole',
         ]);
 
-        $players =
-            $competition
-                ->users
-                ->map(
-                    function ($user) use (
-                        $competition
-                    ) {
-                        $results =
-                            $competition
-                                ->holeResults
-                                ->where(
-                                    'user_id',
-                                    $user->id
-                                );
+        $players = $competition->users
+            ->map(function ($user) use ($competition) {
+                $results = $competition->holeResults
+                    ->where('user_id', $user->id);
 
-                        $totalScore =
-                            $results->sum(
-                                'score'
-                            );
+                $totalScore = $results->sum('score');
+                $totalPar = 0;
 
-                        $totalPar = 0;
-
-                        foreach (
-                            $results as $result
-                        ) {
-                            if (
-                                $result->courseHole
-                            ) {
-                                $totalPar +=
-                                    $result
-                                        ->courseHole
-                                        ->par;
-                            }
-                        }
-
-                        $relative =
-                            $totalScore -
-                            $totalPar;
-
-                        return [
-                            'user' =>
-                                $user,
-
-                            'division' =>
-                                $user
-                                    ->pivot
-                                    ->division
-                                ?? '-',
-
-                            'played' =>
-                                $results
-                                    ->count(),
-
-                            'total_score' =>
-                                $totalScore,
-
-                            'total_par' =>
-                                $totalPar,
-
-                            'relative' =>
-                                $relative,
-                        ];
+                foreach ($results as $result) {
+                    if ($result->courseHole) {
+                        $totalPar += $result->courseHole->par;
                     }
-                )
-                ->filter(
-                    function ($player) {
-                        return
-                            $player['user']
-                            !== null;
-                    }
-                )
-                ->sort(
-                    function ($a, $b) {
+                }
 
-                        if (
-                            $a['played'] === 0 &&
-                            $b['played'] > 0
-                        ) {
-                            return 1;
-                        }
+                return [
+                    'user' => $user,
+                    'division' => $user->pivot->division ?? '-',
+                    'played' => $results->count(),
+                    'total_score' => $totalScore,
+                    'total_par' => $totalPar,
+                    'relative' => $totalScore - $totalPar,
+                ];
+            })
+            ->sort(function ($a, $b) {
+                if ($a['played'] === 0 && $b['played'] > 0) {
+                    return 1;
+                }
 
-                        if (
-                            $a['played'] > 0 &&
-                            $b['played'] === 0
-                        ) {
-                            return -1;
-                        }
+                if ($a['played'] > 0 && $b['played'] === 0) {
+                    return -1;
+                }
 
-                        if (
-                            $a['relative'] !==
-                            $b['relative']
-                        ) {
-                            return
-                                $a['relative']
-                                <=>
-                                $b['relative'];
-                        }
+                if ($a['relative'] !== $b['relative']) {
+                    return $a['relative'] <=> $b['relative'];
+                }
 
-                        if (
-                            $a['total_score'] !==
-                            $b['total_score']
-                        ) {
-                            return
-                                $a['total_score']
-                                <=>
-                                $b['total_score'];
-                        }
+                if ($a['total_score'] !== $b['total_score']) {
+                    return $a['total_score'] <=> $b['total_score'];
+                }
 
-                        return strcasecmp(
-                            $a['user']->name,
-                            $b['user']->name
-                        );
-                    }
-                )
-                ->values();
+                return strcasecmp(
+                    $a['user']->name,
+                    $b['user']->name
+                );
+            })
+            ->values();
 
-        return view(
-            'competitions.show',
-            compact(
-                'competition',
-                'players'
-            )
-        );
+        return view('competitions.show', compact(
+            'competition',
+            'players'
+        ));
     }
 
+    public function edit(Competition $competition)
+    {
+        $this->checkOwner($competition);
 
-    /*
-    |--------------------------------------------------------------------------
-    | SACENSĪBU REDIĢĒŠANA
-    |--------------------------------------------------------------------------
-    */
+        $courses = Course::orderBy('name')->get();
 
-    public function edit(
-        Competition $competition
-    ) {
-        $this->checkOwner(
-            $competition
-        );
-
-        $courses =
-            Course::orderBy('name')
-                ->get();
-
-        return view(
-            'competitions.edit',
-            compact(
-                'competition',
-                'courses'
-            )
-        );
+        return view('competitions.edit', compact(
+            'competition',
+            'courses'
+        ));
     }
-
 
     public function update(
         Request $request,
         Competition $competition
     ) {
-        $this->checkOwner(
-            $competition
-        );
+        $this->checkOwner($competition);
 
-        $validated =
-            $request->validate([
-                'name' => [
-                    'required',
-                    'max:255',
-                ],
+        $validated = $this->validateCompetition($request);
 
-                'description' => [
-                    'nullable',
-                ],
+        // Sacensībām ar ievadītiem rezultātiem
+        // trasi vairs nedrīkst mainīt.
+        $hasResults = $competition->holeResults()->exists()
+            || $competition->results()->exists();
 
-                'date' => [
-                    'required',
-                    'date',
-                ],
-
-                'course_id' => [
-                    'required',
-                    'exists:courses,id',
-                ],
-
-                'max_players' => [
-                    'nullable',
-                    'integer',
-                    'min:1',
-                ],
-
-                'status' => [
-                    'required',
-                    'in:planned,active,finished,cancelled',
-                ],
+        if (
+            $hasResults &&
+            (int) $validated['course_id'] !== (int) $competition->course_id
+        ) {
+            throw ValidationException::withMessages([
+                'course_id' =>
+                    'Trasi nevar mainīt, jo sacensībās jau ir ievadīti rezultāti.',
             ]);
+        }
 
-        $competition->update([
-            'name' =>
-                $validated['name'],
+        // Dalībnieku limits nedrīkst būt mazāks
+        // par jau reģistrēto dalībnieku skaitu.
+        $participantCount = $competition->users()->count();
 
-            'description' =>
-                $validated['description']
-                ?? null,
+        if (
+            $validated['max_players'] !== null &&
+            $validated['max_players'] < $participantCount
+        ) {
+            throw ValidationException::withMessages([
+                'max_players' =>
+                    'Maksimālais dalībnieku skaits nevar būt mazāks par '
+                    . $participantCount . '.',
+            ]);
+        }
 
-            'date' =>
-                $validated['date'],
-
-            'course_id' =>
-                $validated['course_id'],
-
-            'max_players' =>
-                $validated['max_players']
-                ?? null,
-
-            'status' =>
-                $validated['status'],
-        ]);
+        $competition->update($validated);
 
         return redirect()
-            ->route(
-                'competitions.show',
-                $competition
-            )
-            ->with(
-                'success',
-                'Sacensības veiksmīgi atjauninātas!'
-            );
+            ->route('competitions.show', $competition)
+            ->with('success', 'Sacensības veiksmīgi atjauninātas!');
     }
 
+    public function destroy(Competition $competition)
+    {
+        $this->checkOwner($competition);
 
-    /*
-    |--------------------------------------------------------------------------
-    | SACENSĪBU DZĒŠANA
-    |--------------------------------------------------------------------------
-    */
-
-    public function destroy(
-        Competition $competition
-    ) {
-        $this->checkOwner(
-            $competition
-        );
+        // Neļaujam izdzēst vēsturiskus rezultātus.
+        if (
+            $competition->holeResults()->exists() ||
+            $competition->results()->exists()
+        ) {
+            return back()->with(
+                'error',
+                'Sacensības nevar dzēst, jo tajās jau ir ievadīti rezultāti.'
+            );
+        }
 
         $competition->delete();
 
         return redirect()
-            ->route(
-                'competitions.index'
-            )
-            ->with(
-                'success',
-                'Sacensības izdzēstas!'
-            );
+            ->route('competitions.index')
+            ->with('success', 'Sacensības izdzēstas!');
     }
 
+    private function validateCompetition(Request $request): array
+    {
+        return $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'description' => [
+                'nullable',
+                'string',
+            ],
+            'date' => [
+                'required',
+                'date',
+            ],
+            'course_id' => [
+                'required',
+                'integer',
+                'exists:courses,id',
+            ],
+            'max_players' => [
+                'nullable',
+                'integer',
+                'min:1',
+            ],
+            'status' => [
+                'required',
+                Rule::in([
+                    'planned',
+                    'active',
+                    'finished',
+                    'cancelled',
+                ]),
+            ],
+            'registration_starts_at' => [
+                'required',
+                'date',
+                'before:registration_ends_at',
+            ],
+            'registration_ends_at' => [
+                'required',
+                'date',
+                'after:registration_starts_at',
+            ],
+        ]);
+    }
 
-    /*
-    |--------------------------------------------------------------------------
-    | SACENSĪBU ĪPAŠNIEKA PĀRBAUDE
-    |--------------------------------------------------------------------------
-    */
-
-    private function checkOwner(
-        Competition $competition
-    ): void {
-        if (
-            $competition->user_id !==
-            auth()->id()
-        ) {
-            abort(
-                403,
-                'Tev nav tiesību veikt šo darbību.'
-            );
+    private function checkOwner(Competition $competition): void
+    {
+        if ((int) $competition->user_id !== (int) auth()->id()) {
+            abort(403, 'Tev nav tiesību veikt šo darbību.');
         }
     }
 }

@@ -10,7 +10,6 @@ class Competition extends Model
         'name',
         'description',
         'date',
-        'location',
         'max_players',
         'status',
         'user_id',
@@ -59,17 +58,19 @@ class Competition extends Model
             return false;
         }
 
-        if (
-            $this->registration_starts_at &&
-            now()->lt($this->registration_starts_at)
-        ) {
+        if (!$this->registration_starts_at || !$this->registration_ends_at) {
             return false;
         }
 
-        if (
-            $this->registration_ends_at &&
-            now()->gt($this->registration_ends_at)
-        ) {
+        if (now()->lt($this->registration_starts_at)) {
+            return false;
+        }
+
+        if (now()->gt($this->registration_ends_at)) {
+            return false;
+        }
+
+        if ($this->date && $this->date->isBefore(today())) {
             return false;
         }
 
