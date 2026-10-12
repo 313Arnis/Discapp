@@ -21,34 +21,54 @@ return new class extends Migration
     public function up(): void
     {
         foreach ($this->relations as $tableName => $relations) {
-            Schema::table($tableName, function (Blueprint $table) use ($relations) {
-                foreach ($relations as [$column]) {
-                    $table->dropForeign([$column]);
-                }
-            });
+            if (!Schema::hasTable($tableName)) {
+                continue;
+            }
 
-            Schema::table($tableName, function (Blueprint $table) use ($relations) {
-                foreach ($relations as [$column, $parent]) {
+            foreach ($relations as [$column, $parent]) {
+                if (!Schema::hasColumn($tableName, $column)) {
+                    continue;
+                }
+
+                if (!Schema::hasTable($parent)) {
+                    continue;
+                }
+
+                Schema::table($tableName, function (Blueprint $table) use ($column) {
+                    $table->dropForeign([$column]);
+                });
+
+                Schema::table($tableName, function (Blueprint $table) use ($column, $parent) {
                     $table->foreign($column)
                         ->references('id')
                         ->on($parent)
                         ->restrictOnDelete();
-                }
-            });
+                });
+            }
         }
     }
 
     public function down(): void
     {
         foreach ($this->relations as $tableName => $relations) {
-            Schema::table($tableName, function (Blueprint $table) use ($relations) {
-                foreach ($relations as [$column]) {
-                    $table->dropForeign([$column]);
-                }
-            });
+            if (!Schema::hasTable($tableName)) {
+                continue;
+            }
 
-            Schema::table($tableName, function (Blueprint $table) use ($relations, $tableName) {
-                foreach ($relations as [$column, $parent]) {
+            foreach ($relations as [$column, $parent]) {
+                if (!Schema::hasColumn($tableName, $column)) {
+                    continue;
+                }
+
+                if (!Schema::hasTable($parent)) {
+                    continue;
+                }
+
+                Schema::table($tableName, function (Blueprint $table) use ($column) {
+                    $table->dropForeign([$column]);
+                });
+
+                Schema::table($tableName, function (Blueprint $table) use ($column, $parent, $tableName) {
                     $foreign = $table->foreign($column)
                         ->references('id')
                         ->on($parent);
@@ -58,8 +78,8 @@ return new class extends Migration
                     } else {
                         $foreign->cascadeOnDelete();
                     }
-                }
-            });
+                });
+            }
         }
     }
 };
