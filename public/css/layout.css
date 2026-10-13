@@ -1,0 +1,129 @@
+
+/* KOPĪGAIS LAYOUT */
+
+.discapp-nav,
+.discapp-nav * {
+    box-sizing: border-box;
+}
+
+.discapp-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 30px;
+    background: transparent;
+}
+
+.discapp-logo {
+    font-size: 24px;
+    font-weight: 800;
+    color: #e86f2d;
+    text-decoration: none;
+}
+
+.discapp-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+.discapp-nav-links a {
+    color: #333;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.discapp-nav-links a:hover,
+.discapp-nav-links a.active {
+    color: #e86f2d;
+}
+
+.discapp-nav-auth {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.discapp-greeting {
+    color: #666;
+    font-size: 14px;
+}
+
+.discapp-login {
+    color: #333;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.discapp-register,
+.discapp-logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 10px;
+    background: #e86f2d;
+    color: white;
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.discapp-register:hover,
+.discapp-logout:hover {
+    transform: translateY(-1px);
+    opacity: 0.9;
+}
+
+.discapp-nav-auth form {
+    margin: 0;
+}
+
+/* FOOTER */
+
+.discapp-footer {
+    max-width: 1100px;
+    margin: 40px auto 0;
+    padding: 25px 30px;
+    border-top: 1px solid #ddd;
+    color: #999;
+    font-size: 13px;
+    text-align: center;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 850px) {
+    .discapp-nav {
+        flex-wrap: wrap;
+    }
+
+    .discapp-nav-links {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 600px) {
+    .discapp-nav {
+        padding: 18px 20px;
+        gap: 15px;
+    }
+
+    .discapp-nav-links {
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .discapp-greeting {
+        display: none;
+    }
+}
