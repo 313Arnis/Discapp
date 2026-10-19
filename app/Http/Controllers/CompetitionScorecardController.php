@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Competition;
@@ -9,99 +10,154 @@ use Illuminate\Support\Facades\DB;
 
 class CompetitionScorecardController extends Controller
 {
-    // SCORECARD APSKATE
-    public function show(Request $request, Competition $competition)
-    {
-        $this->checkParticipant($competition);
-        $competition->load(['course.courseHoles', 'users']);
+    // ==========================================
+    // REZULTĀTU IEVADES LAPA
+    // ==========================================
 
-        if (!$competition->course) {
-            abort(400, 'Šīm sacensībām nav piesaistīta trase.');
+    public function show(
+        Request $request,
+        Competition $competition
+    ) {
+        $this->checkParticipant($competition, $request->user()->id);
+
+        if (!$competition->canEnterResults()) {
+            return redirect()
+                ->route('competitions.show', $competition)
+                ->with(
+                    'error',
+                    'Rezultātu ievade nav pieejama. Pārbaudi sacensību sākuma un beigu laiku.'
+                );
         }
 
-        $courseHoles = $competition->course->courseHoles
+        $competition->load([
+            'course.courseHoles',
+            'users',
+        ]);
+
+        if (!$competition->course) {
+            abort(400, 'Sacensībām nav piesaistīta trase.');
+        }
+
+        $courseHoles = $competition->course
+            ->courseHoles
             ->sortBy('hole_number')
             ->values();
 
         if ($courseHoles->isEmpty()) {
-            abort(400, 'Šai trasei nav pievienoti grozi.');
+            abort(400, 'Trasei nav pievienoti grozi.');
         }
 
-        $holeNumber = (int) $request->query('hole', 1);
-        $currentHole = $courseHoles->firstWhere('hole_number', $holeNumber);
+        $holeNumber = (int) $request->query(
+            'hole',
+            $courseHoles->first()->hole_number
+        );
+
+        $currentHole = $courseHoles->firstWhere(
+            'hole_number',
+            $holeNumber
+        );
 
         if (!$currentHole) {
             $currentHole = $courseHoles->first();
         }
 
-        $results = CompetitionHoleResult::where('competition_id', $competition->id)
-            ->where('user_id', auth()->id())
+        $results = CompetitionHoleResult::where(
+            'competition_id',
+            $competition->id
+        )
+            ->where('user_id', $request->user()->id)
             ->get()
             ->keyBy('course_hole_id');
 
-        return view('competitions.scorecard', compact(
-            'competition',
-            'courseHoles',
-            'results',
-            'currentHole'
-        ));
+        return view(
+            'competitions.scorecard',
+            compact(
+                'competition',
+                'courseHoles',
+                'results',
+                'currentHole'
+            )
+        );
     }
 
+    // ==========================================
     // GROZA REZULTĀTA SAGLABĀŠANA
-    public function store(Request $request, Competition $competition)
-    {
+    // ==========================================
+
+    public function store(
+        Request $request,
+        Competition $competition
+    ) {
         $validated = $request->validate([
-            'course_hole_id' => ['required', 'integer', 'exists:course_holes,id'],
-            'score' => ['required', 'integer', 'min:1', 'max:100'],
+            'course_hole_id' => [
+                'required',
+                'integer',
+                'exists:course_holes,id',
+            ],
+            'score' => [
+                'required',
+                'integer',
+                'min:1',
+                'max:100',
+            ],
         ]);
 
-        $user = $request->user();
-
-        return DB::transaction(function () use ($competition, $validated, $user) {
-            $competition = Competition::whereKey($competition->id)
+        return DB::transaction(function () use (
+            $competition,
+            $validated,
+            $request
+        ) {
+            // Bloķē sacensību ierakstu,
+            // kamēr tiek saglabāts rezultāts.
+            $competition = Competition::whereKey(
+                $competition->id
+            )
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            $this->checkParticipant($competition);
+            $userId = $request->user()->id;
 
-            if ($competition->status !== 'active') {
-                return redirect()->route('competitions.show', $competition)
-                    ->with('error', 'Rezultātus var ievadīt tikai aktīvās sacensībās.');
-            }
+            // Pārbauda dalībnieka tiesības.
+            $this->checkParticipant($competition, $userId);
 
-            $alreadyFinished = CompetitionResult::where('competition_id', $competition->id)
-                ->where('user_id', $user->id)
-                ->exists();
-
-            if ($alreadyFinished) {
-                return redirect()->route('competitions.show', $competition)
-                    ->with('error', 'Tavs scorecard jau ir pabeigts. Rezultātus vairs nevar mainīt.');
+            // Pārbauda sacensību statusu un laiku.
+            if (!$competition->canEnterResults()) {
+                return redirect()
+                    ->route('competitions.show', $competition)
+                    ->with(
+                        'error',
+                        'Rezultātus var ievadīt tikai sacensību norises laikā.'
+                    );
             }
 
             $competition->load('course');
 
             if (!$competition->course) {
-                abort(400, 'Šīm sacensībām nav piesaistīta trase.');
+                abort(
+                    400,
+                    'Sacensībām nav piesaistīta trase.'
+                );
             }
 
-            $courseHoles = $competition->course->courseHoles()
-                ->orderBy('hole_number')
-                ->get();
-
-            if ($courseHoles->isEmpty()) {
-                abort(400, 'Šai trasei nav pievienoti grozi.');
-            }
-
-            $courseHole = $courseHoles->firstWhere('id', $validated['course_hole_id']);
+            // Pārbauda, vai grozs pieder
+            // sacensību trasei.
+            $courseHole = $competition->course
+                ->courseHoles()
+                ->where('id', $validated['course_hole_id'])
+                ->first();
 
             if (!$courseHole) {
-                abort(403, 'Šis grozs nepieder sacensību trasei.');
+                abort(
+                    403,
+                    'Šis grozs nepieder sacensību trasei.'
+                );
             }
 
+            // Saglabā vai atjaunina groza rezultātu.
             CompetitionHoleResult::updateOrCreate(
                 [
                     'competition_id' => $competition->id,
-                    'user_id' => $user->id,
+                    'user_id' => $userId,
                     'course_hole_id' => $courseHole->id,
                 ],
                 [
@@ -109,79 +165,128 @@ class CompetitionScorecardController extends Controller
                 ]
             );
 
-            $holeIds = $courseHoles->pluck('id');
+            // Iegūst visus trases grozus.
+            $courseHoles = $competition->course
+                ->courseHoles()
+                ->orderBy('hole_number')
+                ->get();
 
-            $playedHoleCount = CompetitionHoleResult::where('competition_id', $competition->id)
-                ->where('user_id', $user->id)
+            $holeIds = $courseHoles->pluck('id');
+            $holeCount = $holeIds->count();
+
+            // Iegūst aizpildītos grozus.
+            $playedHoleIds = CompetitionHoleResult::where(
+                'competition_id',
+                $competition->id
+            )
+                ->where('user_id', $userId)
                 ->whereIn('course_hole_id', $holeIds)
                 ->distinct()
-                ->count('course_hole_id');
-
-            if ($playedHoleCount === $courseHoles->count()) {
-                $this->finishScorecard($competition, $user);
-
-                return redirect()->route('competitions.show', $competition)
-                    ->with('success', 'Scorecard pabeigts! Gala rezultāts saglabāts. Reitings tiks aprēķināts pēc sacensību pabeigšanas.');
-            }
-
-            $playedHoleIds = CompetitionHoleResult::where('competition_id', $competition->id)
-                ->where('user_id', $user->id)
-                ->whereIn('course_hole_id', $holeIds)
                 ->pluck('course_hole_id');
 
-            $nextHole = $courseHoles->first(function ($hole) use ($courseHole, $playedHoleIds) {
-                return $hole->hole_number > $courseHole->hole_number
-                    && !$playedHoleIds->contains($hole->id);
-            });
+            // ======================================
+            // VISI GROZI AIZPILDĪTI
+            // ======================================
 
-            if (!$nextHole) {
-                $nextHole = $courseHoles->first(function ($hole) use ($playedHoleIds) {
-                    return !$playedHoleIds->contains($hole->id);
-                });
+            if (
+                $holeCount > 0 &&
+                $playedHoleIds->count() === $holeCount
+            ) {
+                $this->finishScorecard(
+                    $competition,
+                    $userId,
+                    $holeIds
+                );
+
+                return redirect()
+                    ->route('competitions.show', $competition)
+                    ->with(
+                        'success',
+                        'Scorecard pabeigts! Gala rezultāts saglabāts.'
+                    );
             }
 
-            return redirect()->route('competitions.scorecard', [
-                'competition' => $competition,
-                'hole' => $nextHole?->hole_number ?? $courseHole->hole_number,
-            ])->with('success', 'Rezultāts saglabāts!');
+            // ======================================
+            // NĀKAMAIS NEAIZPILDĪTAIS GROZS
+            // ======================================
+
+            $nextHole = $courseHoles->first(
+                function ($hole) use ($playedHoleIds) {
+                    return !$playedHoleIds->contains(
+                        $hole->id
+                    );
+                }
+            );
+
+            return redirect()
+                ->route(
+                    'competitions.scorecard',
+                    [
+                        'competition' => $competition,
+                        'hole' => $nextHole?->hole_number
+                            ?? $courseHole->hole_number,
+                    ]
+                )
+                ->with(
+                    'success',
+                    'Rezultāts saglabāts!'
+                );
         }, 3);
     }
 
+    // ==========================================
     // SCORECARD PABEIGŠANA
-    private function finishScorecard(Competition $competition, $user): void
-    {
-        $courseHoleIds = $competition->course->courseHoles()->pluck('id');
+    // ==========================================
 
-        $totalScore = CompetitionHoleResult::where('competition_id', $competition->id)
-            ->where('user_id', $user->id)
-            ->whereIn('course_hole_id', $courseHoleIds)
+    private function finishScorecard(
+        Competition $competition,
+        int $userId,
+        $holeIds
+    ): void {
+        // Saskaita tikai sacensību trases
+        // grozu rezultātus.
+        $totalScore = CompetitionHoleResult::where(
+            'competition_id',
+            $competition->id
+        )
+            ->where('user_id', $userId)
+            ->whereIn('course_hole_id', $holeIds)
             ->sum('score');
 
+        // Saglabā gala rezultātu.
         CompetitionResult::updateOrCreate(
             [
                 'competition_id' => $competition->id,
-                'user_id' => $user->id,
+                'user_id' => $userId,
             ],
             [
                 'score' => (int) $totalScore,
+
+                // Reitingu aprēķinās tikai
+                // pēc sacensību pabeigšanas.
                 'round_rating' => null,
             ]
         );
     }
 
+    // ==========================================
     // DALĪBNIEKA PĀRBAUDE
-    private function checkParticipant(Competition $competition): void
-    {
-        if (!auth()->check()) {
-            abort(403, 'Lai piekļūtu scorecard, nepieciešams pieslēgties.');
-        }
+    // ==========================================
 
-        $isParticipant = $competition->users()
-            ->where('users.id', auth()->id())
+    private function checkParticipant(
+        Competition $competition,
+        int $userId
+    ): void {
+        $isParticipant = $competition
+            ->users()
+            ->where('users.id', $userId)
             ->exists();
 
         if (!$isParticipant) {
-            abort(403, 'Tev nav tiesību piekļūt šim scorecard.');
+            abort(
+                403,
+                'Tev nav tiesību ievadīt šo sacensību rezultātus.'
+            );
         }
     }
 }

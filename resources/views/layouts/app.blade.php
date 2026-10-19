@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{{ asset('css/layout.css') }}">
 
     @stack('styles')
+    @stack('scripts')
 </head>
 <body>
     @include('components.navbar')

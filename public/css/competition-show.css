@@ -1,0 +1,748 @@
+
+/* ==========================================
+   DISCAPP — SACENSĪBU SKATS
+========================================== */
+
+.competition-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+    color: #252525;
+}
+
+/* PAZIŅOJUMI */
+
+.competition-page .notice {
+    padding: 15px 20px;
+    margin-bottom: 22px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.competition-page .notice-success {
+    background: #e8f7ed;
+    color: #16803c;
+    border: 1px solid #bde5c8;
+}
+
+.competition-page .notice-error {
+    background: #fdecea;
+    color: #bd342b;
+    border: 1px solid #f3c3be;
+}
+
+/* VIRSRaksts */
+
+.competition-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 28px;
+}
+
+.competition-hero > div:first-child {
+    min-width: 0;
+}
+
+.competition-page .page-label,
+.competition-page .section-label {
+    display: inline-block;
+    margin-bottom: 10px;
+    color: #e86f2d;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+}
+
+.competition-hero h1 {
+    margin: 0 0 18px;
+    color: #222;
+    font-size: clamp(32px, 4.5vw, 48px);
+    line-height: 1.12;
+    letter-spacing: -1.4px;
+    overflow-wrap: anywhere;
+}
+
+.competition-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 14px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.status-planned {
+    color: #b65a1c;
+    background: #fff0e3;
+}
+
+.status-active {
+    color: #16803c;
+    background: #e8f7ed;
+}
+
+.status-finished {
+    color: #4e5968;
+    background: #e9edf2;
+}
+
+.status-cancelled {
+    color: #b3342b;
+    background: #fdecea;
+}
+
+.competition-description-card {
+    margin-top: 24px;
+    max-width: 780px;
+}
+
+.competition-description-card h3 {
+    margin: 0 0 8px;
+    font-size: 16px;
+}
+
+.competition-description-card p {
+    margin: 0;
+    color: #666;
+    font-size: 15px;
+    line-height: 1.7;
+    white-space: pre-line;
+}
+
+/* ==========================================
+   SACENSĪBU NORISES LAIKS
+========================================== */
+
+.competition-schedule {
+    margin-bottom: 24px;
+    padding: 26px;
+    background: #ffffff;
+    border: 1px solid #e7e7e3;
+    border-radius: 18px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.025);
+}
+
+.competition-schedule h2 {
+    margin: 0 0 20px;
+    color: #242424;
+    font-size: 22px;
+    font-weight: 750;
+}
+
+.schedule-times {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.schedule-time {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    min-width: 0;
+    padding: 19px 20px;
+    border-radius: 13px;
+    background: #f8f8f6;
+}
+
+.schedule-time span {
+    color: #777;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.schedule-time strong {
+    color: #242424;
+    font-size: 19px;
+    font-weight: 750;
+    overflow-wrap: anywhere;
+}
+
+.schedule-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 18px;
+    padding: 14px 17px;
+    border-radius: 11px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.schedule-active {
+    background: #e8f7ed;
+    color: #16803c;
+}
+
+.schedule-ended {
+    background: #fdecea;
+    color: #bd342b;
+}
+
+.schedule-upcoming {
+    background: #fff1e7;
+    color: #c65b20;
+}
+
+/* ==========================================
+   KOPĪGĀS KARTĪTES
+========================================== */
+
+.competition-page .discapp-card {
+    margin-bottom: 24px;
+    padding: 27px;
+    border: 1px solid #e7e7e3;
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.025);
+}
+
+.competition-page .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 23px;
+}
+
+.competition-page .section-header h2 {
+    margin: 0;
+    color: #252525;
+    font-size: 23px;
+    font-weight: 750;
+}
+
+.competition-page .section-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 35px;
+    min-height: 35px;
+    padding: 5px 11px;
+    border-radius: 10px;
+    background: #fff0e5;
+    color: #d76425;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+/* ==========================================
+   SACENSĪBU INFORMĀCIJA
+========================================== */
+
+.meta-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.meta-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+    padding: 18px;
+    border-radius: 13px;
+    background: #f8f8f6;
+}
+
+.meta-label {
+    color: #777;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.meta-card strong {
+    color: #252525;
+    font-size: 16px;
+    overflow-wrap: anywhere;
+}
+
+.capacity-section {
+    margin-top: 24px;
+}
+
+.capacity-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 10px;
+    color: #666;
+    font-size: 14px;
+}
+
+.capacity-top strong {
+    color: #222;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 10px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: #f0f0ed;
+}
+
+.progress-bar {
+    height: 100%;
+    border-radius: inherit;
+    background: #e86f2d;
+    transition: width 0.3s ease;
+}
+
+/* ==========================================
+   DALĪBNIEKI UN DIVĪZIJAS
+========================================== */
+
+.division-group + .division-group {
+    margin-top: 27px;
+}
+
+.division-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding-bottom: 11px;
+    border-bottom: 1px solid #ededeb;
+}
+
+.division-header h3 {
+    margin: 0;
+    color: #292929;
+    font-size: 17px;
+}
+
+.division-count {
+    color: #888;
+    font-size: 13px;
+}
+
+.participants-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.participant-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    padding: 15px;
+    border: 1px solid #eeeeea;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.participant-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 43px;
+    height: 43px;
+    border-radius: 12px;
+    background: #fff0e5;
+    color: #d76425;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.participant-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.participant-info strong {
+    color: #292929;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+.participant-info span {
+    color: #888;
+    font-size: 12px;
+}
+
+/* ==========================================
+   MANA REZULTĀTA KOPSAVILKUMS
+========================================== */
+
+.my-score-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.score-summary-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    border-radius: 13px;
+    background: #f8f8f6;
+}
+
+.score-summary-card span {
+    color: #777;
+    font-size: 14px;
+}
+
+.score-summary-card strong {
+    color: #e86f2d;
+    font-size: 27px;
+    font-weight: 800;
+}
+
+.result-not-entered {
+    display: inline-block;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: #f4f4f1;
+    color: #777;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* ==========================================
+   REZULTĀTU TABULA
+========================================== */
+
+.results-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #e8e8e5;
+    border-radius: 12px;
+}
+
+.metrix-table {
+    width: 100%;
+    min-width: 680px;
+    border-collapse: collapse;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.metrix-table th,
+.metrix-table td {
+    padding: 13px 11px;
+    border-bottom: 1px solid #eeeeeb;
+    text-align: center;
+}
+
+.metrix-table thead th {
+    background: #f7f7f4;
+    color: #555;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.metrix-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.metrix-table tbody tr:not(.par-row):hover {
+    background: #fffaf6;
+}
+
+.metrix-table .col-name,
+.metrix-table .player-name-cell {
+    min-width: 170px;
+    text-align: left;
+}
+
+.metrix-table .player-name-cell strong {
+    display: block;
+    color: #252525;
+    font-size: 13px;
+}
+
+.player-division {
+    display: block;
+    margin-top: 4px;
+    color: #999;
+    font-size: 11px;
+}
+
+.metrix-table .par-row {
+    background: #fff3e9;
+    font-weight: 700;
+}
+
+.metrix-table .par-title {
+    color: #d76425;
+    text-align: left;
+}
+
+.metrix-table .hole-heading {
+    min-width: 37px;
+}
+
+.metrix-table .hole-score {
+    font-weight: 750;
+}
+
+.metrix-table .hole-double-under {
+    background: #d8edff;
+    color: #1769aa;
+}
+
+.metrix-table .hole-under {
+    background: #e3f6e9;
+    color: #18723b;
+}
+
+.metrix-table .hole-par {
+    color: #555;
+}
+
+.metrix-table .hole-over {
+    background: #fff0db;
+    color: #a96014;
+}
+
+.metrix-table .hole-double-over {
+    background: #fde5e1;
+    color: #ba3528;
+}
+
+.metrix-table .relative-cell {
+    font-weight: 800;
+}
+
+.metrix-table .sum-cell {
+    font-weight: 800;
+    color: #222;
+}
+
+.position-cell {
+    font-weight: 750;
+    color: #555;
+}
+
+/* ==========================================
+   POGAS
+========================================== */
+
+.competition-page a.discapp-button,
+.competition-page button.discapp-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 45px;
+    padding: 12px 20px;
+    border: 0;
+    border-radius: 10px;
+    background: #e86f2d;
+    color: #ffffff;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 750;
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.competition-page a.discapp-button:hover,
+.competition-page button.discapp-button:hover {
+    background: #d75f21;
+    color: #ffffff;
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+.competition-page a.discapp-secondary-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 45px;
+    padding: 12px 20px;
+    border: 1px solid #dededb;
+    border-radius: 10px;
+    background: #fff;
+    color: #444;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.competition-page a.discapp-secondary-button:hover {
+    border-color: #e86f2d;
+    color: #e86f2d;
+    background: #fff8f4;
+    text-decoration: none;
+}
+
+.competition-page .discapp-danger-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 45px;
+    padding: 12px 20px;
+    border: 1px solid #f0c7c1;
+    border-radius: 10px;
+    background: #fff1ef;
+    color: #bd342b;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.competition-page .discapp-danger-button:hover {
+    background: #bd342b;
+    color: #fff;
+}
+
+/* ==========================================
+   SACENSĪBU DARBĪBAS
+========================================== */
+
+.competition-actions,
+.competition-admin-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.competition-admin-actions {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eeeeeb;
+}
+
+.competition-actions form,
+.competition-admin-actions form {
+    margin: 0;
+}
+
+.creator-status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 45px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: #fff3e9;
+    color: #b65a1c;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* ==========================================
+   TUKŠIE STĀVOKĻI
+========================================== */
+
+.empty-state {
+    padding: 36px 20px;
+    border: 1px dashed #deded9;
+    border-radius: 12px;
+    background: #fafaf8;
+    text-align: center;
+}
+
+.empty-state h3 {
+    margin: 0 0 8px;
+    color: #333;
+    font-size: 18px;
+}
+
+.empty-state p {
+    margin: 0;
+    color: #888;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* ==========================================
+   RESPONSĪVAIS DIZAINS
+========================================== */
+
+@media (max-width: 1000px) {
+    .meta-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .participants-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .competition-page {
+        padding: 30px 16px 60px;
+    }
+
+    .competition-hero {
+        flex-direction: column;
+    }
+
+    .competition-page .discapp-card,
+    .competition-schedule {
+        padding: 20px;
+    }
+
+    .schedule-times {
+        grid-template-columns: 1fr;
+    }
+
+    .my-score-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .participants-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .competition-page .section-header h2 {
+        font-size: 20px;
+    }
+
+    .competition-actions,
+    .competition-admin-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .competition-actions > *,
+    .competition-admin-actions > *,
+    .competition-actions form,
+    .competition-admin-actions form {
+        width: 100%;
+    }
+
+    .competition-actions a,
+    .competition-actions button,
+    .competition-admin-actions a,
+    .competition-admin-actions button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .meta-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .competition-hero h1 {
+        font-size: 32px;
+    }
+
+    .schedule-time strong {
+        font-size: 17px;
+    }
+
+    .metrix-table th,
+    .metrix-table td {
+        padding: 11px 9px;
+    }
+}

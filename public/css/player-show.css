@@ -1,0 +1,417 @@
+
+/* ==========================================
+   DISCAPP — PUBLISKAIS SPĒLĒTĀJA PROFILS
+========================================== */
+
+.player-profile-page {
+    width: min(1100px, calc(100% - 40px));
+    margin: 45px auto 90px;
+    color: #252525;
+}
+
+.player-profile-page *,
+.player-profile-page *::before,
+.player-profile-page *::after {
+    box-sizing: border-box;
+}
+
+/* PROFILA GALVENE */
+
+.player-profile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    padding: 32px;
+    margin-bottom: 20px;
+    border: 1px solid #eee7e1;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.025);
+}
+
+.player-profile-identity {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    min-width: 0;
+}
+
+.player-profile-avatar-wrap {
+    flex-shrink: 0;
+}
+
+.player-profile-picture,
+.player-profile-avatar {
+    width: 105px;
+    height: 105px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    box-shadow: 0 0 0 2px #f6dfcd;
+}
+
+.player-profile-picture {
+    display: block;
+    object-fit: cover;
+}
+
+.player-profile-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #fff0e4, #ffd9bc);
+    color: #e86f2d;
+    font-size: 40px;
+    font-weight: 800;
+}
+
+.player-profile-eyebrow {
+    display: block;
+    margin-bottom: 9px;
+    color: #e86f2d;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.6px;
+}
+
+.player-profile-info h1 {
+    margin: 0 0 12px;
+    color: #252525;
+    font-size: clamp(25px, 4vw, 36px);
+    font-weight: 800;
+    letter-spacing: -0.7px;
+    overflow-wrap: anywhere;
+}
+
+.player-profile-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 13px;
+    border-radius: 20px;
+    background: #fff1e6;
+    color: #d96525;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* REITINGS */
+
+.player-profile-rating {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    min-width: 185px;
+    padding: 22px 26px;
+    border: 1px solid #ffe4d0;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #fff7f0, #ffeadb);
+}
+
+.player-profile-rating span {
+    color: #b87349;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.player-profile-rating strong {
+    margin: 8px 0 4px;
+    color: #e86f2d;
+    font-size: 42px;
+    font-weight: 900;
+    line-height: 1.2;
+}
+
+.player-profile-rating small {
+    color: #ad8c77;
+    font-size: 11px;
+}
+
+/* STATISTIKA */
+
+.player-profile-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.player-stat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 26px 15px;
+    border: 1px solid #eee7e1;
+    border-radius: 15px;
+    background: #fff;
+    text-align: center;
+    transition: transform .2s, box-shadow .2s;
+}
+
+.player-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .04);
+}
+
+.player-stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    margin-bottom: 13px;
+    border-radius: 12px;
+    background: #fff2e9;
+    font-size: 23px;
+}
+
+.player-stat-card span {
+    color: #888;
+    font-size: 13px;
+}
+
+.player-stat-card strong {
+    margin-top: 10px;
+    color: #252525;
+    font-size: 31px;
+    font-weight: 850;
+}
+
+/* SACENSĪBU VĒSTURE */
+
+.player-history-section {
+    overflow: hidden;
+    border: 1px solid #eee7e1;
+    border-radius: 18px;
+    background: #fff;
+}
+
+.player-history-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 27px 30px;
+    border-bottom: 1px solid #f0eae5;
+}
+
+.player-history-heading h2 {
+    margin: 0 0 7px;
+    color: #252525;
+    font-size: 23px;
+    font-weight: 800;
+}
+
+.player-history-heading p {
+    margin: 0;
+    color: #999;
+    font-size: 13px;
+}
+
+.player-history-count {
+    flex-shrink: 0;
+    padding: 9px 13px;
+    border-radius: 20px;
+    background: #fff1e6;
+    color: #d96525;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+/* TABULA */
+
+.player-history-scroll {
+    overflow-x: auto;
+}
+
+.player-history-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.player-history-table th {
+    padding: 17px 22px;
+    background: #fffaf6;
+    color: #a08c7e;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+}
+
+.player-history-table td {
+    padding: 20px 22px;
+    border-top: 1px solid #f3eeea;
+    color: #555;
+    font-size: 13px;
+}
+
+.player-history-table tbody tr:hover {
+    background: #fffcfa;
+}
+
+.player-competition-link {
+    color: #252525;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.player-competition-link:hover {
+    color: #e86f2d;
+}
+
+.player-division-badge {
+    display: inline-block;
+    padding: 7px 11px;
+    border-radius: 7px;
+    background: #fff0e5;
+    color: #d96525;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.player-score {
+    color: #252525;
+    font-size: 15px;
+}
+
+.player-place {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 35px;
+    padding: 7px;
+    border-radius: 8px;
+    background: #f5f5f5;
+    color: #333;
+    font-weight: 800;
+}
+
+/* TUKŠA VĒSTURE */
+
+.player-history-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 65px 20px;
+    text-align: center;
+}
+
+.player-history-empty-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 75px;
+    height: 75px;
+    border-radius: 20px;
+    background: #fff1e6;
+    font-size: 36px;
+}
+
+.player-history-empty h3 {
+    margin: 22px 0 10px;
+    color: #252525;
+    font-size: 19px;
+}
+
+.player-history-empty p {
+    max-width: 380px;
+    margin: 0;
+    color: #999;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+/* ATPAKAĻ POGA */
+
+.player-profile-footer {
+    margin-top: 25px;
+}
+
+.player-profile-back {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 17px;
+    border: 1px solid #e9e3dd;
+    border-radius: 9px;
+    background: #fff;
+    color: #555;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: .2s;
+}
+
+.player-profile-back:hover {
+    border-color: #e86f2d;
+    color: #e86f2d;
+}
+
+/* RESPONSĪVAIS DIZAINS */
+
+@media (max-width: 700px) {
+    .player-profile-page {
+        width: calc(100% - 28px);
+        margin-top: 25px;
+    }
+
+    .player-profile-header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 22px;
+    }
+
+    .player-profile-identity {
+        gap: 15px;
+    }
+
+    .player-profile-picture,
+    .player-profile-avatar {
+        width: 75px;
+        height: 75px;
+    }
+
+    .player-profile-avatar {
+        font-size: 29px;
+    }
+
+    .player-profile-rating {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .player-profile-stats {
+        gap: 10px;
+    }
+
+    .player-stat-card {
+        padding: 20px 8px;
+    }
+
+    .player-stat-card span {
+        font-size: 11px;
+    }
+
+    .player-stat-card strong {
+        font-size: 25px;
+    }
+
+    .player-history-heading {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 22px;
+    }
+
+    .player-history-table {
+        min-width: 650px;
+    }
+}
+
+@media (max-width: 380px) {
+    .player-profile-stats {
+        grid-template-columns: 1fr;
+    }
+}

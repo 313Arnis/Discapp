@@ -10,19 +10,24 @@ class Competition extends Model
         'name',
         'description',
         'date',
+        'starts_at',
+        'ends_at',
+        'registration_starts_at',
+        'registration_ends_at',
+        'location',
         'max_players',
         'status',
         'user_id',
         'course_id',
-        'registration_starts_at',
-        'registration_ends_at',
     ];
 
     protected $casts = [
         'date' => 'date',
-        'max_players' => 'integer',
+        'starts_at' => 'datetime',
+        'ends_at' => 'datetime',
         'registration_starts_at' => 'datetime',
         'registration_ends_at' => 'datetime',
+        'max_players' => 'integer',
     ];
 
     public function creator()
@@ -54,26 +59,21 @@ class Competition extends Model
 
     public function isRegistrationOpen(): bool
     {
-        if (!in_array($this->status, ['planned', 'active'], true)) {
-            return false;
-        }
+        return $this->status === 'planned'
+            && $this->registration_starts_at !== null
+            && $this->registration_ends_at !== null
+            && now()->betweenIncluded(
+                $this->registration_starts_at,
+                $this->registration_ends_at
+            );
+    }
 
-        if (!$this->registration_starts_at || !$this->registration_ends_at) {
-            return false;
-        }
-
-        if (now()->lt($this->registration_starts_at)) {
-            return false;
-        }
-
-        if (now()->gt($this->registration_ends_at)) {
-            return false;
-        }
-
-        if ($this->date && $this->date->isBefore(today())) {
-            return false;
-        }
-
-        return true;
+    public function canEnterResults(): bool
+    {
+        return $this->status === 'active'
+            && $this->starts_at !== null
+            && $this->ends_at !== null
+            && now()->greaterThanOrEqualTo($this->starts_at)
+            && now()->lessThan($this->ends_at);
     }
 }

@@ -1,0 +1,432 @@
+
+/* ==========================================
+   DISCAPP — SCORECARD
+========================================== */
+
+.scorecard-page {
+    width: min(100% - 32px, 850px);
+    margin: 45px auto 90px;
+    color: #282828;
+}
+
+/* PAZIŅOJUMI */
+
+.scorecard-error,
+.scorecard-success {
+    margin-bottom: 20px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.scorecard-error {
+    background: #fdecea;
+    border: 1px solid #f1c6c0;
+    color: #b8322a;
+}
+
+.scorecard-success {
+    background: #e9f7ed;
+    border: 1px solid #bfe5c9;
+    color: #187b3c;
+}
+
+/* GALVENE */
+
+.scorecard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.scorecard-header h1 {
+    margin: 0;
+    font-size: clamp(26px, 4vw, 38px);
+    font-weight: 800;
+    letter-spacing: -0.8px;
+    overflow-wrap: anywhere;
+}
+
+.competition-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 10px 16px;
+    border-radius: 25px;
+    background: #fff0e5;
+    color: #d76527;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+/* SACENSĪBU LAIKS */
+
+.scorecard-schedule {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 26px;
+}
+
+.scorecard-schedule span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px;
+    border: 1px solid #e9e9e5;
+    border-radius: 10px;
+    background: #fff;
+    color: #777;
+    font-size: 13px;
+}
+
+.scorecard-schedule strong {
+    color: #333;
+}
+
+/* GROZU INDIKATORI */
+
+.hole-indicators {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 30px 0;
+}
+
+.hole-indicator {
+    display: block;
+    width: 13px;
+    height: 13px;
+    border: 2px solid #e3e3df;
+    border-radius: 50%;
+    background: #e3e3df;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.hole-indicator:hover {
+    transform: scale(1.25);
+    border-color: #e86f2d;
+}
+
+.hole-indicator.completed {
+    border-color: #e86f2d;
+    background: #e86f2d;
+}
+
+.hole-indicator.active {
+    border-color: #e86f2d;
+    background: #fff;
+    box-shadow: 0 0 0 4px #fff0e5;
+    transform: scale(1.2);
+}
+
+/* GROZA INFORMĀCIJA */
+
+.hole-info {
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.hole-info-title {
+    margin-bottom: 8px;
+    color: #252525;
+    font-size: clamp(22px, 4vw, 30px);
+    font-weight: 800;
+}
+
+.hole-info-subtitle {
+    color: #888;
+    font-size: 14px;
+}
+
+/* REZULTĀTA KARTĪTE */
+
+.score-card {
+    overflow: hidden;
+    border: 1px solid #e8e8e5;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.035);
+}
+
+.competition-score-form {
+    margin: 0;
+    padding: 25px;
+}
+
+.player-row {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) 50px 105px 60px;
+    align-items: center;
+    gap: 12px;
+}
+
+.player-position {
+    color: #777;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.player-name {
+    min-width: 0;
+    color: #262626;
+    font-size: 16px;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+.penalty {
+    color: #999;
+    font-size: 12px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.score-input {
+    width: 100%;
+    height: 58px;
+    padding: 8px;
+    border: 2px solid #e7e7e3;
+    border-radius: 12px;
+    outline: none;
+    background: #fff;
+    color: #242424;
+    font: inherit;
+    font-size: 24px;
+    font-weight: 800;
+    text-align: center;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.score-input:focus {
+    border-color: #e86f2d;
+    box-shadow: 0 0 0 4px #fff1e6;
+}
+
+.score-input.saving {
+    background: #fff8f2;
+    border-color: #e86f2d;
+}
+
+.score-input:disabled {
+    background: #f3f3f1;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.relative-score {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 50px;
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.under-par {
+    color: #17834a;
+}
+
+.over-par {
+    color: #d85e25;
+}
+
+.even-par {
+    color: #666;
+}
+
+.autosave-info {
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid #efefec;
+    color: #888;
+    font-size: 13px;
+    text-align: center;
+}
+
+/* GROZU NAVIGĀCIJA */
+
+.score-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 25px 0 35px;
+}
+
+.nav-hole {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 43px;
+    padding: 10px 16px;
+    border: 1px solid #e3e3df;
+    border-radius: 10px;
+    background: #fff;
+    color: #444;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.nav-hole:hover {
+    border-color: #e86f2d;
+    background: #fff7f1;
+    color: #d76527;
+    text-decoration: none;
+}
+
+.nav-hole.disabled {
+    background: #f5f5f3;
+    color: #aaa;
+    cursor: not-allowed;
+}
+
+/* KOPSAVILKUMS */
+
+.summary {
+    overflow: hidden;
+    border: 1px solid #e8e8e5;
+    border-radius: 16px;
+    background: #fff;
+}
+
+.summary-title {
+    padding: 19px 23px;
+    border-bottom: 1px solid #eeeeeb;
+    color: #292929;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.summary-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 15px 23px;
+    border-bottom: 1px solid #f0f0ed;
+    font-size: 14px;
+}
+
+.summary-row:last-child {
+    border-bottom: 0;
+}
+
+.summary-row span {
+    color: #777;
+}
+
+.summary-row strong {
+    color: #252525;
+    font-weight: 800;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+/* STATUSA PAZIŅOJUMI */
+
+.finished-message {
+    margin-top: 24px;
+    padding: 17px 20px;
+    border: 1px solid #f2d8c4;
+    border-radius: 12px;
+    background: #fff4e9;
+    color: #ae5926;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.6;
+    text-align: center;
+}
+
+/* RESPONSĪVAIS DIZAINS */
+
+@media (max-width: 700px) {
+    .scorecard-page {
+        margin-top: 30px;
+        margin-bottom: 60px;
+    }
+
+    .scorecard-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .scorecard-schedule {
+        flex-direction: column;
+    }
+
+    .scorecard-schedule span {
+        justify-content: space-between;
+    }
+
+    .competition-score-form {
+        padding: 18px;
+    }
+
+    .player-row {
+        grid-template-columns: 25px minmax(0, 1fr) 85px 45px;
+        gap: 9px;
+    }
+
+    .penalty {
+        display: none;
+    }
+
+    .player-name {
+        font-size: 14px;
+    }
+
+    .score-input {
+        height: 52px;
+        font-size: 21px;
+    }
+
+    .relative-score {
+        font-size: 18px;
+    }
+
+    .score-navigation {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 420px) {
+    .scorecard-page {
+        width: min(100% - 20px, 850px);
+    }
+
+    .player-row {
+        grid-template-columns: 20px minmax(0, 1fr) 72px 35px;
+        gap: 6px;
+    }
+
+    .competition-score-form {
+        padding: 14px;
+    }
+
+    .score-input {
+        height: 48px;
+        font-size: 19px;
+    }
+
+    .relative-score {
+        font-size: 16px;
+    }
+
+    .nav-hole {
+        padding: 9px 12px;
+        font-size: 12px;
+    }
+
+    .summary-row {
+        padding: 14px 16px;
+    }
+}

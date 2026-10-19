@@ -1,1234 +1,443 @@
-<!DOCTYPE html>
-<html lang="lv">
 
-<head>
+@extends('layouts.app')
 
-    <meta charset="UTF-8">
+@section('title', 'Mans profils - Discapp')
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
+@endpush
 
-    <title>Mans profils - DiscGolf</title>
+@section('content')
 
-    <link
-        rel="stylesheet"
-        href="{{ asset('css/style.css') }}"
-    >
+<main class="discapp-profile">
 
-    <style>
-
-        /* =====================================================
-           PROFILA GALVENE
-        ===================================================== */
-
-        .profile-user {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-
-        /* =====================================================
-           PROFILA BILDE
-        ===================================================== */
-
-        .profile-picture-wrapper {
-            position: relative;
-            flex-shrink: 0;
-        }
-
-        .profile-picture {
-            width: 95px;
-            height: 95px;
-
-            border-radius: 50%;
-
-            object-fit: cover;
-            display: block;
-
-            border: 3px solid #fff;
-
-            box-shadow:
-                0 2px 10px rgba(0, 0, 0, 0.12);
-        }
-
-        .profile-avatar {
-            width: 95px;
-            height: 95px;
-
-            border-radius: 50%;
-
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            background: #e8e8e8;
-            color: #333;
-
-            font-size: 35px;
-            font-weight: bold;
-
-            border: 3px solid #fff;
-
-            box-shadow:
-                0 2px 10px rgba(0, 0, 0, 0.12);
-        }
-
-
-        /* =====================================================
-           PROFILA INFORMĀCIJA
-        ===================================================== */
-
-        .profile-user-info {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .profile-user-info h1 {
-            margin: 0 0 5px;
-        }
-
-        .profile-user-info p {
-            margin: 0 0 8px;
-        }
-
-        .profile-picture-form {
-            margin-top: 12px;
-        }
-
-        .profile-picture-actions {
-            display: flex;
-            align-items: center;
-
-            gap: 10px;
-
-            flex-wrap: wrap;
-        }
-
-        .profile-picture-input {
-            display: none;
-        }
-
-
-        /* =====================================================
-           IZVĒLĒTIES BILDI
-        ===================================================== */
-
-        .choose-picture-button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-
-            padding: 9px 15px;
-
-            background: #222;
-            color: white;
-
-            border: none;
-            border-radius: 5px;
-
-            cursor: pointer;
-
-            font-size: 14px;
-            font-weight: bold;
-
-            text-decoration: none;
-        }
-
-        .choose-picture-button:hover {
-            background: #000;
-        }
-
-
-        /* =====================================================
-           SAGLABĀT BILDI
-        ===================================================== */
-
-        .save-picture-button {
-            display: none;
-
-            padding: 9px 15px;
-
-            background: #ff6500;
-            color: white;
-
-            border: none;
-            border-radius: 5px;
-
-            cursor: pointer;
-
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .save-picture-button:hover {
-            background: #e95700;
-        }
-
-        .save-picture-button.visible {
-            display: inline-block;
-        }
-
-
-        /* =====================================================
-           FAILA NOSAUKUMS
-        ===================================================== */
-
-        .selected-file {
-            display: none;
-
-            max-width: 180px;
-
-            color: #666;
-
-            font-size: 13px;
-
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .selected-file.visible {
-            display: inline-block;
-        }
-
-
-        /* =====================================================
-           NOŅEMT PROFILA BILDI
-        ===================================================== */
-
-        .remove-picture-form {
-            margin: 0;
-        }
-
-        .remove-picture-button {
-            padding: 9px 12px;
-
-            background: transparent;
-            color: #c0392b;
-
-            border: none;
-
-            cursor: pointer;
-
-            font-size: 13px;
-            font-weight: bold;
-        }
-
-        .remove-picture-button:hover {
-            text-decoration: underline;
-        }
-
-
-        /* =====================================================
-           SACENSĪBU VĒSTURE
-        ===================================================== */
-
-        .competition-history-table-wrapper {
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        .competition-history-table {
-            width: 100%;
-
-            border-collapse: collapse;
-        }
-
-        .competition-history-table th {
-            padding: 13px 16px;
-
-            background: #f8f8f8;
-
-            border-bottom: 1px solid #ddd;
-
-            color: #666;
-
-            font-size: 13px;
-            font-weight: 600;
-
-            text-align: left;
-        }
-
-        .competition-history-table td {
-            padding: 15px 16px;
-
-            border-bottom: 1px solid #eee;
-
-            vertical-align: middle;
-        }
-
-        .competition-history-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .competition-history-table tbody tr:hover {
-            background: #fafafa;
-        }
-
-        .competition-history-name {
-            color: #222;
-
-            font-weight: 600;
-
-            text-decoration: none;
-        }
-
-        .competition-history-name:hover {
-            text-decoration: underline;
-        }
-
-        .history-division {
-            display: inline-block;
-
-            padding: 4px 9px;
-
-            background: #eee;
-
-            border-radius: 4px;
-
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .history-score {
-            font-weight: bold;
-        }
-
-        .history-place {
-            font-weight: bold;
-        }
-
-        .history-empty {
-            padding: 30px 20px;
-
-            color: #777;
-
-            text-align: center;
-        }
-
-
-        /* =====================================================
-           MOBILE
-        ===================================================== */
-
-        @media (max-width: 650px) {
-
-            .profile-user {
-                align-items: flex-start;
-            }
-
-            .profile-picture {
-                width: 80px;
-                height: 80px;
-            }
-
-            .profile-avatar {
-                width: 80px;
-                height: 80px;
-
-                font-size: 30px;
-            }
-
-            .profile-picture-actions {
-                gap: 6px;
-            }
-
-            .choose-picture-button,
-            .save-picture-button {
-                padding: 8px 10px;
-
-                font-size: 12px;
-            }
-
-            .selected-file {
-                max-width: 120px;
-            }
-
-            .competition-history-table {
-                min-width: 650px;
-            }
-
-        }
-
-    </style>
-
-</head>
-
-<body>
-
-
-<nav>
-
-    <h2>
-        DiscGolf
-    </h2>
-
-    <div>
-
-        <a href="/">
-            Sākums
-        </a>
-
-        <a href="{{ route('competitions.index') }}">
-            Sacensības
-        </a>
-
-        <a href="{{ route('profile') }}">
-            Mans profils
-        </a>
-
-    </div>
-
-
-    <div class="nav-auth">
-
-        <span>
-            Sveiks, {{ $user->name }}!
-        </span>
-
-        <form
-            method="POST"
-            action="{{ route('logout') }}"
-        >
-
-            @csrf
-
-            <button type="submit">
-                Iziet
-            </button>
-
-        </form>
-
-    </div>
-
-</nav>
-
-
-<main class="profile-page">
-
-
-    {{-- =====================================================
-         PAZIŅOJUMI
-    ===================================================== --}}
-
+    {{-- PAZIŅOJUMI --}}
     @if(session('success'))
-
-        <div class="success">
+        <div class="dp-alert dp-alert-success" role="status">
             {{ session('success') }}
         </div>
-
     @endif
-
 
     @if($errors->any())
-
-        <div class="error">
-
-            @foreach($errors->all() as $error)
-
-                <div>
-                    {{ $error }}
-                </div>
-
-            @endforeach
-
+        <div class="dp-alert dp-alert-error" role="alert">
+            <strong>Radās kļūda:</strong>
+            <ul>
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
-
     @endif
 
+    {{-- PROFILA GALVENE --}}
+    <section class="dp-hero">
 
-    {{-- =====================================================
-         PROFILA GALVENE
-    ===================================================== --}}
+        <div class="dp-hero-decoration"></div>
 
-    <div class="profile-header">
+        <div class="dp-hero-content">
 
+            <div class="dp-user">
 
-        <div class="profile-user">
+                <div class="dp-avatar-wrap">
 
-
-            {{-- PROFILA BILDE --}}
-
-            <div class="profile-picture-wrapper">
-
-                @if($user->profile_picture)
-
-                    <img
-                        src="{{ asset(
-                            'storage/' .
-                            $user->profile_picture
-                        ) }}"
-                        alt="{{ $user->name }}"
-                        class="profile-picture"
-                        id="profileImage"
-                    >
-
-                @else
-
-                    <div
-                        class="profile-avatar"
-                        id="profileAvatar"
-                    >
-                        {{ strtoupper(
-                            substr(
-                                $user->name,
-                                0,
-                                1
-                            )
-                        ) }}
-                    </div>
-
-                    <img
-                        src=""
-                        alt="{{ $user->name }}"
-                        class="profile-picture"
-                        id="profileImage"
-                        style="display: none;"
-                    >
-
-                @endif
-
-            </div>
-
-
-            {{-- VĀRDS + BILDES PIEVIENOŠANA --}}
-
-            <div class="profile-user-info">
-
-                <h1>
-                    {{ $user->name }}
-                </h1>
-
-                <p>
-                    {{ $user->email }}
-                </p>
-
-                <span class="profile-status">
-                    Spēlētājs
-                </span>
-
-
-                {{-- BILDES FORMA --}}
-
-                <form
-                    method="POST"
-                    action="{{ route(
-                        'profile.picture.update'
-                    ) }}"
-                    enctype="multipart/form-data"
-                    class="profile-picture-form"
-                    id="profilePictureForm"
-                >
-
-                    @csrf
-                    @method('PUT')
-
-                    <div class="profile-picture-actions">
-
-                        <input
-                            type="file"
-                            id="profile_picture"
-                            name="profile_picture"
-                            class="profile-picture-input"
-                            accept=".jpg,.jpeg,.png,.webp"
-                            required
+                    @if($user->profile_picture)
+                        <img
+                            src="{{ asset('storage/' . $user->profile_picture) }}"
+                            alt="{{ $user->name }}"
+                            class="dp-avatar"
+                            id="profileImage"
                         >
-
-                        <label
-                            for="profile_picture"
-                            class="choose-picture-button"
-                        >
-                            Mainīt bildi
-                        </label>
-
-                        <span
-                            id="selectedFile"
-                            class="selected-file"
-                        ></span>
-
-                        <button
-                            type="submit"
-                            id="savePictureButton"
-                            class="save-picture-button"
-                        >
-                            Saglabāt
-                        </button>
-
-                    </div>
-
-                </form>
-
-
-                @if($user->profile_picture)
-
-                    <form
-                        method="POST"
-                        action="{{ route(
-                            'profile.picture.delete'
-                        ) }}"
-                        class="remove-picture-form"
-                        onsubmit="
-                            return confirm(
-                                'Vai tiešām vēlies noņemt profila bildi?'
-                            );
-                        "
-                    >
-
-                        @csrf
-                        @method('DELETE')
-
-                        <button
-                            type="submit"
-                            class="remove-picture-button"
-                        >
-                            Noņemt bildi
-                        </button>
-
-                    </form>
-
-                @endif
-
-            </div>
-
-        </div>
-
-
-        {{-- REITINGS --}}
-
-        <div class="profile-rating">
-
-            <span>
-                Reitings
-            </span>
-
-            <strong>
-                {{ $user->rating }}
-            </strong>
-
-        </div>
-
-    </div>
-
-
-    {{-- =====================================================
-         STATISTIKA
-    ===================================================== --}}
-
-    <div class="profile-stats">
-
-        <div class="stat-box">
-
-            <span>
-                Sacensības
-            </span>
-
-            <strong>
-                {{ $user->competitions->count() }}
-            </strong>
-
-        </div>
-
-
-        <div class="stat-box">
-
-            <span>
-                Izspēlētās sacensības
-            </span>
-
-            <strong>
-                {{ $playedCompetitions }}
-            </strong>
-
-        </div>
-
-
-        <div class="stat-box">
-
-            <span>
-                Uzvaras
-            </span>
-
-            <strong>
-                {{ $wins }}
-            </strong>
-
-        </div>
-
-
-        <div class="stat-box">
-
-            <span>
-                Diski somā
-            </span>
-
-            <strong>
-                {{ $user->discs->count() }}
-            </strong>
-
-        </div>
-
-    </div>
-
-
-    <div class="profile-content">
-
-
-        {{-- =====================================================
-             PAR SPĒLĒTĀJU
-        ===================================================== --}}
-
-        <div class="profile-section">
-
-            <div class="section-header">
-
-                <h2>
-                    Par spēlētāju
-                </h2>
-
-            </div>
-
-
-            <div class="profile-info">
-
-                <div>
-
-                    <span>
-                        Vārds
-                    </span>
-
-                    <strong>
-                        {{ $user->name }}
-                    </strong>
-
-                </div>
-
-
-                <div>
-
-                    <span>
-                        E-pasts
-                    </span>
-
-                    <strong>
-                        {{ $user->email }}
-                    </strong>
-
-                </div>
-
-
-                <div>
-
-                    <span>
-                        Reitings
-                    </span>
-
-                    <strong>
-                        {{ $user->rating }}
-                    </strong>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        {{-- =====================================================
-             SACENSĪBU VĒSTURE
-        ===================================================== --}}
-
-        <div class="profile-section">
-
-            <div class="section-header">
-
-                <h2>
-                    Sacensību vēsture
-                </h2>
-
-                <span>
-                    {{ $competitionHistory->count() }}
-                </span>
-
-            </div>
-
-
-            @if($competitionHistory->count() > 0)
-
-                <div class="competition-history-table-wrapper">
-
-                    <table class="competition-history-table">
-
-                        <thead>
-
-                            <tr>
-
-                                <th>
-                                    Sacensības
-                                </th>
-
-                                <th>
-                                    Datums
-                                </th>
-
-                                <th>
-                                    Divīzija
-                                </th>
-
-                                <th>
-                                    Rezultāts
-                                </th>
-
-                                <th>
-                                    Vieta
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-                            @foreach(
-                                $competitionHistory
-                                as $history
-                            )
-
-                                <tr>
-
-                                    <td>
-
-                                        <a
-                                            href="{{ route(
-                                                'competitions.show',
-                                                $history[
-                                                    'competition'
-                                                ]
-                                            ) }}"
-                                            class="competition-history-name"
-                                        >
-                                            {{
-                                                $history[
-                                                    'competition'
-                                                ]->name
-                                            }}
-                                        </a>
-
-                                    </td>
-
-
-                                    <td>
-
-                                        {{
-                                            $history[
-                                                'competition'
-                                            ]->date
-                                                ? \Carbon\Carbon::parse(
-                                                    $history[
-                                                        'competition'
-                                                    ]->date
-                                                )->format(
-                                                    'd.m.Y'
-                                                )
-                                                : '-'
-                                        }}
-
-                                    </td>
-
-
-                                    <td>
-
-                                        <span class="history-division">
-
-                                            {{
-                                                $history[
-                                                    'division'
-                                                ]
-                                            }}
-
-                                        </span>
-
-                                    </td>
-
-
-                                    <td>
-
-                                        <span class="history-score">
-
-                                            @if(
-                                                $history[
-                                                    'relative_to_par'
-                                                ] === 0
-                                            )
-
-                                                E
-
-                                            @elseif(
-                                                $history[
-                                                    'relative_to_par'
-                                                ] > 0
-                                            )
-
-                                                +{{
-                                                    $history[
-                                                        'relative_to_par'
-                                                    ]
-                                                }}
-
-                                            @else
-
-                                                {{
-                                                    $history[
-                                                        'relative_to_par'
-                                                    ]
-                                                }}
-
-                                            @endif
-
-                                        </span>
-
-                                    </td>
-
-
-                                    <td>
-
-                                        <span class="history-place">
-
-                                            {{
-                                                $history[
-                                                    'place'
-                                                ]
-                                            }}.
-
-                                        </span>
-
-                                    </td>
-
-                                </tr>
-
-                            @endforeach
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            @else
-
-                <div class="history-empty">
-
-                    Tu vēl neesi pabeidzis nevienas
-                    sacensības.
-
-                </div>
-
-            @endif
-
-        </div>
-
-
-        {{-- =====================================================
-             DISKU SOMA
-        ===================================================== --}}
-
-        <div class="profile-section">
-
-            <div class="section-header">
-
-                <h2>
-                    Mana disku soma
-                </h2>
-
-                <a
-                    href="{{ route(
-                        'profile.discs.index'
-                    ) }}"
-                    class="button"
-                >
-                    Pārvaldīt diskus
-                </a>
-
-            </div>
-
-
-            @if($user->discs->count() > 0)
-
-                <div class="discs">
-
-                    @foreach($user->discs as $disc)
-
-                        <div class="disc">
-
-
-                            @if($disc->image)
-
-                                <img
-                                    src="{{ asset(
-                                        'storage/' .
-                                        $disc->image
-                                    ) }}"
-                                    alt="{{ $disc->name }}"
-                                    class="disc-image"
-                                >
-
-                            @else
-
-                                <div class="disc-no-image">
-                                    🥏
-                                </div>
-
-                            @endif
-
-
-                            <h3>
-                                {{ $disc->name }}
-                            </h3>
-
-
-                            @if($disc->type)
-
-                                <p>
-
-                                    <strong>
-                                        Tips:
-                                    </strong>
-
-                                    {{ $disc->type }}
-
-                                </p>
-
-                            @endif
-
-
-                            <div class="flight-numbers">
-
-
-                                <div>
-
-                                    <span>
-                                        Speed
-                                    </span>
-
-                                    <strong>
-                                        {{ $disc->speed }}
-                                    </strong>
-
-                                </div>
-
-
-                                <div>
-
-                                    <span>
-                                        Glide
-                                    </span>
-
-                                    <strong>
-                                        {{ $disc->glide }}
-                                    </strong>
-
-                                </div>
-
-
-                                <div>
-
-                                    <span>
-                                        Turn
-                                    </span>
-
-                                    <strong>
-                                        {{ $disc->turn }}
-                                    </strong>
-
-                                </div>
-
-
-                                <div>
-
-                                    <span>
-                                        Fade
-                                    </span>
-
-                                    <strong>
-                                        {{ $disc->fade }}
-                                    </strong>
-
-                                </div>
-
-
-                            </div>
-
+                    @else
+                        <div class="dp-avatar-fallback" id="profileAvatar">
+                            {{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}
                         </div>
 
-                    @endforeach
+                        <img
+                            src=""
+                            alt="{{ $user->name }}"
+                            class="dp-avatar"
+                            id="profileImage"
+                            style="display: none;"
+                        >
+                    @endif
 
                 </div>
 
-            @else
+                <div class="dp-user-details">
+                    <span class="dp-eyebrow">MANS PROFILS</span>
 
-                <div class="bag-empty">
+                    <h1>{{ $user->name }}</h1>
 
-                    <div class="bag-icon">
-                        🥏
+                    <p class="dp-email">{{ $user->email }}</p>
+
+                    <span class="dp-role">Spēlētājs</span>
+
+                    <div class="dp-picture-controls">
+
+                        <form
+                            method="POST"
+                            action="{{ route('profile.picture.update') }}"
+                            enctype="multipart/form-data"
+                            id="profilePictureForm"
+                            class="dp-picture-form"
+                        >
+                            @csrf
+                            @method('PUT')
+
+                            <input
+                                type="file"
+                                name="profile_picture"
+                                id="profile_picture"
+                                accept=".jpg,.jpeg,.png,.webp"
+                                class="dp-file-input"
+                                required
+                            >
+
+                            <label for="profile_picture" class="dp-btn dp-btn-outline">
+                                Mainīt bildi
+                            </label>
+
+                            <span id="selectedFile" class="dp-selected-file"></span>
+
+                            <button
+                                type="submit"
+                                id="savePictureButton"
+                                class="dp-btn dp-btn-primary"
+                            >
+                            Saglabāt bildi
+                            </button>
+                        </form>
+
+                        @if($user->profile_picture)
+                            <form
+                                method="POST"
+                                action="{{ route('profile.picture.delete') }}"
+                                onsubmit="return confirm('Vai tiešām vēlies noņemt profila bildi?')"
+                            >
+                                @csrf
+                                @method('DELETE')
+
+                                <button type="submit" class="dp-remove-picture">
+                                    Noņemt bildi
+                                </button>
+                            </form>
+                        @endif
+
                     </div>
-
-                    <h3>
-                        Disku soma vēl ir tukša
-                    </h3>
-
-                    <p>
-                        Pievieno savus diskus profilam,
-                        lai vienuviet redzētu savu
-                        disku golfa somas saturu.
-                    </p>
-
-                    <a
-                        href="{{ route(
-                            'profile.discs.index'
-                        ) }}"
-                        class="button"
-                    >
-                        Pievienot diskus
-                    </a>
-
                 </div>
 
-            @endif
+            </div>
+
+            <div class="dp-rating">
+                <span>SPĒLĒTĀJA REITINGS</span>
+                <strong>{{ $user->rating ?? '—' }}</strong>
+                <small>Discapp Rating</small>
+            </div>
 
         </div>
+    </section>
 
-    </div>
+    {{-- STATISTIKA --}}
+    <section class="dp-stats">
+
+        <div class="dp-stat-card">
+            <span class="dp-stat-label">Sacensības</span>
+            <strong>{{ $user->competitions->count() }}</strong>
+            <span class="dp-stat-description">Pieteiktās sacensības</span>
+        </div>
+
+        <div class="dp-stat-card">
+            <span class="dp-stat-label">Izspēlētās sacensības</span>
+            <strong>{{ $playedCompetitions }}</strong>
+            <span class="dp-stat-description">Pabeigtie turnīri</span>
+        </div>
+
+        <div class="dp-stat-card">
+            <span class="dp-stat-label">Uzvaras</span>
+            <strong>{{ $wins }}</strong>
+            <span class="dp-stat-description">Iegūtās pirmās vietas</span>
+        </div>
+
+        <div class="dp-stat-card">
+            <span class="dp-stat-label">Diski somā</span>
+            <strong>{{ $user->discs->count() }}</strong>
+            <span class="dp-stat-description">Tava kolekcija</span>
+        </div>
+
+    </section>
+
+    {{-- PAR SPĒLĒTĀJU --}}
+    <section class="dp-panel">
+
+        <div class="dp-panel-header">
+            <div>
+                <span class="dp-eyebrow">INFORMĀCIJA</span>
+                <h2>Par spēlētāju</h2>
+            </div>
+        </div>
+
+        <div class="dp-info-grid">
+
+            <div class="dp-info-item">
+                <span>Vārds</span>
+                <strong>{{ $user->name }}</strong>
+            </div>
+
+            <div class="dp-info-item">
+                <span>E-pasts</span>
+                <strong>{{ $user->email }}</strong>
+            </div>
+
+            <div class="dp-info-item">
+                <span>Reitings</span>
+                <strong>{{ $user->rating ?? '—' }}</strong>
+            </div>
+
+        </div>
+    </section>
+
+    {{-- SACENSĪBU VĒSTURE --}}
+    <section class="dp-panel">
+
+        <div class="dp-panel-header">
+            <div>
+                <span class="dp-eyebrow">TAVI REZULTĀTI</span>
+                <h2>Sacensību vēsture</h2>
+            </div>
+
+            <span class="dp-count">
+                {{ $competitionHistory->count() }}
+            </span>
+        </div>
+
+        @if($competitionHistory->count() > 0)
+
+            <div class="dp-table-wrap">
+                <table class="dp-history-table">
+
+                    <thead>
+                        <tr>
+                            <th>Sacensības</th>
+                            <th>Datums</th>
+                            <th>Divīzija</th>
+                            <th>Rezultāts</th>
+                            <th>Vieta</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach($competitionHistory as $history)
+                            <tr>
+                                <td>
+                                    <a
+                                        href="{{ route('competitions.show', $history['competition']) }}"
+                                        class="dp-history-link"
+                                    >
+                                        {{ $history['competition']->name }}
+                                    </a>
+                                </td>
+
+                                <td>
+                                    {{ $history['competition']->date
+                                        ? \Carbon\Carbon::parse($history['competition']->date)->format('d.m.Y')
+                                        : ($history['competition']->starts_at
+                                            ? \Carbon\Carbon::parse($history['competition']->starts_at)->format('d.m.Y')
+                                            : '-') }}
+                                </td>
+
+                                <td>
+                                    <span class="dp-division">
+                                        {{ $history['division'] }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <strong class="dp-score">
+                                        @if($history['relative_to_par'] === 0)
+                                            E
+                                        @elseif($history['relative_to_par'] > 0)
+                                            +{{ $history['relative_to_par'] }}
+                                        @else
+                                            {{ $history['relative_to_par'] }}
+                                        @endif
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    <span class="dp-place">
+                                        {{ $history['place'] }}.
+                                    </span>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+
+                </table>
+            </div>
+
+        @else
+
+            <div class="dp-empty">
+                <div class="dp-empty-icon">🏆</div>
+                <h3>Vēl nav sacensību rezultātu</h3>
+                <p>Te parādīsies tavi pabeigto sacensību rezultāti.</p>
+
+                <a href="{{ route('competitions.index') }}" class="dp-btn dp-btn-primary">
+                    Apskatīt sacensības
+                </a>
+            </div>
+
+        @endif
+
+    </section>
+
+    {{-- DISKU SOMA --}}
+    <section class="dp-panel">
+
+        <div class="dp-panel-header">
+            <div>
+                <span class="dp-eyebrow">TAVA KOLEKCIJA</span>
+                <h2>Mana disku soma</h2>
+            </div>
+
+            <a
+                href="{{ route('profile.discs.index') }}"
+                class="dp-btn dp-btn-primary"
+            >
+                Pārvaldīt diskus
+            </a>
+        </div>
+
+        @if($user->discs->count() > 0)
+
+            <div class="dp-discs-grid">
+
+                @foreach($user->discs as $disc)
+                    <article class="dp-disc-card">
+
+                        <div class="dp-disc-image-wrap">
+                            @if($disc->image)
+                                <img
+                                    src="{{ asset('storage/' . $disc->image) }}"
+                                    alt="{{ $disc->name }}"
+                                    class="dp-disc-image"
+                                >
+                            @else
+                                <div class="dp-disc-placeholder">🥏</div>
+                            @endif
+                        </div>
+
+                        <div class="dp-disc-body">
+                            <h3>{{ $disc->name }}</h3>
+
+                            @if($disc->type)
+                                <span class="dp-disc-type">
+                                    {{ $disc->type }}
+                                </span>
+                            @endif
+
+                            <div class="dp-flight-numbers">
+
+                                <div>
+                                    <span>Speed</span>
+                                    <strong>{{ $disc->speed }}</strong>
+                                </div>
+
+                                <div>
+                                    <span>Glide</span>
+                                    <strong>{{ $disc->glide }}</strong>
+                                </div>
+
+                                <div>
+                                    <span>Turn</span>
+                                    <strong>{{ $disc->turn }}</strong>
+                                </div>
+
+                                <div>
+                                    <span>Fade</span>
+                                    <strong>{{ $disc->fade }}</strong>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </article>
+                @endforeach
+
+            </div>
+
+        @else
+
+            <div class="dp-empty">
+                <div class="dp-empty-icon">🥏</div>
+
+                <h3>Disku soma vēl ir tukša</h3>
+
+                <p>
+                    Pievieno savus diskus, lai vienuviet redzētu
+                    visu savu disku golfa kolekciju.
+                </p>
+
+                <a
+                    href="{{ route('profile.discs.index') }}"
+                    class="dp-btn dp-btn-primary"
+                >
+                    Pievienot diskus
+                </a>
+            </div>
+
+        @endif
+
+    </section>
 
 </main>
 
+@endsection
 
+@push('scripts')
 <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('profile_picture');
+    const profileImage = document.getElementById('profileImage');
+    const profileAvatar = document.getElementById('profileAvatar');
+    const selectedFile = document.getElementById('selectedFile');
+    const saveButton = document.getElementById('savePictureButton');
 
-    document.addEventListener(
-        'DOMContentLoaded',
-        function () {
+    if (!input || !profileImage || !selectedFile || !saveButton) {
+        return;
+    }
 
-            const input =
-                document.getElementById(
-                    'profile_picture'
-                );
+    input.addEventListener('change', function () {
+        const file = this.files[0];
 
-            const profileImage =
-                document.getElementById(
-                    'profileImage'
-                );
+        if (!file) {
+            selectedFile.textContent = '';
+            selectedFile.classList.remove('visible');
+            saveButton.classList.remove('visible');
+            return;
+        }
 
-            const profileAvatar =
-                document.getElementById(
-                    'profileAvatar'
-                );
+        selectedFile.textContent = file.name;
+        selectedFile.classList.add('visible');
+        saveButton.classList.add('visible');
 
-            const selectedFile =
-                document.getElementById(
-                    'selectedFile'
-                );
+        if (!file.type.startsWith('image/')) {
+            return;
+        }
 
-            const saveButton =
-                document.getElementById(
-                    'savePictureButton'
-                );
+        const reader = new FileReader();
 
-
-            if (!input) {
-                return;
+        reader.onload = function (event) {
+            if (profileAvatar) {
+                profileAvatar.style.display = 'none';
             }
 
+            profileImage.src = event.target.result;
+            profileImage.style.display = 'block';
+        };
 
-            input.addEventListener(
-                'change',
-                function () {
-
-                    const file =
-                        this.files[0];
-
-
-                    if (!file) {
-
-                        selectedFile.textContent = '';
-
-                        selectedFile.classList.remove(
-                            'visible'
-                        );
-
-                        saveButton.classList.remove(
-                            'visible'
-                        );
-
-                        return;
-                    }
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | PARĀDĀM FAILA NOSAUKUMU
-                    |--------------------------------------------------------------------------
-                    */
-
-                    selectedFile.textContent =
-                        file.name;
-
-                    selectedFile.classList.add(
-                        'visible'
-                    );
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | PARĀDĀM SAGLABĀŠANAS POGU
-                    |--------------------------------------------------------------------------
-                    */
-
-                    saveButton.classList.add(
-                        'visible'
-                    );
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | PROFILA BILDES PRIEKŠSKATĪJUMS
-                    |--------------------------------------------------------------------------
-                    */
-
-                    const reader =
-                        new FileReader();
-
-                    reader.onload =
-                        function (event) {
-
-                            if (profileAvatar) {
-
-                                profileAvatar.style.display =
-                                    'none';
-
-                            }
-
-                            profileImage.src =
-                                event.target.result;
-
-                            profileImage.style.display =
-                                'block';
-
-                        };
-
-
-                    reader.readAsDataURL(file);
-
-                }
-            );
-
-        }
-    );
-
+        reader.readAsDataURL(file);
+    });
+});
 </script>
-
-</body>
-</html>
+@endpush

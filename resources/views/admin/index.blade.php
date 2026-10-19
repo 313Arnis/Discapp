@@ -1,315 +1,272 @@
-<!DOCTYPE html>
-<html lang="lv">
-<head>
-    <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
 
-    <title>Admin panelis - Discapp</title>
+@extends('layouts.app')
 
-    <link
-        rel="stylesheet"
-        href="{{ asset('css/style.css') }}"
-    >
-</head>
+@section('title', 'Admin panelis - Discapp')
 
-<body>
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin-dashboard.css') }}">
+@endpush
 
-<nav>
+@section('content')
 
-    <div>
-        <a href="{{ route('admin') }}">
-            Discapp Admin
-        </a>
-    </div>
+<div class="admin-dashboard">
 
-    <div>
+    {{-- ADMIN NAVIGĀCIJA --}}
+    <nav class="admin-navigation" aria-label="Admin navigācija">
+        <div class="admin-navigation-links">
+            <a href="{{ route('admin') }}" class="active">
+                Dashboard
+            </a>
 
-        <a href="{{ route('admin') }}">
-            Dashboard
-        </a>
+            <a href="{{ route('admin.users') }}">
+                Lietotāji
+            </a>
 
-        <a href="{{ route('admin.users') }}">
-            Lietotāji
-        </a>
+            <a href="{{ route('courses.index') }}">
+                Trases
+            </a>
+        </div>
 
-        <a href="{{ route('courses.index') }}">
-            Trases
-        </a>
+        <div class="admin-navigation-user">
+            <span>
+                Admin: {{ auth()->user()->name }}
+            </span>
+        </div>
+    </nav>
 
-    </div>
-
-    <div class="nav-auth">
-
-        <span>
-            Admin: {{ auth()->user()->name }}
-        </span>
-
-        <form
-            method="POST"
-            action="{{ route('logout') }}"
-        >
-            @csrf
-
-            <button type="submit">
-                Iziet
-            </button>
-        </form>
-
-    </div>
-
-</nav>
-
-
-<main class="profile-page">
-
-    <div class="profile-header">
-
+    {{-- GALVENE --}}
+    <header class="admin-welcome">
         <div>
+            <span class="admin-eyebrow">
+                DISCAPP ADMINISTRĀCIJA
+            </span>
 
             <h1>
-                Admin panelis
+                Sveiks, {{ auth()->user()->name }}!
             </h1>
 
             <p>
-                Sveiks, {{ auth()->user()->name }}!
+                Pārvaldi Discapp lietotājus, disku golfa
+                trases un apskati sistēmas statistiku.
             </p>
-
         </div>
 
-    </div>
+        <div class="admin-welcome-icon" aria-hidden="true">
+            ⚙
+        </div>
+    </header>
 
+    {{-- STATISTIKA --}}
+    <section class="admin-section">
+        <div class="admin-section-heading">
+            <div>
+                <span class="admin-section-label">
+                    PĀRSKATS
+                </span>
 
-    <!-- STATISTIKA -->
-
-    <section
-        class="profile-stats"
-        style="
-            display: grid;
-            grid-template-columns:
-                repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        "
-    >
-
-        <div>
-
-            <strong>
-                Lietotāji
-            </strong>
-
-            <span>
-                {{ $usersCount }}
-            </span>
-
+                <h2>Sistēmas statistika</h2>
+            </div>
         </div>
 
+        <div class="admin-stats-grid">
 
-        <div>
+            <div class="admin-stat-card">
+                <div class="admin-stat-top">
+                    <span>Lietotāji</span>
+                    <span class="admin-stat-icon" aria-hidden="true">👥</span>
+                </div>
 
-            <strong>
-                Trases
-            </strong>
+                <strong>{{ $usersCount }}</strong>
 
-            <span>
-                {{ $coursesCount }}
-            </span>
+                <span class="admin-stat-caption">
+                    Reģistrētie lietotāji
+                </span>
+            </div>
+
+            <div class="admin-stat-card">
+                <div class="admin-stat-top">
+                    <span>Trases</span>
+                    <span class="admin-stat-icon" aria-hidden="true">📍</span>
+                </div>
+
+                <strong>{{ $coursesCount }}</strong>
+
+                <span class="admin-stat-caption">
+                    Disku golfa trases
+                </span>
+            </div>
+
+            <div class="admin-stat-card">
+                <div class="admin-stat-top">
+                    <span>Sacensības</span>
+                    <span class="admin-stat-icon" aria-hidden="true">🏆</span>
+                </div>
+
+                <strong>{{ $competitionsCount }}</strong>
+
+                <span class="admin-stat-caption">
+                    Izveidotās sacensības
+                </span>
+            </div>
+
+            <div class="admin-stat-card">
+                <div class="admin-stat-top">
+                    <span>Vidējais reitings</span>
+                    <span class="admin-stat-icon" aria-hidden="true">📈</span>
+                </div>
+
+                <strong>{{ $averageRating ?? '—' }}</strong>
+
+                <span class="admin-stat-caption">
+                    Spēlētāju vidējais reitings
+                </span>
+            </div>
 
         </div>
-
-
-        <div>
-
-            <strong>
-                Sacensības
-            </strong>
-
-            <span>
-                {{ $competitionsCount }}
-            </span>
-
-        </div>
-
-
-        <div>
-
-            <strong>
-                Vidējais reitings
-            </strong>
-
-            <span>
-                {{ $averageRating }}
-            </span>
-
-        </div>
-
     </section>
 
+    {{-- ĀTRĀS DARBĪBAS --}}
+    <section class="admin-section">
 
-    <!-- ĀTRĀS DARBĪBAS -->
-
-    <section class="competitions">
-
-        <h2 style="margin-bottom: 15px;">
-            Ātrās darbības
-        </h2>
-
-
-        <div class="competition">
-
+        <div class="admin-section-heading">
             <div>
+                <span class="admin-section-label">
+                    PĀRVALDĪBA
+                </span>
 
-                <h2>
-                    Lietotāji
-                </h2>
+                <h2>Ātrās darbības</h2>
+            </div>
+        </div>
+
+        <div class="admin-actions-grid">
+
+            {{-- LIETOTĀJI --}}
+            <article class="admin-action-card">
+                <div class="admin-action-icon" aria-hidden="true">
+                    👥
+                </div>
+
+                <h3>Lietotāji</h3>
 
                 <p>
                     Skati un pārvaldi Discapp lietotājus,
                     viņu lomas un reitingus.
                 </p>
 
-            </div>
-
-            <div>
-
                 <a
                     href="{{ route('admin.users') }}"
-                    class="btn"
+                    class="admin-action-button"
                 >
                     Pārvaldīt lietotājus
+                    <span aria-hidden="true">→</span>
                 </a>
+            </article>
 
-            </div>
+            {{-- TRASES --}}
+            <article class="admin-action-card">
+                <div class="admin-action-icon" aria-hidden="true">
+                    📍
+                </div>
 
-        </div>
-
-
-        <div class="competition">
-
-            <div>
-
-                <h2>
-                    Disku golfa trases
-                </h2>
+                <h3>Disku golfa trases</h3>
 
                 <p>
                     Pievieno un pārvaldi trases,
                     grozus un PAR vērtības.
                 </p>
 
-            </div>
-
-            <div>
-
                 <a
                     href="{{ route('courses.index') }}"
-                    class="btn"
+                    class="admin-action-button"
                 >
                     Pārvaldīt trases
+                    <span aria-hidden="true">→</span>
                 </a>
+            </article>
 
-            </div>
+            {{-- SACENSĪBAS --}}
+            <article class="admin-action-card">
+                <div class="admin-action-icon" aria-hidden="true">
+                    🏆
+                </div>
 
-        </div>
-
-
-        <div class="competition">
-
-            <div>
-
-                <h2>
-                    Sacensības
-                </h2>
+                <h3>Sacensības</h3>
 
                 <p>
                     Sacensību administrēšana būs pieejama
                     nākamajā sistēmas versijā.
                 </p>
 
-            </div>
-
-            <div>
-
                 <button
-                    class="btn"
                     type="button"
+                    class="admin-action-button disabled"
                     disabled
-                    style="
-                        opacity: 0.5;
-                        cursor: not-allowed;
-                    "
                 >
                     Drīzumā
                 </button>
-
-            </div>
+            </article>
 
         </div>
-
     </section>
 
+    {{-- JAUNĀKIE LIETOTĀJI --}}
+    <section class="admin-section">
 
-    <!-- PĒDĒJIE LIETOTĀJI -->
+        <div class="admin-section-heading">
+            <div>
+                <span class="admin-section-label">
+                    LIETOTĀJI
+                </span>
 
-    <section
-        class="competitions"
-        style="margin-top: 30px;"
-    >
-
-        <h2 style="margin-bottom: 15px;">
-            Jaunākie lietotāji
-        </h2>
-
-
-        @forelse($recentUsers as $user)
-
-            <div class="competition">
-
-                <div>
-
-                    <h2>
-                        {{ $user->name }}
-                    </h2>
-
-                    <p>
-                        {{ $user->email }}
-                    </p>
-
-                </div>
-
-
-                <div style="text-align: right;">
-
-                    <strong>
-                        Reitings
-                    </strong>
-
-                    <p>
-                        {{ $user->rating }}
-                    </p>
-
-                </div>
-
+                <h2>Jaunākie lietotāji</h2>
             </div>
 
-        @empty
+            <a
+                href="{{ route('admin.users') }}"
+                class="admin-view-all"
+            >
+                Skatīt visus →
+            </a>
+        </div>
 
-            <div class="competition">
+        <div class="admin-users-card">
 
-                <p>
-                    Lietotāju vēl nav.
-                </p>
+            @forelse($recentUsers as $user)
+                <div class="admin-user-row">
 
-            </div>
+                    <div class="admin-user-details">
+                        <div
+                            class="admin-user-avatar"
+                            aria-hidden="true"
+                        >
+                            {{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}
+                        </div>
 
-        @endforelse
+                        <div class="admin-user-text">
+                            <strong>{{ $user->name }}</strong>
 
+                            <span>{{ $user->email }}</span>
+                        </div>
+                    </div>
+
+                    <div class="admin-user-rating">
+                        <span>Reitings</span>
+
+                        <strong>
+                            {{ $user->rating ?? '—' }}
+                        </strong>
+                    </div>
+
+                </div>
+            @empty
+                <div class="admin-empty">
+                    <p>Lietotāju vēl nav.</p>
+                </div>
+            @endforelse
+
+        </div>
     </section>
 
-</main>
+</div>
 
-</body>
-</html>
+@endsection

@@ -14,90 +14,7 @@ body {
 }
 
 /* =========================
-   NAVBAR
-========================= */
-
-.competitions-nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 30px;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px 30px;
-    background: transparent;
-}
-
-.competitions-logo {
-    font-size: 24px;
-    font-weight: 800;
-    color: #e86f2d;
-    text-decoration: none;
-}
-
-.competitions-nav-links {
-    display: flex;
-    align-items: center;
-    gap: 28px;
-}
-
-.competitions-nav-links a {
-    color: #333;
-    text-decoration: none;
-    font-weight: 600;
-    transition: 0.2s;
-}
-
-.competitions-nav-links a:hover,
-.competitions-nav-links .active {
-    color: #e86f2d;
-}
-
-.competitions-nav-auth {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.competitions-nav-auth span {
-    color: #666;
-    font-size: 14px;
-}
-
-.nav-login {
-    color: #333;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.nav-register,
-.nav-logout {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 18px;
-    border: none;
-    border-radius: 10px;
-    background: #e86f2d;
-    color: white;
-    font-weight: 700;
-    text-decoration: none;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.nav-register:hover,
-.nav-logout:hover {
-    transform: translateY(-1px);
-    opacity: 0.9;
-}
-
-.competitions-nav-auth form {
-    margin: 0;
-}
-
-/* =========================
-   PAGE
+   SACENSĪBU LAPA
 ========================= */
 
 .competitions-page {
@@ -139,6 +56,7 @@ body {
     font-size: clamp(36px, 5vw, 52px);
     line-height: 1.05;
     letter-spacing: -2px;
+    color: #202020;
 }
 
 .competitions-header p {
@@ -148,29 +66,47 @@ body {
     line-height: 1.6;
 }
 
-.create-competition-button {
+/* =========================
+   IZVEIDOT SACENSĪBAS POGA
+========================= */
+
+.competitions-page a.create-competition-button,
+.competitions-page a.create-competition-button:link,
+.competitions-page a.create-competition-button:visited {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
+
     min-height: 48px;
-    padding: 0 20px;
+    padding: 12px 22px;
+
+    border: none;
     border-radius: 10px;
+
     background: #e86f2d;
-    color: white;
+    color: #ffffff;
+
+    font-size: 15px;
     font-weight: 700;
+    line-height: 1.4;
     text-decoration: none;
+
     white-space: nowrap;
-    transition: 0.2s;
+    cursor: pointer;
+    transition: 0.2s ease;
 }
 
-.create-competition-button:hover {
+.competitions-page a.create-competition-button:hover {
+    background: #d95f1f;
+    color: #ffffff;
+    text-decoration: none;
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(232, 111, 45, 0.2);
 }
 
 /* =========================
-   COMPETITION LIST
+   SACENSĪBU SARAKSTS
 ========================= */
 
 .competition-list {
@@ -180,14 +116,17 @@ body {
 
 .competition-card {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
     gap: 30px;
+
     padding: 26px 28px;
+
     border: 1px solid #e4e4df;
     border-radius: 18px;
-    background: white;
-    transition: 0.2s;
+
+    background: #ffffff;
+    transition: 0.2s ease;
 }
 
 .competition-card:hover {
@@ -200,17 +139,19 @@ body {
     margin: 0 0 8px;
     color: #222;
     font-size: 23px;
+    font-weight: 700;
 }
 
 .competition-description {
     max-width: 700px;
     margin: 0 0 20px;
     color: #777;
+    font-size: 15px;
     line-height: 1.6;
 }
 
 /* =========================
-   META INFO
+   SACENSĪBU INFORMĀCIJA
 ========================= */
 
 .competition-meta {
@@ -223,10 +164,13 @@ body {
     display: flex;
     align-items: center;
     gap: 7px;
+
     padding: 8px 12px;
+
     border-radius: 9px;
     background: #f7f7f4;
     color: #555;
+
     font-size: 14px;
 }
 
@@ -235,7 +179,7 @@ body {
 }
 
 /* =========================
-   VIEW BUTTON
+   SKATĪT SACENSĪBAS POGA
 ========================= */
 
 .competition-card-action {
@@ -244,38 +188,47 @@ body {
     justify-content: center;
 }
 
-.view-competition-button {
+.competitions-page a.view-competition-button,
+.competitions-page a.view-competition-button:link,
+.competitions-page a.view-competition-button:visited {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+
     min-height: 44px;
-    padding: 0 18px;
+    padding: 10px 18px;
+
     border: 1px solid #ddd;
     border-radius: 10px;
-    background: white;
+
+    background: #ffffff;
     color: #333;
+
     font-size: 14px;
     font-weight: 700;
     text-decoration: none;
     white-space: nowrap;
-    transition: 0.2s;
+
+    cursor: pointer;
+    transition: 0.2s ease;
 }
 
-.view-competition-button:hover {
+.competitions-page a.view-competition-button:hover {
     border-color: #e86f2d;
     background: #fff8f4;
     color: #e86f2d;
+    text-decoration: none;
 }
 
 /* =========================
-   EMPTY STATE
+   JA SACENSĪBU NAV
 ========================= */
 
 .empty-competitions {
     padding: 60px 30px;
     border: 1px dashed #d7d7d2;
     border-radius: 18px;
-    background: white;
+    background: #ffffff;
     text-align: center;
 }
 
@@ -283,9 +236,11 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+
     width: 65px;
     height: 65px;
     margin: 0 auto 18px;
+
     border-radius: 18px;
     background: #fff0e7;
     font-size: 28px;
@@ -294,25 +249,13 @@ body {
 .empty-competitions h2 {
     margin: 0 0 8px;
     font-size: 22px;
+    color: #222;
 }
 
 .empty-competitions p {
     margin: 0;
     color: #777;
-}
-
-/* =========================
-   FOOTER
-========================= */
-
-.competitions-footer {
-    max-width: 1100px;
-    margin: 40px auto 0;
-    padding: 25px 30px;
-    border-top: 1px solid #ddd;
-    color: #999;
-    font-size: 13px;
-    text-align: center;
+    line-height: 1.6;
 }
 
 /* =========================
@@ -320,16 +263,6 @@ body {
 ========================= */
 
 @media (max-width: 850px) {
-    .competitions-nav {
-        flex-wrap: wrap;
-    }
-
-    .competitions-nav-links {
-        order: 3;
-        width: 100%;
-        justify-content: center;
-    }
-
     .competitions-header {
         align-items: flex-start;
         flex-direction: column;
@@ -345,20 +278,8 @@ body {
 }
 
 @media (max-width: 600px) {
-    .competitions-nav {
-        padding: 18px 20px;
-    }
-
     .competitions-page {
         padding: 45px 20px 60px;
-    }
-
-    .competitions-nav-links {
-        gap: 15px;
-    }
-
-    .competitions-nav-auth span {
-        display: none;
     }
 
     .competitions-header h1 {
@@ -366,7 +287,7 @@ body {
         letter-spacing: -1px;
     }
 
-    .create-competition-button {
+    .competitions-page a.create-competition-button {
         width: 100%;
     }
 
@@ -382,7 +303,7 @@ body {
         width: 100%;
     }
 
-    .view-competition-button {
+    .competitions-page a.view-competition-button {
         width: 100%;
     }
 }

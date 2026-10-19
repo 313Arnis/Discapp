@@ -1,0 +1,304 @@
+
+/* ==========================================
+   DISCAPP — PIEVIENOŠANĀS SACENSĪBĀM
+========================================== */
+
+.join-page {
+    width: min(100% - 32px, 660px);
+    margin: 60px auto 90px;
+    color: #252525;
+}
+
+/* LAPAS VIRSRaksts */
+
+.join-heading {
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+.join-eyebrow {
+    display: inline-block;
+    margin-bottom: 12px;
+    color: #e86f2d;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.8px;
+}
+
+.join-heading h1 {
+    margin: 0 0 12px;
+    color: #242424;
+    font-size: clamp(28px, 4vw, 38px);
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.join-heading p {
+    margin: 0;
+    color: #777;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+/* GALVENĀ KARTĪTE */
+
+.join-card {
+    padding: 34px;
+    border: 1px solid #e9e9e5;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.04);
+}
+
+/* SACENSĪBU INFORMĀCIJA */
+
+.join-competition-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 25px;
+}
+
+.join-competition-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 54px;
+    height: 54px;
+    border-radius: 15px;
+    background: #fff0e5;
+    color: #e86f2d;
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.join-small-label {
+    display: block;
+    margin-bottom: 5px;
+    color: #e86f2d;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.join-competition-info h2 {
+    margin: 0;
+    color: #252525;
+    font-size: 22px;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+/* SPĒLĒTĀJA REITINGS */
+
+.join-rating {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 30px;
+    padding: 20px 22px;
+    border: 1px solid #f5dfce;
+    border-radius: 14px;
+    background: #fff7f0;
+}
+
+.join-rating > div {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.join-rating-label {
+    color: #936c50;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.join-rating strong {
+    color: #df6929;
+    font-size: 29px;
+    font-weight: 800;
+}
+
+.join-rating-badge {
+    padding: 8px 11px;
+    border-radius: 8px;
+    background: #fff;
+    color: #d66a30;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.7px;
+    white-space: nowrap;
+}
+
+/* FORMA */
+
+.join-form {
+    margin: 0;
+}
+
+.join-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.join-form-group label {
+    color: #333;
+    font-size: 14px;
+    font-weight: 750;
+}
+
+.join-form-group select {
+    width: 100%;
+    min-height: 52px;
+    padding: 12px 15px;
+    border: 1px solid #dededb;
+    border-radius: 11px;
+    outline: none;
+    background: #fff;
+    color: #292929;
+    font: inherit;
+    font-size: 15px;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.join-form-group select:focus {
+    border-color: #e86f2d;
+    box-shadow: 0 0 0 4px #fff1e6;
+}
+
+.join-form-group select.is-invalid {
+    border-color: #d74337;
+}
+
+.join-field-hint {
+    margin: 0;
+    color: #999;
+    font-size: 12px;
+}
+
+.join-error {
+    color: #c4352b;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* POGAS */
+
+.join-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.join-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 52px;
+    padding: 13px 20px;
+    border: none;
+    border-radius: 11px;
+    background: #e86f2d;
+    color: #fff;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.join-submit:hover {
+    background: #d75f21;
+    transform: translateY(-1px);
+}
+
+.join-submit span {
+    font-size: 20px;
+}
+
+.join-cancel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    border: 1px solid #e6e6e2;
+    border-radius: 11px;
+    background: #fff;
+    color: #666;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.join-cancel:hover {
+    border-color: #e86f2d;
+    background: #fff8f3;
+    color: #e86f2d;
+    text-decoration: none;
+}
+
+/* APAKŠĒJĀ PIEZĪME */
+
+.join-footer-note {
+    max-width: 470px;
+    margin: 22px auto 0;
+    color: #999;
+    font-size: 13px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+/* RESPONSĪVAIS DIZAINS */
+
+@media (max-width: 600px) {
+    .join-page {
+        margin-top: 35px;
+        margin-bottom: 60px;
+    }
+
+    .join-card {
+        padding: 22px;
+        border-radius: 16px;
+    }
+
+    .join-competition-info h2 {
+        font-size: 19px;
+    }
+
+    .join-rating {
+        padding: 17px;
+    }
+
+    .join-rating strong {
+        font-size: 25px;
+    }
+
+    .join-rating-badge {
+        font-size: 9px;
+    }
+}
+
+@media (max-width: 400px) {
+    .join-card {
+        padding: 18px;
+    }
+
+    .join-rating {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .join-competition-icon {
+        width: 46px;
+        height: 46px;
+    }
+}

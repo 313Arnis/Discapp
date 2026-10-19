@@ -1,94 +1,168 @@
-<!DOCTYPE html>
-<html lang="lv">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@extends('layouts.app')
 
-    <title>Mani diski - DiscGolf</title>
+@section('title', 'Mani diski - Discapp')
 
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-</head>
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/disc-form.css') }}">
+@endpush
 
-<body>
+@section('content')
 
-<nav>
-    <h2>DiscGolf</h2>
+<main class="disc-list-page">
 
-    <div>
-        <a href="/">Sākums</a>
-        <a href="/competitions">Sacensības</a>
-        <a href="/profile">Mans profils</a>
+    {{-- GALVENE --}}
+    <div class="disc-list-header">
+
+        <div>
+            <span class="disc-form-eyebrow">MANA KOLEKCIJA</span>
+
+            <h1>Mani diski</h1>
+
+            <p>
+                Pārvaldi savu disku golfa kolekciju.
+                Tev ir {{ $discs->count() }} diski.
+            </p>
+        </div>
+
+        <a
+            href="{{ route('profile.discs.create') }}"
+            class="disc-form-submit"
+        >
+            + Pievienot disku
+        </a>
+
     </div>
-</nav>
 
-<main>
-
-    <h1>Mani diski</h1>
-
-    <a href="{{ route('profile.discs.create') }}" class="button">
-        + Pievienot disku
-    </a>
-
+    {{-- PAZIŅOJUMI --}}
     @if(session('success'))
-        <p class="success">
+        <div class="disc-list-success" role="status">
             {{ session('success') }}
-        </p>
+        </div>
     @endif
 
+    {{-- DISKU SARAKSTS --}}
     @if($discs->count() > 0)
 
-        <ul>
+        <div class="disc-list-grid">
 
             @foreach($discs as $disc)
 
-                <li>
+                <article class="disc-list-card">
 
-                    <strong>{{ $disc->name }}</strong>
-                    - {{ $disc->type }}
+                    <div class="disc-list-image">
 
-                    <a
-                        href="{{ route('profile.discs.edit', $disc) }}"
-                        class="button"
-                    >
-                        Rediģēt
-                    </a>
+                        @if($disc->image)
+                            <img
+                                src="{{ asset('storage/' . $disc->image) }}"
+                                alt="{{ $disc->name }}"
+                            >
+                        @else
+                            <span>🥏</span>
+                        @endif
 
-                    <form
-                        action="{{ route('profile.discs.destroy', $disc) }}"
-                        method="POST"
-                        style="display:inline;"
-                        onsubmit="return confirm('Vai tiešām vēlies dzēst šo disku?');"
-                    >
+                        <span class="disc-list-type">
+                            {{ $disc->type }}
+                        </span>
 
-                        @csrf
-                        @method('DELETE')
+                    </div>
 
-                        <button type="submit" class="delete-button">
-                            Dzēst
-                        </button>
+                    <div class="disc-list-body">
 
-                    </form>
+                        <h2>{{ $disc->name }}</h2>
 
-                </li>
+                        <div class="disc-list-stats">
+
+                            <div>
+                                <span>Speed</span>
+                                <strong>{{ $disc->speed }}</strong>
+                            </div>
+
+                            <div>
+                                <span>Glide</span>
+                                <strong>{{ $disc->glide }}</strong>
+                            </div>
+
+                            <div>
+                                <span>Turn</span>
+                                <strong>{{ $disc->turn }}</strong>
+                            </div>
+
+                            <div>
+                                <span>Fade</span>
+                                <strong>{{ $disc->fade }}</strong>
+                            </div>
+
+                        </div>
+
+                        <div class="disc-list-actions">
+
+                            <a
+                                href="{{ route('profile.discs.edit', $disc) }}"
+                                class="disc-list-edit"
+                            >
+                                Rediģēt
+                            </a>
+
+                            <form
+                                method="POST"
+                                action="{{ route('profile.discs.destroy', $disc) }}"
+                                onsubmit="return confirm('Vai tiešām vēlies dzēst šo disku?')"
+                            >
+                                @csrf
+                                @method('DELETE')
+
+                                <button
+                                    type="submit"
+                                    class="disc-list-delete"
+                                >
+                                    Dzēst
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </article>
 
             @endforeach
 
-        </ul>
+        </div>
 
     @else
 
-        <p>Tev vēl nav pievienotu disku.</p>
+        <div class="disc-list-empty">
+
+            <div class="disc-list-empty-icon">🥏</div>
+
+            <h2>Tava disku soma vēl ir tukša</h2>
+
+            <p>
+                Pievieno savu pirmo disku, lai sāktu
+                veidot personīgo disku golfa kolekciju.
+            </p>
+
+            <a
+                href="{{ route('profile.discs.create') }}"
+                class="disc-form-submit"
+            >
+                + Pievienot pirmo disku
+            </a>
+
+        </div>
 
     @endif
 
-    <br>
+    <div class="disc-list-footer">
 
-    <a href="/profile" class="button">
-        Atpakaļ uz profilu
-    </a>
+        <a href="{{ route('profile') }}" class="disc-form-back">
+            ← Atpakaļ uz profilu
+        </a>
+
+    </div>
 
 </main>
 
-</body>
-</html>
+@endsection

@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -20,6 +21,13 @@ return new class extends Migration
 
                 $table->date('date');
 
+                // SACENSĪBU NORISES LAIKS
+                $table->dateTime('starts_at')
+                    ->nullable();
+
+                $table->dateTime('ends_at')
+                    ->nullable();
+
                 $table->unsignedInteger(
                     'max_players'
                 )->nullable();
@@ -37,6 +45,7 @@ return new class extends Migration
                     ->constrained('courses')
                     ->nullOnDelete();
 
+                // REĢISTRĀCIJAS LAIKS
                 $table->dateTime(
                     'registration_starts_at'
                 )->nullable();

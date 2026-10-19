@@ -1,0 +1,671 @@
+
+/* ============================================
+   DISCAPP — PROFILE
+   Oranžs / Balts
+============================================ */
+
+.discapp-profile {
+    --dp-orange: #f47721;
+    --dp-orange-dark: #db6011;
+    --dp-orange-light: #fff1e5;
+    --dp-text: #242424;
+    --dp-muted: #858585;
+    --dp-border: #eaeaea;
+
+    width: min(1120px, calc(100% - 40px));
+    margin: 40px auto 90px;
+    color: var(--dp-text);
+}
+
+.discapp-profile *,
+.discapp-profile *::before,
+.discapp-profile *::after {
+    box-sizing: border-box;
+}
+
+/* PAZIŅOJUMI */
+
+.dp-alert {
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    font-size: 14px;
+}
+
+.dp-alert-success {
+    color: #18733b;
+    background: #e9f8ee;
+    border: 1px solid #c4e8d0;
+}
+
+.dp-alert-error {
+    color: #b92f2f;
+    background: #fff0f0;
+    border: 1px solid #f0c8c8;
+}
+
+.dp-alert ul {
+    margin: 8px 0 0;
+    padding-left: 20px;
+}
+
+/* PROFILA GALVENE */
+
+.dp-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 35px;
+    margin-bottom: 20px;
+    background: #fff;
+    border: 1px solid var(--dp-border);
+    border-radius: 20px;
+    box-shadow: 0 6px 25px rgba(0,0,0,.025);
+}
+
+.dp-hero-decoration {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #f47721, #ffb36f);
+}
+
+.dp-hero-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.dp-user {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    min-width: 0;
+}
+
+.dp-avatar-wrap {
+    flex-shrink: 0;
+}
+
+.dp-avatar,
+.dp-avatar-fallback {
+    width: 112px;
+    height: 112px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    box-shadow: 0 0 0 2px #ffddc4,
+                0 5px 18px rgba(0,0,0,.08);
+}
+
+.dp-avatar {
+    display: block;
+    object-fit: cover;
+}
+
+.dp-avatar-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--dp-orange-light);
+    color: var(--dp-orange-dark);
+    font-size: 42px;
+    font-weight: 800;
+}
+
+.dp-user-details {
+    min-width: 0;
+}
+
+.dp-eyebrow {
+    display: block;
+    margin-bottom: 9px;
+    color: var(--dp-orange);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.dp-user-details h1 {
+    margin: 0 0 7px;
+    font-size: clamp(26px, 4vw, 35px);
+    font-weight: 800;
+    letter-spacing: -.8px;
+}
+
+.dp-email {
+    margin: 0 0 12px;
+    color: var(--dp-muted);
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+.dp-role {
+    display: inline-flex;
+    padding: 6px 12px;
+    background: var(--dp-orange-light);
+    color: var(--dp-orange-dark);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* PROFILA BILDES DARBĪBAS */
+
+.dp-picture-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-top: 17px;
+}
+
+.dp-picture-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+}
+
+.dp-file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    overflow: hidden;
+}
+
+.dp-selected-file {
+    display: none;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    color: var(--dp-muted);
+}
+
+.dp-selected-file.visible {
+    display: inline-block;
+}
+
+.dp-save-picture {
+    display: none !important;
+}
+
+.dp-save-picture.visible {
+    display: inline-flex !important;
+}
+
+.dp-remove-picture {
+    padding: 8px 5px;
+    border: none;
+    background: transparent;
+    color: #c33d35;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.dp-remove-picture:hover {
+    text-decoration: underline;
+}
+
+/* REITINGS */
+
+.dp-rating {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    min-width: 190px;
+    min-height: 155px;
+    padding: 22px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #f47721, #e96013);
+    color: #fff;
+    text-align: center;
+}
+
+.dp-rating span {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.dp-rating strong {
+    margin: 8px 0;
+    font-size: 48px;
+    line-height: 1.1;
+    font-weight: 900;
+}
+
+.dp-rating small {
+    opacity: .8;
+    font-size: 11px;
+}
+
+/* POGAS */
+
+.dp-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 10px 16px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 750;
+    text-decoration: none;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.dp-btn-primary {
+    background: var(--dp-orange);
+    border-color: var(--dp-orange);
+    color: #fff;
+}
+
+.dp-btn-primary:hover {
+    background: var(--dp-orange-dark);
+    color: #fff;
+    text-decoration: none;
+}
+
+.dp-btn-outline {
+    border-color: #e7e7e7;
+    background: #fff;
+    color: #444;
+}
+
+.dp-btn-outline:hover {
+    border-color: var(--dp-orange);
+    color: var(--dp-orange);
+    background: #fffaf6;
+}
+
+/* STATISTIKA */
+
+.dp-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.dp-stat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 25px 12px;
+    border: 1px solid var(--dp-border);
+    border-radius: 15px;
+    background: #fff;
+    text-align: center;
+    transition: transform .2s, box-shadow .2s;
+}
+
+.dp-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 20px rgba(0,0,0,.045);
+}
+
+.dp-stat-label {
+    color: var(--dp-muted);
+    font-size: 13px;
+}
+
+.dp-stat-card strong {
+    margin: 12px 0 7px;
+    color: var(--dp-orange);
+    font-size: 34px;
+    font-weight: 850;
+}
+
+.dp-stat-description {
+    color: #aaa;
+    font-size: 11px;
+}
+
+/* VISPĀRĒJĀS SADAĻAS */
+
+.dp-panel {
+    overflow: hidden;
+    margin-bottom: 20px;
+    border: 1px solid var(--dp-border);
+    border-radius: 17px;
+    background: #fff;
+    box-shadow: 0 5px 20px rgba(0,0,0,.02);
+}
+
+.dp-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 24px 28px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.dp-panel-header h2 {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.dp-count {
+    padding: 7px 13px;
+    border-radius: 9px;
+    background: var(--dp-orange-light);
+    color: var(--dp-orange-dark);
+    font-weight: 800;
+}
+
+/* PAR SPĒLĒTĀJU */
+
+.dp-info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    padding: 28px;
+}
+
+.dp-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+}
+
+.dp-info-item span {
+    color: var(--dp-muted);
+    font-size: 12px;
+}
+
+.dp-info-item strong {
+    font-size: 15px;
+    overflow-wrap: anywhere;
+}
+
+/* SACENSĪBU VĒSTURE */
+
+.dp-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.dp-history-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.dp-history-table th {
+    padding: 16px 20px;
+    background: #fafafa;
+    color: #888;
+    font-size: 12px;
+    font-weight: 750;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.dp-history-table td {
+    padding: 18px 20px;
+    border-top: 1px solid #f1f1f1;
+    font-size: 14px;
+}
+
+.dp-history-table tbody tr:hover {
+    background: #fffaf6;
+}
+
+.dp-history-link {
+    color: var(--dp-text);
+    font-weight: 750;
+    text-decoration: none;
+}
+
+.dp-history-link:hover {
+    color: var(--dp-orange);
+}
+
+.dp-division {
+    display: inline-flex;
+    padding: 6px 10px;
+    border-radius: 7px;
+    background: #f3f3f3;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.dp-score {
+    font-weight: 800;
+}
+
+.dp-place {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 35px;
+    min-height: 35px;
+    border-radius: 9px;
+    background: var(--dp-orange-light);
+    color: var(--dp-orange-dark);
+    font-weight: 800;
+}
+
+/* DISKU SOMA */
+
+.dp-discs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    padding: 25px;
+}
+
+.dp-disc-card {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--dp-border);
+    border-radius: 14px;
+    background: #fff;
+    transition: .2s;
+}
+
+.dp-disc-card:hover {
+    border-color: #ffd5b8;
+    box-shadow: 0 8px 22px rgba(0,0,0,.05);
+    transform: translateY(-3px);
+}
+
+.dp-disc-image-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 190px;
+    padding: 15px;
+    background: #faf8f5;
+}
+
+.dp-disc-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.dp-disc-placeholder {
+    font-size: 72px;
+}
+
+.dp-disc-body {
+    padding: 20px;
+}
+
+.dp-disc-body h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+.dp-disc-type {
+    display: inline-flex;
+    padding: 5px 10px;
+    border-radius: 7px;
+    background: var(--dp-orange-light);
+    color: var(--dp-orange-dark);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.dp-flight-numbers {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 7px;
+    margin-top: 20px;
+}
+
+.dp-flight-numbers > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 3px;
+    border-radius: 8px;
+    background: #f7f7f7;
+}
+
+.dp-flight-numbers span {
+    color: #999;
+    font-size: 10px;
+}
+
+.dp-flight-numbers strong {
+    font-size: 17px;
+    font-weight: 800;
+}
+
+/* TUKŠĀS SADAĻAS */
+
+.dp-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 45px 20px;
+    text-align: center;
+}
+
+.dp-empty-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 75px;
+    height: 75px;
+    border-radius: 20px;
+    background: var(--dp-orange-light);
+    font-size: 35px;
+}
+
+.dp-empty h3 {
+    margin: 20px 0 9px;
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.dp-empty p {
+    max-width: 390px;
+    margin: 0 0 20px;
+    color: var(--dp-muted);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* RESPONSĪVAIS DIZAINS */
+
+@media (max-width: 900px) {
+    .dp-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .dp-discs-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .dp-hero-content {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .dp-rating {
+        width: 100%;
+        min-height: 120px;
+    }
+}
+
+@media (max-width: 600px) {
+    .discapp-profile {
+        width: calc(100% - 24px);
+        margin-top: 24px;
+    }
+
+    .dp-hero {
+        padding: 25px 18px;
+    }
+
+    .dp-user {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .dp-avatar,
+    .dp-avatar-fallback {
+        width: 90px;
+        height: 90px;
+    }
+
+    .dp-stats {
+        gap: 10px;
+    }
+
+    .dp-stat-card {
+        padding: 20px 8px;
+    }
+
+    .dp-stat-card strong {
+        font-size: 27px;
+    }
+
+    .dp-stat-label {
+        font-size: 11px;
+    }
+
+    .dp-panel-header {
+        padding: 20px;
+    }
+
+    .dp-info-grid {
+        grid-template-columns: 1fr;
+        padding: 20px;
+    }
+
+    .dp-discs-grid {
+        grid-template-columns: 1fr;
+        padding: 15px;
+    }
+
+    .dp-history-table {
+        min-width: 680px;
+    }
+
+    .dp-rating strong {
+        font-size: 40px;
+    }
+}

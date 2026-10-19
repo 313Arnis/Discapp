@@ -1,84 +1,121 @@
-<!DOCTYPE html>
-<html lang="lv">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@extends('layouts.app')
 
-    <title>Pievienoties sacensībām - DiscGolf</title>
+@section('title', 'Pievienoties sacensībām - Discapp')
 
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-</head>
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/competition-join.css') }}">
+@endpush
 
-<body>
+@section('content')
 
-<nav>
-    <h2>DiscGolf</h2>
+<div class="join-page">
 
-    <div>
-        <a href="/">Sākums</a>
-        <a href="/competitions">Sacensības</a>
-        <a href="/profile">Mans profils</a>
-    </div>
-</nav>
-
-
-<main>
-
-    <div class="join-box">
+    <div class="join-heading">
+        <span class="join-eyebrow">DISCAPP SACENSĪBAS</span>
 
         <h1>Pievienoties sacensībām</h1>
 
-        <h2>{{ $competition->name }}</h2>
-
         <p>
-            Tavs reitings:
-            <strong>{{ $rating }}</strong>
+            Izvēlies savu divīziju un piesakies sacensībām.
         </p>
+    </div>
 
-        <form method="POST" action="{{ route('competitions.join.store', $competition) }}">
+    <div class="join-card">
 
+        <div class="join-competition-info">
+            <div class="join-competition-icon">
+                <icon>★</icon>
+            </div>
+
+            <div>
+                <span class="join-small-label">
+                    SACENSĪBAS
+                </span>
+
+                <h2>{{ $competition->name }}</h2>
+            </div>
+        </div>
+
+        <div class="join-rating">
+            <div>
+                <span class="join-rating-label">
+                    Tavs pašreizējais reitings
+                </span>
+
+                <strong>{{ $rating ?? 'Nav reitinga' }}</strong>
+            </div>
+
+            <span class="join-rating-badge">
+                PLAYER RATING
+            </span>
+        </div>
+
+        <form
+            method="POST"
+            action="{{ route('competitions.join.store', $competition) }}"
+            class="join-form"
+        >
             @csrf
 
-            <label for="division">
-                Izvēlies divīziju
-            </label>
-
-            <select id="division" name="division" required>
-
-                <option value="">
+            <div class="join-form-group">
+                <label for="division">
                     Izvēlies divīziju
-                </option>
+                </label>
 
-                @foreach($divisions as $code => $name)
-
-                    <option value="{{ $code }}">
-                        {{ $name }}
+                <select
+                    id="division"
+                    name="division"
+                    required
+                    class="@error('division') is-invalid @enderror"
+                >
+                    <option value="">
+                        Izvēlies divīziju
                     </option>
 
-                @endforeach
+                    @foreach($divisions as $code => $name)
+                        <option
+                            value="{{ $code }}"
+                            @selected(old('division') == $code)
+                        >
+                            {{ $name }}
+                        </option>
+                    @endforeach
+                </select>
 
-            </select>
+                @error('division')
+                    <div class="join-error">
+                        {{ $message }}
+                    </div>
+                @enderror
 
-            @error('division')
-                <div class="error">
-                    {{ $message }}
-                </div>
-            @enderror
+                <p class="join-field-hint">
+                    Izvēlies divīziju, kurā vēlies piedalīties.
+                </p>
+            </div>
 
-            <button type="submit" class="button">
-                Pieteikties
-            </button>
+            <div class="join-actions">
+                <button type="submit" class="join-submit">
+                    Pieteikties sacensībām
+                    <span aria-hidden="true">→</span>
+                </button>
 
-            <a href="{{ route('competitions.show', $competition) }}" class="button">
-                Atcelt
-            </a>
-
+                <a
+                    href="{{ route('competitions.show', $competition) }}"
+                    class="join-cancel"
+                >
+                    Atcelt
+                </a>
+            </div>
         </form>
 
     </div>
 
-</main>
+    <div class="join-footer-note">
+        Pēc pieteikšanās varēsi apskatīt savu dalību
+        sacensību lapā.
+    </div>
 
-</body>
-</html>
+</div>
+
+@endsection

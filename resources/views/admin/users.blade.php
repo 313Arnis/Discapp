@@ -1,247 +1,210 @@
-<!DOCTYPE html>
-<html lang="lv">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Lietotāji - Discapp</title>
+@extends('layouts.app')
 
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-</head>
+@section('title', 'Lietotāju pārvaldība - Discapp')
 
-<body>
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin-users.css') }}">
+@endpush
 
-<nav>
+@section('content')
 
-    <div>
-        <a href="{{ route('home') }}">
-            Discapp
-        </a>
-    </div>
+<div class="admin-users-page">
 
-    <div class="nav-auth">
-
-        <a href="{{ route('admin') }}">
-            Admin
-        </a>
-
-        <a href="{{ route('profile') }}">
-            Profils
-        </a>
-
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-
-            <button type="submit">
-                Iziet
-            </button>
-        </form>
-
-    </div>
-
-</nav>
-
-
-<main class="profile-page">
-
-    <div class="profile-header">
-
+    {{-- LAPAS GALVENE --}}
+    <div class="admin-users-header">
         <div>
-            <h1>Lietotāji</h1>
+            <span class="admin-users-eyebrow">
+                DISCAPP ADMINISTRĀCIJA
+            </span>
+
+            <h1>Lietotāju pārvaldība</h1>
 
             <p>
-                Discapp lietotāju pārvaldība
+                Apskati lietotājus, maini viņu lomas
+                un pārvaldi reitingus.
             </p>
         </div>
 
-        <div>
-
-            <a
-                href="{{ route('admin') }}"
-                class="btn"
-            >
-                Atpakaļ
-            </a>
-
-        </div>
-
+        <a href="{{ route('admin') }}" class="admin-back-btn">
+            ← Atpakaļ uz paneli
+        </a>
     </div>
 
-
+    {{-- PAZIŅOJUMI --}}
     @if(session('success'))
-
-        <div class="success-message">
+        <div class="admin-users-alert success">
             {{ session('success') }}
         </div>
-
     @endif
-
 
     @if($errors->any())
-
-        <div class="competition">
-
+        <div class="admin-users-alert error">
             @foreach($errors->all() as $error)
-
-                <p>
-                    {{ $error }}
-                </p>
-
+                <p>{{ $error }}</p>
             @endforeach
-
         </div>
-
     @endif
 
+    {{-- LIETOTĀJU SKAITS --}}
+    <div class="admin-users-overview">
+        <div class="admin-users-overview-icon" aria-hidden="true">
+            👥
+        </div>
 
-    <section class="competitions">
+        <div>
+            <span>Kopējais lietotāju skaits</span>
+            <strong>{{ $users->count() }}</strong>
+        </div>
+    </div>
+
+    {{-- LIETOTĀJU SARAKSTS --}}
+    <div class="admin-users-list">
 
         @forelse($users as $user)
+            <article class="admin-user-card">
 
-            <div class="competition">
+                {{-- LIETOTĀJA INFORMĀCIJA --}}
+                <div class="admin-user-info">
+                    <div class="admin-user-avatar" aria-hidden="true">
+                        {{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}
+                    </div>
 
-                <div>
+                    <div class="admin-user-details">
+                        <div class="admin-user-name-row">
+                            <h2>{{ $user->name }}</h2>
 
-                    <h2>
-                        {{ $user->name }}
-                    </h2>
+                            @if($user->role === 'admin')
+                                <span class="admin-role-badge admin">
+                                    Administrators
+                                </span>
+                            @else
+                                <span class="admin-role-badge user">
+                                    Lietotājs
+                                </span>
+                            @endif
 
-                    <p>
-                        <strong>E-pasts:</strong>
-                        {{ $user->email }}
-                    </p>
+                            @if($user->id === auth()->id())
+                                <span class="admin-self-badge">
+                                    Tavs profils
+                                </span>
+                            @endif
+                        </div>
 
-                    <p>
-                        <strong>Reitings:</strong>
-                        {{ $user->rating }}
-                    </p>
+                        <p>{{ $user->email }}</p>
 
-                    <p>
-                        <strong>Loma:</strong>
-                        {{ $user->role }}
-                    </p>
+                        <div class="admin-user-meta">
+                            <span>
+                                Reitings:
+                                <strong>{{ $user->rating ?? '—' }}</strong>
+                            </span>
 
+                            <span>
+                                Loma:
+                                <strong>{{ $user->role }}</strong>
+                            </span>
+                        </div>
+                    </div>
                 </div>
 
-
-                <div>
+                {{-- REDIĢĒŠANAS FORMA --}}
+                <div class="admin-user-management">
 
                     <form
                         method="POST"
                         action="{{ route('admin.users.update', $user) }}"
+                        class="admin-user-edit-form"
                     >
-
                         @csrf
                         @method('PUT')
 
-                        <div style="margin-bottom: 10px;">
+                        <div class="admin-user-fields">
 
-                            <label for="role_{{ $user->id }}">
-                                Loma
-                            </label>
+                            <div class="admin-field">
+                                <label for="role_{{ $user->id }}">
+                                    Lietotāja loma
+                                </label>
 
-                            <select
-                                id="role_{{ $user->id }}"
-                                name="role"
-                            >
-
-                                <option
-                                    value="user"
-                                    {{ $user->role === 'user' ? 'selected' : '' }}
+                                <select
+                                    id="role_{{ $user->id }}"
+                                    name="role"
+                                    required
                                 >
-                                    Lietotājs
-                                </option>
+                                    <option
+                                        value="user"
+                                        @selected($user->role === 'user')
+                                    >
+                                        Lietotājs
+                                    </option>
 
-                                <option
-                                    value="admin"
-                                    {{ $user->role === 'admin' ? 'selected' : '' }}
+                                    <option
+                                        value="admin"
+                                        @selected($user->role === 'admin')
+                                    >
+                                        Administrators
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="admin-field">
+                                <label for="rating_{{ $user->id }}">
+                                    Spēlētāja reitings
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="rating_{{ $user->id }}"
+                                    name="rating"
+                                    value="{{ $user->rating }}"
+                                    min="0"
+                                    max="2000"
+                                    required
                                 >
-                                    Administrators
-                                </option>
-
-                            </select>
+                            </div>
 
                         </div>
 
-
-                        <div style="margin-bottom: 10px;">
-
-                            <label for="rating_{{ $user->id }}">
-                                Reitings
-                            </label>
-
-                            <input
-                                type="number"
-                                id="rating_{{ $user->id }}"
-                                name="rating"
-                                value="{{ $user->rating }}"
-                                min="0"
-                                max="2000"
-                                required
+                        <div class="admin-user-actions">
+                            <button
+                                type="submit"
+                                class="admin-save-btn"
                             >
-
+                                Saglabāt izmaiņas
+                            </button>
                         </div>
-
-
-                        <button
-                            type="submit"
-                            class="btn"
-                        >
-                            Saglabāt
-                        </button>
-
                     </form>
 
-
                     @if($user->id !== auth()->id())
-
                         <form
                             method="POST"
                             action="{{ route('admin.users.destroy', $user) }}"
-                            style="margin-top: 10px;"
+                            class="admin-delete-form"
                             onsubmit="return confirm('Vai tiešām vēlies dzēst šo lietotāju?')"
                         >
-
                             @csrf
                             @method('DELETE')
 
                             <button
                                 type="submit"
-                                style="
-                                    padding: 10px 15px;
-                                    background: #c0392b;
-                                    color: white;
-                                    border: none;
-                                    border-radius: 6px;
-                                    cursor: pointer;
-                                "
+                                class="admin-delete-btn"
                             >
                                 Dzēst lietotāju
                             </button>
-
                         </form>
-
                     @endif
 
                 </div>
 
-            </div>
-
+            </article>
         @empty
-
-            <div class="competition">
-
-                <p>
-                    Sistēmā nav neviena lietotāja.
-                </p>
-
+            <div class="admin-users-empty">
+                <h3>Nav lietotāju</h3>
+                <p>Sistēmā pašlaik nav neviena lietotāja.</p>
             </div>
-
         @endforelse
 
-    </section>
+    </div>
 
-</main>
+</div>
 
-</body>
-</html>
+@endsection

@@ -1,192 +1,380 @@
-<!DOCTYPE html>
 
-<html lang="lv">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@section('title', 'Pievienot disku - Discapp')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/disc-form.css') }}">
+@endpush
 
-<title>Pievienot disku - DiscGolf</title>
+@section('content')
 
-<link rel="stylesheet" href="{{ asset('css/style.css') }}">
+<main class="disc-form-page">
 
+    {{-- LAPAS GALVENE --}}
+    <div class="disc-form-header">
 
-</head>
+        <div>
+            <span class="disc-form-eyebrow">
+                MANA DISKU SOMA
+            </span>
 
-<body>
+            <h1>Pievienot disku</h1>
 
-<nav>
-    <h2>DiscGolf</h2>
+            <p>
+                Pievieno jaunu disku savai kolekcijai
+                un norādi tā lidojuma parametrus.
+            </p>
+        </div>
 
-
-<div>
-    <a href="/">Sākums</a>
-    <a href="/competitions">Sacensības</a>
-    <a href="/profile">Mans profils</a>
-</div>
-
-
-</nav>
-
-<main>
-
-
-<h1>Pievienot disku</h1>
-
-@if($errors->any())
-
-    <div class="error">
-
-        @foreach($errors->all() as $error)
-            <p>{{ $error }}</p>
-        @endforeach
+        <a
+            href="{{ route('profile.discs.index') }}"
+            class="disc-form-back"
+        >
+            ← Atpakaļ uz diskiem
+        </a>
 
     </div>
 
-@endif
+    {{-- KĻŪDU PAZIŅOJUMI --}}
+    @if($errors->any())
+        <div class="disc-form-alert" role="alert">
+            <strong>Neizdevās pievienot disku.</strong>
 
-<form method="POST"
-      action="{{ route('profile.discs.store') }}"
-      enctype="multipart/form-data">
+            <ul>
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-    @csrf
-
-    <label for="name">
-        Diska nosaukums
-    </label>
-
-    <input
-        type="text"
-        id="name"
-        name="name"
-        value="{{ old('name') }}"
-        placeholder="Piemēram, Destroyer"
-        required
+    {{-- DISKA PIEVIENOŠANAS FORMA --}}
+    <form
+        method="POST"
+        action="{{ route('profile.discs.store') }}"
+        enctype="multipart/form-data"
+        class="disc-create-form"
     >
+        @csrf
 
-    <label for="type">
-        Diska tips
-    </label>
+        {{-- PAMATINFORMĀCIJA --}}
+        <section class="disc-form-card">
 
-    <select id="type" name="type" required>
+            <div class="disc-form-section-heading">
+                <div class="disc-form-section-icon">
+                    🥏
+                </div>
 
-        <option value="">Izvēlies tipu</option>
+                <div>
+                    <h2>Diska informācija</h2>
+                    <p>Norādi diska nosaukumu un tipu.</p>
+                </div>
+            </div>
 
-        <option value="Distance Driver">
-            Distance Driver
-        </option>
+            <div class="disc-form-fields">
 
-        <option value="Fairway Driver">
-            Fairway Driver
-        </option>
+                <div class="disc-form-field">
+                    <label for="name">
+                        Diska nosaukums
+                    </label>
 
-        <option value="Midrange">
-            Midrange
-        </option>
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value="{{ old('name') }}"
+                        placeholder="Piemēram, Destroyer"
+                        required
+                    >
 
-        <option value="Putter">
-            Putter
-        </option>
+                    @error('name')
+                        <span class="disc-field-error">
+                            {{ $message }}
+                        </span>
+                    @enderror
+                </div>
 
-    </select>
+                <div class="disc-form-field">
+                    <label for="type">
+                        Diska tips
+                    </label>
 
+                    <select id="type" name="type" required>
+                        <option value="">
+                            Izvēlies diska tipu
+                        </option>
 
-    <h2>Diska stats</h2>
+                        <option
+                            value="Distance Driver"
+                            @selected(old('type') === 'Distance Driver')
+                        >
+                            Distance Driver
+                        </option>
 
-    <label for="speed">
-        Speed
-    </label>
+                        <option
+                            value="Fairway Driver"
+                            @selected(old('type') === 'Fairway Driver')
+                        >
+                            Fairway Driver
+                        </option>
 
-    <input
-        type="number"
-        id="speed"
-        name="speed"
-        value="{{ old('speed') }}"
-        min="1"
-        max="15"
-        step="0.5"
-        placeholder="Piemēram, 12"
-        required
-    >
+                        <option
+                            value="Midrange"
+                            @selected(old('type') === 'Midrange')
+                        >
+                            Midrange
+                        </option>
 
+                        <option
+                            value="Putter"
+                            @selected(old('type') === 'Putter')
+                        >
+                            Putter
+                        </option>
+                    </select>
 
-    <label for="glide">
-        Glide
-    </label>
+                    @error('type')
+                        <span class="disc-field-error">
+                            {{ $message }}
+                        </span>
+                    @enderror
+                </div>
 
-    <input
-        type="number"
-        id="glide"
-        name="glide"
-        value="{{ old('glide') }}"
-        min="1"
-        max="7"
-        step="0.5"
-        placeholder="Piemēram, 5"
-        required
-    >
+            </div>
 
+        </section>
 
-    <label for="turn">
-        Turn
-    </label>
+        {{-- LIDOJUMA PARAMETRI --}}
+        <section class="disc-form-card">
 
-    <input
-        type="number"
-        id="turn"
-        name="turn"
-        value="{{ old('turn') }}"
-        min="-5"
-        max="1"
-        step="0.5"
-        placeholder="Piemēram, -1"
-        required
-    >
+            <div class="disc-form-section-heading">
+                <div class="disc-form-section-icon">
+                    📊
+                </div>
 
+                <div>
+                    <h2>Diska lidojuma parametri</h2>
 
-    <label for="fade">
-        Fade
-    </label>
+                    <p>
+                        Ievadi Speed, Glide, Turn un Fade vērtības.
+                    </p>
+                </div>
+            </div>
 
-    <input
-        type="number"
-        id="fade"
-        name="fade"
-        value="{{ old('fade') }}"
-        min="0"
-        max="5"
-        step="0.5"
-        placeholder="Piemēram, 3"
-        required
-    >
+            <div class="disc-stats-grid">
 
+                <div class="disc-form-field">
+                    <label for="speed">Speed</label>
 
-    <label for="image">
-        Diska bilde
-    </label>
+                    <input
+                        type="number"
+                        id="speed"
+                        name="speed"
+                        value="{{ old('speed') }}"
+                        min="1"
+                        max="15"
+                        step="0.5"
+                        placeholder="12"
+                        required
+                    >
 
-    <input
-        type="file"
-        id="image"
-        name="image"
-        accept="image/jpeg,image/png,image/webp"
-    >
+                    <span class="disc-field-hint">
+                        Diska ātrums
+                    </span>
+                </div>
 
-    <button type="submit" class="button">
-        Pievienot disku
-    </button>
+                <div class="disc-form-field">
+                    <label for="glide">Glide</label>
 
-</form>
+                    <input
+                        type="number"
+                        id="glide"
+                        name="glide"
+                        value="{{ old('glide') }}"
+                        min="1"
+                        max="7"
+                        step="0.5"
+                        placeholder="5"
+                        required
+                    >
 
-<br>
+                    <span class="disc-field-hint">
+                        Planēšanas spēja
+                    </span>
+                </div>
 
-<a href="{{ route('profile.discs.index') }}" class="button">
-    Atpakaļ
-</a>
+                <div class="disc-form-field">
+                    <label for="turn">Turn</label>
 
+                    <input
+                        type="number"
+                        id="turn"
+                        name="turn"
+                        value="{{ old('turn') }}"
+                        min="-5"
+                        max="1"
+                        step="0.5"
+                        placeholder="-1"
+                        required
+                    >
+
+                    <span class="disc-field-hint">
+                        Sākotnējā novirze
+                    </span>
+                </div>
+
+                <div class="disc-form-field">
+                    <label for="fade">Fade</label>
+
+                    <input
+                        type="number"
+                        id="fade"
+                        name="fade"
+                        value="{{ old('fade') }}"
+                        min="0"
+                        max="5"
+                        step="0.5"
+                        placeholder="3"
+                        required
+                    >
+
+                    <span class="disc-field-hint">
+                        Noslēguma novirze
+                    </span>
+                </div>
+
+            </div>
+
+            <div class="disc-stats-example">
+                <span>Piemērs:</span>
+
+                <strong>12</strong>
+                <strong>5</strong>
+                <strong>-1</strong>
+                <strong>3</strong>
+            </div>
+
+        </section>
+
+        {{-- DISKA ATTĒLS --}}
+        <section class="disc-form-card">
+
+            <div class="disc-form-section-heading">
+                <div class="disc-form-section-icon">
+                    📷
+                </div>
+
+                <div>
+                    <h2>Diska bilde</h2>
+
+                    <p>
+                        Pievieno diska attēlu no savas ierīces.
+                    </p>
+                </div>
+            </div>
+
+            <div class="disc-image-upload">
+
+                <div class="disc-image-preview" id="discImagePreview">
+                    <span id="discImagePlaceholder">🥏</span>
+
+                    <img
+                        id="discPreviewImage"
+                        alt="Diska attēla priekšskatījums"
+                        hidden
+                    >
+                </div>
+
+                <div class="disc-image-upload-info">
+
+                    <label for="image">
+                        Izvēlies diska bildi
+                    </label>
+
+                    <input
+                        type="file"
+                        id="image"
+                        name="image"
+                        accept="image/jpeg,image/png,image/webp"
+                    >
+
+                    <p>
+                        Atļautie formāti: JPG, PNG un WEBP.
+                        Attēla pievienošana nav obligāta.
+                    </p>
+
+                    @error('image')
+                        <span class="disc-field-error">
+                            {{ $message }}
+                        </span>
+                    @enderror
+
+                </div>
+
+            </div>
+
+        </section>
+
+        {{-- DARBĪBAS --}}
+        <div class="disc-form-actions">
+
+            <a
+                href="{{ route('profile.discs.index') }}"
+                class="disc-form-cancel"
+            >
+                Atcelt
+            </a>
+
+            <button
+                type="submit"
+                class="disc-form-submit"
+            >
+                + Pievienot disku
+            </button>
+
+        </div>
+
+    </form>
 
 </main>
 
-</body>
-</html>
+@endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const imageInput = document.getElementById('image');
+    const previewImage = document.getElementById('discPreviewImage');
+    const placeholder = document.getElementById('discImagePlaceholder');
+
+    if (!imageInput || !previewImage || !placeholder) {
+        return;
+    }
+
+    let previewUrl = null;
+
+    imageInput.addEventListener('change', function () {
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+            previewUrl = null;
+        }
+
+        const file = this.files[0];
+
+        if (!file || !file.type.startsWith('image/')) {
+            previewImage.hidden = true;
+            previewImage.removeAttribute('src');
+            placeholder.style.display = 'block';
+            return;
+        }
+
+        previewUrl = URL.createObjectURL(file);
+
+        previewImage.src = previewUrl;
+        previewImage.hidden = false;
+        placeholder.style.display = 'none';
+    });
+});
+</script>
+@endpush

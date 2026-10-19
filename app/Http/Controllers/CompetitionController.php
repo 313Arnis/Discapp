@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Competition;
@@ -11,44 +12,52 @@ use Illuminate\Validation\ValidationException;
 
 class CompetitionController extends Controller
 {
-    public function __construct(private RatingService $ratingService)
-    {
-    }
+    public function __construct(
+        private RatingService $ratingService
+    ) {}
 
+    // SACENSĪBU SARAKSTS
     public function index()
     {
-        $competitions = Competition::with(['course', 'creator', 'users'])
+        $competitions = Competition::with([
+            'course',
+            'creator',
+            'users'
+        ])
             ->latest('date')
             ->get();
 
         return view('competitions.index', compact('competitions'));
     }
 
+    // SACENSĪBU IZVEIDES FORMA
     public function create()
     {
         $courses = Course::orderBy('name')->get();
+
         return view('competitions.create', compact('courses'));
     }
 
+    // SACENSĪBU IZVEIDE
     public function store(Request $request)
     {
         $validated = $this->validateCompetition($request);
 
-        if ($validated['status'] === 'finished') {
-            throw ValidationException::withMessages([
-                'status' => 'Jaunas sacensības nevar izveidot ar statusu Pabeigtas.',
-            ]);
-        }
+        // Jaunas sacensības vienmēr ir plānotas.
+        // Statusu vēlāk automātiski maina Laravel plānotājs.
+        $validated['status'] = 'planned';
 
         Competition::create([
             ...$validated,
             'user_id' => auth()->id(),
         ]);
 
-        return redirect()->route('competitions.index')
+        return redirect()
+            ->route('competitions.index')
             ->with('success', 'Sacensības veiksmīgi izveidotas!');
     }
 
+    // SACENSĪBU APSKATE
     public function show(Competition $competition)
     {
         $competition->load([
@@ -99,143 +108,125 @@ class CompetitionController extends Controller
                     return $a['total_score'] <=> $b['total_score'];
                 }
 
-                return strcasecmp($a['user']->name, $b['user']->name);
+                return strcasecmp(
+                    $a['user']->name,
+                    $b['user']->name
+                );
             })
             ->values();
 
-        return view('competitions.show', compact('competition', 'players'));
+        return view(
+            'competitions.show',
+            compact('competition', 'players')
+        );
     }
 
+    // SACENSĪBU REDIĢĒŠANAS FORMA
     public function edit(Competition $competition)
     {
         $this->checkOwner($competition);
 
         if ($competition->status === 'finished') {
-            return redirect()->route('competitions.show', $competition)
-                ->with('error', 'Pabeigtas sacensības vairs nevar rediģēt.');
+            return redirect()
+                ->route('competitions.show', $competition)
+                ->with(
+                    'error',
+                    'Pabeigtas sacensības vairs nevar rediģēt.'
+                );
         }
 
         $courses = Course::orderBy('name')->get();
 
-        return view('competitions.edit', compact('competition', 'courses'));
+        return view(
+            'competitions.edit',
+            compact('competition', 'courses')
+        );
     }
 
-    public function update(Request $request, Competition $competition)
-    {
+    // SACENSĪBU ATJAUNINĀŠANA
+    public function update(
+        Request $request,
+        Competition $competition
+    ) {
         $this->checkOwner($competition);
+
         $validated = $this->validateCompetition($request);
 
-        return DB::transaction(function () use ($competition, $validated) {
+        return DB::transaction(function () use (
+            $competition,
+            $validated
+        ) {
             $competition = Competition::whereKey($competition->id)
                 ->lockForUpdate()
                 ->firstOrFail();
 
             if ($competition->status === 'finished') {
-                return redirect()->route('competitions.show', $competition)
-                    ->with('error', 'Pabeigtas sacensības vairs nevar rediģēt.');
+                return redirect()
+                    ->route('competitions.show', $competition)
+                    ->with(
+                        'error',
+                        'Pabeigtas sacensības vairs nevar rediģēt.'
+                    );
             }
+
+            // Saglabājam pašreizējo statusu.
+            // Lietotājs to nevar mainīt manuāli.
+            $validated['status'] = $competition->status;
 
             $hasResults = $competition->holeResults()->exists()
                 || $competition->results()->exists();
 
-            if ($hasResults && (int) $validated['course_id'] !== (int) $competition->course_id) {
+            // Trasi nedrīkst mainīt, ja jau ievadīti rezultāti.
+            if (
+                $hasResults &&
+                (int) $validated['course_id'] !==
+                (int) $competition->course_id
+            ) {
                 throw ValidationException::withMessages([
-                    'course_id' => 'Trasi nevar mainīt, jo sacensībās jau ir ievadīti rezultāti.',
+                    'course_id' =>
+                        'Trasi nevar mainīt, jo sacensībās jau ir ievadīti rezultāti.',
                 ]);
             }
 
             $participantCount = $competition->users()->count();
 
-            if ($validated['max_players'] !== null && $validated['max_players'] < $participantCount) {
+            // Dalībnieku limits nedrīkst būt mazāks
+            // par jau pieteikto dalībnieku skaitu.
+            if (
+                $validated['max_players'] !== null &&
+                $validated['max_players'] < $participantCount
+            ) {
                 throw ValidationException::withMessages([
-                    'max_players' => 'Maksimālais dalībnieku skaits nevar būt mazāks par ' . $participantCount . '.',
+                    'max_players' =>
+                        'Maksimālais dalībnieku skaits nevar būt mazāks par '
+                        . $participantCount . '.',
                 ]);
             }
 
-            if ($hasResults && $validated['status'] !== 'active' && $validated['status'] !== 'finished') {
+            // Neļaujam pārvietot sākuma laiku uz nākotni,
+            // ja sacensības jau ir aktīvas.
+            if (
+                $competition->status === 'active' &&
+                \Carbon\Carbon::parse($validated['starts_at'])->isFuture()
+            ) {
                 throw ValidationException::withMessages([
-                    'status' => 'Sacensībām ar ievadītiem rezultātiem nevar atgriezt statusu uz Plānotas vai Atceltas.',
+                    'starts_at' =>
+                        'Aktīvām sacensībām sākuma laiku nevar pārcelt uz nākotni.',
                 ]);
-            }
-
-            if ($validated['status'] === 'finished') {
-                if ($competition->status !== 'active') {
-                    throw ValidationException::withMessages([
-                        'status' => 'Pabeigt var tikai aktīvas sacensības.',
-                    ]);
-                }
-
-                if ((int) $validated['course_id'] !== (int) $competition->course_id) {
-                    throw ValidationException::withMessages([
-                        'course_id' => 'Pabeidzot sacensības, trasi mainīt nedrīkst.',
-                    ]);
-                }
-
-                $competition->load('course');
-
-                if (!$competition->course) {
-                    throw ValidationException::withMessages([
-                        'status' => 'Sacensības nevar pabeigt, jo nav piesaistīta trase.',
-                    ]);
-                }
-
-                $holeIds = $competition->course->courseHoles()->pluck('id');
-                $holeCount = $holeIds->count();
-                $participantIds = $competition->users()->pluck('users.id');
-
-                if ($holeCount === 0 || $participantIds->isEmpty()) {
-                    throw ValidationException::withMessages([
-                        'status' => 'Sacensības nevar pabeigt bez dalībniekiem un trases groziem.',
-                    ]);
-                }
-
-                foreach ($participantIds as $userId) {
-                    $holeResults = $competition->holeResults()
-                        ->where('user_id', $userId)
-                        ->whereIn('course_hole_id', $holeIds);
-
-                    $playedCount = (clone $holeResults)
-                        ->distinct()
-                        ->count('course_hole_id');
-
-                    if ($playedCount !== $holeCount) {
-                        throw ValidationException::withMessages([
-                            'status' => 'Visiem dalībniekiem jāpabeidz visi grozi pirms sacensību pabeigšanas.',
-                        ]);
-                    }
-
-                    $totalScore = (int) (clone $holeResults)->sum('score');
-
-                    $savedResult = $competition->results()
-                        ->where('user_id', $userId)
-                        ->first();
-
-                    if (!$savedResult) {
-                        throw ValidationException::withMessages([
-                            'status' => 'Visiem dalībniekiem jābūt saglabātam gala rezultātam.',
-                        ]);
-                    }
-
-                    if ((int) $savedResult->score !== $totalScore) {
-                        throw ValidationException::withMessages([
-                            'status' => 'Dalībnieka gala rezultāts nesakrīt ar grozu rezultātu summu.',
-                        ]);
-                    }
-                }
-
-                // APRĒĶINA VISU DALĪBNIEKU REITINGUS
-                $this->ratingService->finalizeCompetitionRatings($competition);
             }
 
             $competition->update($validated);
 
-            return redirect()->route('competitions.show', $competition)
-                ->with('success', $validated['status'] === 'finished'
-                    ? 'Sacensības pabeigtas! Visu dalībnieku reitingi aprēķināti.'
-                    : 'Sacensības veiksmīgi atjauninātas!');
+            return redirect()
+                ->route('competitions.show', $competition)
+                ->with(
+                    'success',
+                    'Sacensības veiksmīgi atjauninātas!'
+                );
         }, 3);
     }
 
+    // SACENSĪBU DZĒŠANA
     public function destroy(Competition $competition)
     {
         $this->checkOwner($competition);
@@ -246,38 +237,110 @@ class CompetitionController extends Controller
                 ->firstOrFail();
 
             if ($competition->status === 'finished') {
-                return back()->with('error', 'Pabeigtas sacensības nevar dzēst.');
+                return back()->with(
+                    'error',
+                    'Pabeigtas sacensības nevar dzēst.'
+                );
             }
 
-            if ($competition->holeResults()->exists() || $competition->results()->exists()) {
-                return back()->with('error', 'Sacensības nevar dzēst, jo tajās jau ir ievadīti rezultāti.');
+            if (
+                $competition->holeResults()->exists() ||
+                $competition->results()->exists()
+            ) {
+                return back()->with(
+                    'error',
+                    'Sacensības nevar dzēst, jo tajās jau ir ievadīti rezultāti.'
+                );
             }
 
             $competition->delete();
 
-            return redirect()->route('competitions.index')
+            return redirect()
+                ->route('competitions.index')
                 ->with('success', 'Sacensības izdzēstas!');
         }, 3);
     }
 
+    // SACENSĪBU DATU VALIDĀCIJA
     private function validateCompetition(Request $request): array
     {
         return $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'date' => ['required', 'date'],
-            'course_id' => ['required', 'integer', 'exists:courses,id'],
-            'max_players' => ['nullable', 'integer', 'min:1'],
-            'status' => ['required', Rule::in(['planned', 'active', 'finished', 'cancelled'])],
-            'registration_starts_at' => ['required', 'date', 'before:registration_ends_at'],
-            'registration_ends_at' => ['required', 'date', 'after:registration_starts_at'],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'description' => [
+                'nullable',
+                'string',
+            ],
+
+            'date' => [
+                'required',
+                'date',
+            ],
+
+            'starts_at' => [
+                'required',
+                'date',
+            ],
+
+            'ends_at' => [
+                'required',
+                'date',
+                'after:starts_at',
+            ],
+
+            'course_id' => [
+                'required',
+                'integer',
+                'exists:courses,id',
+            ],
+
+            'max_players' => [
+                'nullable',
+                'integer',
+                'min:1',
+            ],
+
+            // Saglabājam saderību ar esošajām formām.
+            // Faktisko statusu nosaka kontrolieris un plānotājs.
+            'status' => [
+                'sometimes',
+                Rule::in([
+                    'planned',
+                    'active',
+                    'finished',
+                    'cancelled',
+                ]),
+            ],
+
+            'registration_starts_at' => [
+                'required',
+                'date',
+                'before:registration_ends_at',
+            ],
+
+            'registration_ends_at' => [
+                'required',
+                'date',
+                'after:registration_starts_at',
+            ],
         ]);
     }
 
+    // PĀRBAUDA SACENSĪBU ĪPAŠNIEKU
     private function checkOwner(Competition $competition): void
     {
-        if ((int) $competition->user_id !== (int) auth()->id()) {
-            abort(403, 'Tev nav tiesību veikt šo darbību.');
+        if (
+            (int) $competition->user_id !==
+            (int) auth()->id()
+        ) {
+            abort(
+                403,
+                'Tev nav tiesību veikt šo darbību.'
+            );
         }
     }
 }

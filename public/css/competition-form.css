@@ -1,0 +1,67 @@
+
+.competition-form-page {
+    max-width: 780px;
+    margin: 50px auto 80px;
+    padding: 30px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 18px;
+}
+
+.competition-form-page h1 {
+    margin: 0 0 26px;
+}
+
+.competition-form {
+    display: grid;
+    gap: 18px;
+}
+
+.competition-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.competition-form label {
+    font-weight: 700;
+    color: #333;
+}
+
+.competition-form input,
+.competition-form textarea,
+.competition-form select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font: inherit;
+    background: #fff;
+    color: #222;
+}
+
+.competition-form textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+.competition-form .field-error {
+    color: #bd342b;
+}
+
+.competition-form .discapp-button {
+    background: #e86f2d;
+    color: white;
+    border: 0;
+    padding: 14px 22px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .competition-form-page {
+        margin: 20px 12px;
+        padding: 20px;
+    }
+}

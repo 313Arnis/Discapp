@@ -1,69 +1,68 @@
-<!DOCTYPE html>
-<html lang="lv">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Pievienot trasi - Discapp</title>
+@extends('layouts.app')
 
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-</head>
+@section('title', 'Pievienot trasi - Discapp')
 
-<body>
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin-courses.css') }}">
+@endpush
 
-<nav>
-    <div>
-        <a href="/">Discapp</a>
+@section('content')
+<main class="courses-page courses-page-narrow">
+
+    <div class="courses-header">
+        <div>
+            <span class="courses-eyebrow">DISCAPP ADMINISTRĀCIJA</span>
+            <h1>Pievienot trasi</h1>
+            <p>Izveido jaunu disku golfa trasi un norādi tās parametrus.</p>
+        </div>
+
+        <a href="{{ route('courses.index') }}" class="courses-btn-secondary">
+            ← Atpakaļ
+        </a>
     </div>
 
-    <div class="nav-auth">
-        <a href="/admin">Admin</a>
-        <a href="{{ route('courses.index') }}">Trases</a>
-
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit">Iziet</button>
-        </form>
-    </div>
-</nav>
-
-<div class="profile-page">
-
-    <div class="profile-header">
-        <h1>Pievienot trasi</h1>
-        <p>Izveido jaunu disku golfa trasi.</p>
-    </div>
-
-    @if ($errors->any())
-        <div class="competition">
-            @foreach ($errors->all() as $error)
-                <p>{{ $error }}</p>
-            @endforeach
+    @if($errors->any())
+        <div class="courses-alert courses-alert-error" role="alert">
+            <strong>Neizdevās izveidot trasi.</strong>
+            <ul>
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
     @endif
 
-    <div class="competition">
+    <section class="courses-panel">
+        <div class="courses-panel-heading">
+            <span class="courses-panel-icon">⛳</span>
+            <div>
+                <h2>Trases informācija</h2>
+                <p>Aizpildi nepieciešamos laukus.</p>
+            </div>
+        </div>
 
-        <form method="POST" action="{{ route('courses.store') }}">
+        <form method="POST" action="{{ route('courses.store') }}" class="courses-form">
             @csrf
 
-            <div>
+            <div class="courses-field">
                 <label for="name">Trases nosaukums</label>
-
                 <input
                     type="text"
                     id="name"
                     name="name"
                     value="{{ old('name') }}"
+                    placeholder="Piemēram, Mežaparka trase"
+                    maxlength="255"
                     required
                 >
+                @error('name')
+                    <span class="courses-field-error">{{ $message }}</span>
+                @enderror
             </div>
 
-            <br>
-
-            <div>
+            <div class="courses-field">
                 <label for="holes">Grozu skaits</label>
-
                 <input
                     type="number"
                     id="holes"
@@ -73,53 +72,58 @@
                     max="36"
                     required
                 >
+                <span class="courses-field-hint">
+                    Iespējams norādīt no 1 līdz 36 groziem.
+                </span>
             </div>
 
-            <br>
+            <div class="courses-form-divider"></div>
 
-            <div>
-                <label for="rating_1000_score">
-                    1000 reitinga rezultāts
-                </label>
+            <h3 class="courses-form-subtitle">Reitinga parametri</h3>
 
-                <input
-                    type="number"
-                    step="0.01"
-                    id="rating_1000_score"
-                    name="rating_1000_score"
-                    value="{{ old('rating_1000_score') }}"
-                    required
-                >
+            <div class="courses-fields-grid">
+                <div class="courses-field">
+                    <label for="rating_1000_score">
+                        1000 reitinga rezultāts
+                    </label>
+                    <input
+                        type="number"
+                        step="0.01"
+                        id="rating_1000_score"
+                        name="rating_1000_score"
+                        value="{{ old('rating_1000_score') }}"
+                        placeholder="Ievadi vērtību"
+                        required
+                    >
+                </div>
+
+                <div class="courses-field">
+                    <label for="rating_per_throw">
+                        Reitinga punkti par metienu
+                    </label>
+                    <input
+                        type="number"
+                        step="0.01"
+                        id="rating_per_throw"
+                        name="rating_per_throw"
+                        value="{{ old('rating_per_throw') }}"
+                        placeholder="Piemēram, 10"
+                        required
+                    >
+                </div>
             </div>
 
-            <br>
+            <div class="courses-form-actions">
+                <a href="{{ route('courses.index') }}" class="courses-btn-secondary">
+                    Atcelt
+                </a>
 
-            <div>
-                <label for="rating_per_throw">
-                    Reitinga punkti par metienu
-                </label>
-
-                <input
-                    type="number"
-                    step="0.01"
-                    id="rating_per_throw"
-                    name="rating_per_throw"
-                    value="{{ old('rating_per_throw') }}"
-                    required
-                >
+                <button type="submit" class="courses-btn-primary">
+                    + Izveidot trasi
+                </button>
             </div>
-
-            <br>
-
-            <button type="submit">
-                Izveidot trasi
-            </button>
-
         </form>
+    </section>
 
-    </div>
-
-</div>
-
-</body>
-</html>
+</main>
+@endsection

@@ -1,0 +1,471 @@
+
+/* ==========================================
+   DISCAPP — ADMIN COURSES
+========================================== */
+
+.courses-page {
+    width: min(100% - 40px, 1140px);
+    margin: 45px auto 90px;
+    color: #252525;
+}
+
+.courses-page-narrow {
+    max-width: 780px;
+}
+
+.courses-page *,
+.courses-page *::before,
+.courses-page *::after {
+    box-sizing: border-box;
+}
+
+/* GALVENE */
+
+.courses-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+    margin-bottom: 30px;
+}
+
+.courses-eyebrow {
+    display: block;
+    margin-bottom: 10px;
+    color: #e86f2d;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.courses-header h1 {
+    margin: 0 0 10px;
+    color: #252525;
+    font-size: clamp(28px, 4vw, 39px);
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.courses-header p {
+    margin: 0;
+    color: #777;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+/* POGAS */
+
+.courses-btn-primary,
+.courses-btn-secondary,
+.courses-btn-danger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 45px;
+    padding: 11px 18px;
+    border-radius: 10px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 750;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.courses-btn-primary {
+    border: 1px solid #e86f2d;
+    background: #e86f2d;
+    color: #fff;
+}
+
+.courses-btn-primary:hover {
+    background: #d65f22;
+    border-color: #d65f22;
+    color: #fff;
+    text-decoration: none;
+}
+
+.courses-btn-secondary {
+    border: 1px solid #e4e4e0;
+    background: #fff;
+    color: #555;
+}
+
+.courses-btn-secondary:hover {
+    border-color: #e86f2d;
+    background: #fff8f3;
+    color: #e86f2d;
+    text-decoration: none;
+}
+
+.courses-btn-danger {
+    border: 1px solid #f0c7c1;
+    background: #fff1ef;
+    color: #bd342b;
+}
+
+.courses-btn-danger:hover {
+    border-color: #bd342b;
+    background: #bd342b;
+    color: #fff;
+}
+
+/* PAZIŅOJUMI */
+
+.courses-alert {
+    margin-bottom: 24px;
+    padding: 16px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.courses-alert-success {
+    border: 1px solid #bee4c9;
+    background: #e8f7ed;
+    color: #16803c;
+}
+
+.courses-alert-error {
+    border: 1px solid #f1c4be;
+    background: #fdecea;
+    color: #b8322a;
+}
+
+.courses-alert ul {
+    margin: 8px 0 0;
+    padding-left: 20px;
+}
+
+/* KARTĪTES */
+
+.courses-panel,
+.courses-list-card {
+    border: 1px solid #e9e9e5;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 5px 22px rgba(0, 0, 0, 0.025);
+}
+
+.courses-panel {
+    padding: 30px;
+}
+
+.courses-panel-heading {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 23px;
+    border-bottom: 1px solid #eeeeeb;
+}
+
+.courses-panel-icon,
+.courses-list-icon,
+.courses-empty-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    background: #fff0e5;
+    font-size: 25px;
+}
+
+.courses-panel-heading h2 {
+    margin: 0 0 6px;
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.courses-panel-heading p {
+    margin: 0;
+    color: #888;
+    font-size: 13px;
+}
+
+/* FORMA */
+
+.courses-form {
+    margin: 0;
+}
+
+.courses-field {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    margin-bottom: 21px;
+}
+
+.courses-field label {
+    color: #444;
+    font-size: 14px;
+    font-weight: 750;
+}
+
+.courses-field input,
+.courses-hole-card input {
+    width: 100%;
+    min-height: 50px;
+    padding: 12px 15px;
+    border: 1px solid #dededb;
+    border-radius: 10px;
+    outline: none;
+    background: #fff;
+    color: #292929;
+    font: inherit;
+    font-size: 15px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.courses-field input:focus,
+.courses-hole-card input:focus {
+    border-color: #e86f2d;
+    box-shadow: 0 0 0 4px #fff1e6;
+}
+
+.courses-field-hint {
+    color: #999;
+    font-size: 12px;
+}
+
+.courses-field-error {
+    color: #c4352b;
+    font-size: 13px;
+}
+
+.courses-form-divider {
+    height: 1px;
+    margin: 25px 0;
+    background: #eeeeeb;
+}
+
+.courses-form-subtitle {
+    margin: 0 0 21px;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.courses-fields-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.courses-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 30px;
+    padding-top: 22px;
+    border-top: 1px solid #eeeeeb;
+}
+
+/* GROZU PAR */
+
+.courses-holes-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.courses-hole-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 15px;
+    border: 1px solid #eaeae6;
+    border-radius: 12px;
+    background: #fafaf8;
+}
+
+.courses-hole-card label {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.courses-hole-number {
+    color: #333;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.courses-hole-caption {
+    color: #999;
+    font-size: 11px;
+}
+
+.courses-hole-card input {
+    min-height: 44px;
+    padding: 8px;
+    font-size: 19px;
+    font-weight: 800;
+    text-align: center;
+}
+
+/* TRAŠU SARAKSTS */
+
+.courses-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.courses-list-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 26px;
+}
+
+.courses-list-top {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 24px;
+}
+
+.courses-list-top h2 {
+    margin: 0 0 6px;
+    font-size: 20px;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+.courses-list-subtitle {
+    color: #999;
+    font-size: 13px;
+}
+
+.courses-details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 13px;
+    flex: 1;
+}
+
+.courses-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    padding: 15px;
+    border-radius: 11px;
+    background: #f8f8f6;
+}
+
+.courses-detail span {
+    color: #888;
+    font-size: 12px;
+}
+
+.courses-detail strong {
+    color: #292929;
+    font-size: 17px;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+.courses-list-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #eeeeeb;
+}
+
+.courses-list-actions form {
+    margin: 0;
+}
+
+/* TUKŠAIS SARAKSTS */
+
+.courses-empty {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 55px 25px;
+    border: 1px dashed #deded9;
+    border-radius: 18px;
+    background: #fff;
+    text-align: center;
+}
+
+.courses-empty h2 {
+    margin: 20px 0 8px;
+    font-size: 21px;
+}
+
+.courses-empty p {
+    margin: 0 0 24px;
+    color: #888;
+    font-size: 14px;
+}
+
+/* RESPONSĪVAIS DIZAINS */
+
+@media (max-width: 1000px) {
+    .courses-holes-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 750px) {
+    .courses-page {
+        width: min(100% - 28px, 1140px);
+        margin-top: 30px;
+    }
+
+    .courses-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .courses-list {
+        grid-template-columns: 1fr;
+    }
+
+    .courses-holes-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .courses-panel {
+        padding: 22px;
+    }
+}
+
+@media (max-width: 550px) {
+    .courses-fields-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .courses-holes-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .courses-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .courses-form-actions > * {
+        width: 100%;
+    }
+
+    .courses-list-actions {
+        flex-direction: column;
+    }
+
+    .courses-list-actions > *,
+    .courses-list-actions form,
+    .courses-list-actions button {
+        width: 100%;
+    }
+}

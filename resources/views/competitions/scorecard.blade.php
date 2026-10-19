@@ -1,445 +1,54 @@
-<!DOCTYPE html>
-<html lang="lv">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
+@section('title', $competition->name . ' - Scorecard')
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/competition-scorecard.css') }}">
+@endpush
 
-    <title>
-        {{ $competition->name }} - Scorecard
-    </title>
+@section('content')
+@php
+    $currentIndex = $courseHoles->search(
+        fn ($hole) => $currentHole &&
+            $hole->id === $currentHole->id
+    );
 
-    <link
-        rel="stylesheet"
-        href="{{ asset('css/style.css') }}"
-    >
+    $previousHole = $currentIndex !== false && $currentIndex > 0
+        ? $courseHoles[$currentIndex - 1]
+        : null;
 
-    <style>
-        body {
-            background: #f7f7f4;
+    $nextHole = $currentIndex !== false &&
+        $currentIndex < $courseHoles->count() - 1
+        ? $courseHoles[$currentIndex + 1]
+        : null;
+
+    $playedCount = $results->count();
+    $totalScore = $results->sum('score');
+    $playedPar = 0;
+
+    foreach ($results as $courseHoleId => $result) {
+        $playedHole = $courseHoles->firstWhere('id', $courseHoleId);
+
+        if ($playedHole) {
+            $playedPar += $playedHole->par;
         }
+    }
 
-        .scorecard-page {
-            max-width: 730px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
+    $relativeToPar = $totalScore - $playedPar;
+    $allHolesPlayed = $courseHoles->count() > 0 &&
+        $playedCount >= $courseHoles->count();
 
-        /*
-        |--------------------------------------------------------------------------
-        | HEADER
-        |--------------------------------------------------------------------------
-        */
+    $canEdit = $competition->canEnterResults();
+@endphp
 
-        .scorecard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 25px;
-        }
+<div class="scorecard-page">
 
-        .scorecard-header h1 {
-            margin: 0;
-            font-size: 30px;
-        }
-
-        .competition-button {
-            padding: 11px 24px;
-            border: none;
-            border-radius: 4px;
-            background: #e86f2d;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            white-space: nowrap;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | GROZU INDIKATORI
-        |--------------------------------------------------------------------------
-        */
-
-        .hole-indicators {
-            display: flex;
-            justify-content: center;
-            gap: 7px;
-            margin: 20px 0 10px;
-            flex-wrap: wrap;
-        }
-
-        .hole-indicator {
-            display: block;
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: #d9dedd;
-            text-decoration: none;
-            transition: 0.15s;
-        }
-
-        .hole-indicator:hover {
-            transform: scale(1.2);
-        }
-
-        .hole-indicator.active {
-            background: #35b000;
-            outline: 2px solid #35b000;
-            outline-offset: 1px;
-        }
-
-        .hole-indicator.completed {
-            background: #777;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | GROZA INFORMĀCIJA
-        |--------------------------------------------------------------------------
-        */
-
-        .hole-info {
-            margin-bottom: 22px;
-            text-align: center;
-        }
-
-        .hole-info-title {
-            color: #222;
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .hole-info-subtitle {
-            margin-top: 5px;
-            color: #555;
-            font-size: 15px;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | SCORECARD
-        |--------------------------------------------------------------------------
-        */
-
-        .score-card {
-            border-top: 1px solid #ddd;
-            background: transparent;
-        }
-
-        .competition-score-form {
-            width: 100% !important;
-            max-width: none !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            border: none !important;
-            background: transparent !important;
-        }
-
-        .player-row {
-            display: flex;
-            align-items: center;
-            min-height: 70px;
-            gap: 16px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .player-position {
-            width: 30px;
-            color: #777;
-            font-size: 18px;
-            text-align: right;
-        }
-
-        .player-name {
-            flex: 1;
-            font-size: 19px;
-            font-weight: 500;
-        }
-
-        .penalty {
-            color: #bbb;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | SCORE INPUT
-        |--------------------------------------------------------------------------
-        */
-
-        .score-input {
-            width: 120px !important;
-            height: 60px;
-            box-sizing: border-box;
-            margin: 0 !important;
-            padding: 0 !important;
-            border: 2px solid #ff6500 !important;
-            border-radius: 6px !important;
-            background: #fffdf9 !important;
-            font-size: 25px !important;
-            font-weight: 700;
-            text-align: center;
-            outline: none;
-        }
-
-        .score-input:focus {
-            border-color: #222 !important;
-            outline: none;
-            box-shadow: none !important;
-        }
-
-        .score-input.saving {
-            opacity: 0.6;
-        }
-
-        .score-input:disabled {
-            border-color: #ccc !important;
-            background: #eee !important;
-            color: #777;
-            cursor: not-allowed;
-        }
-
-        .relative-score {
-            width: 45px;
-            font-size: 18px;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .under-par {
-            color: #2e9d27;
-        }
-
-        .over-par {
-            color: #c0392b;
-        }
-
-        .even-par {
-            color: #555;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | AUTOSAVE
-        |--------------------------------------------------------------------------
-        */
-
-        .autosave-info {
-            margin-top: 12px;
-            color: #777;
-            font-size: 13px;
-            text-align: right;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | NAVIGĀCIJA
-        |--------------------------------------------------------------------------
-        */
-
-        .score-navigation {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-            margin-top: 22px;
-        }
-
-        .nav-hole {
-            min-width: 100px;
-            padding: 11px 18px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background: white;
-            color: #222;
-            font-weight: bold;
-            text-align: center;
-            text-decoration: none;
-        }
-
-        .nav-hole:hover {
-            background: #eee;
-        }
-
-        .nav-hole.disabled {
-            visibility: hidden;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | KOPSAVILKUMS
-        |--------------------------------------------------------------------------
-        */
-
-        .summary {
-            margin-top: 30px;
-            padding: 18px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            background: white;
-        }
-
-        .summary-title {
-            margin-bottom: 12px;
-            font-size: 17px;
-            font-weight: bold;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
-            padding: 6px 0;
-            color: #555;
-        }
-
-        .summary-row strong {
-            color: #222;
-            text-align: right;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | PAZIŅOJUMI
-        |--------------------------------------------------------------------------
-        */
-
-        .scorecard-error {
-            margin-bottom: 20px;
-            padding: 12px 15px;
-            border: 1px solid #f1c0bb;
-            border-radius: 6px;
-            background: #fff2f0;
-            color: #b63b2f;
-        }
-
-        .scorecard-success {
-            margin-bottom: 20px;
-            padding: 12px 15px;
-            border: 1px solid #b9dfb5;
-            border-radius: 6px;
-            background: #f2fff0;
-            color: #287c22;
-        }
-
-        .finished-message {
-            margin-top: 20px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            background: white;
-            color: #555;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | MOBILĀ VERSIJA
-        |--------------------------------------------------------------------------
-        */
-
-        @media (max-width: 600px) {
-            .scorecard-page {
-                margin-top: 15px;
-                padding: 0 10px;
-            }
-
-            .scorecard-header {
-                align-items: flex-start;
-            }
-
-            .scorecard-header h1 {
-                font-size: 23px;
-            }
-
-            .competition-button {
-                padding: 9px 15px;
-                font-size: 13px;
-            }
-
-            .player-row {
-                gap: 8px;
-            }
-
-            .player-name {
-                font-size: 15px;
-            }
-
-            .score-input {
-                width: 85px !important;
-                height: 52px;
-                font-size: 22px !important;
-            }
-
-            .penalty {
-                display: none;
-            }
-
-            .relative-score {
-                width: 35px;
-            }
-
-            .nav-hole {
-                min-width: 80px;
-                padding: 9px 12px;
-                font-size: 13px;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-<nav>
-    <h2>
-        <a href="/">
-            Discapp
-        </a>
-    </h2>
-
-    <div>
-        <a href="{{ route('competitions.index') }}">
-            Sacensības
-        </a>
-
-        <a href="{{ route('players.index') }}">
-            Spēlētāji
-        </a>
-
-        <a href="{{ route('practice.index') }}">
-            Practice
-        </a>
-
-        <a href="{{ route('profile') }}">
-            Profils
-        </a>
-    </div>
-</nav>
-
-
-<main class="scorecard-page">
-
-    {{-- =====================================================
-         ERROR
-    ===================================================== --}}
-
+    {{-- PAZIŅOJUMI --}}
     @if($errors->any())
         <div class="scorecard-error">
             {{ $errors->first() }}
         </div>
     @endif
-
-
-    {{-- =====================================================
-         SUCCESS
-    ===================================================== --}}
 
     @if(session('success'))
         <div class="scorecard-success">
@@ -447,154 +56,60 @@
         </div>
     @endif
 
-
-    {{-- =====================================================
-         APRĒĶINI
-    ===================================================== --}}
-
-    @php
-        $currentIndex = $courseHoles->search(
-            fn ($hole) =>
-                $currentHole &&
-                $hole->id === $currentHole->id
-        );
-
-        $previousHole =
-            $currentIndex !== false && $currentIndex > 0
-                ? $courseHoles[$currentIndex - 1]
-                : null;
-
-        $nextHole =
-            $currentIndex !== false &&
-            $currentIndex < $courseHoles->count() - 1
-                ? $courseHoles[$currentIndex + 1]
-                : null;
-
-        $playedCount = $results->count();
-
-        $totalScore = $results->sum('score');
-
-        $playedPar = $results->sum(
-            function ($result) {
-                return $result->courseHole
-                    ? $result->courseHole->par
-                    : 0;
-            }
-        );
-
-        /*
-         * $results no kontroliera pašlaik nav ielādēts courseHole,
-         * tāpēc drošāk aprēķinām PAR pēc $courseHoles.
-         */
-        $playedPar = 0;
-
-        foreach ($results as $courseHoleId => $result) {
-            $playedHole =
-                $courseHoles->firstWhere(
-                    'id',
-                    $courseHoleId
-                );
-
-            if ($playedHole) {
-                $playedPar += $playedHole->par;
-            }
-        }
-
-        $relativeToPar =
-            $totalScore - $playedPar;
-
-        $allHolesPlayed =
-            $playedCount >= $courseHoles->count();
-
-        $isFinished =
-            $competition->status === 'finished';
-
-        $isCancelled =
-            $competition->status === 'cancelled';
-
-        $canEdit =
-            !$isFinished && !$isCancelled;
-    @endphp
-
-
-    {{-- =====================================================
-         HEADER
-    ===================================================== --}}
-
+    {{-- GALVENE --}}
     <div class="scorecard-header">
-
-        <h1>
-            {{ $competition->name }}
-        </h1>
+        <h1>{{ $competition->name }}</h1>
 
         <div class="competition-button">
             Sacensības
         </div>
-
     </div>
 
+    {{-- SACENSĪBU LAIKS --}}
+    <div class="scorecard-schedule">
+        <span>
+            Sākums:
+            <strong>
+                {{ $competition->starts_at?->format('d.m.Y H:i') ?? '-' }}
+            </strong>
+        </span>
 
-    {{-- =====================================================
-         GROZU INDIKATORI
-    ===================================================== --}}
+        <span>
+            Beigas:
+            <strong>
+                {{ $competition->ends_at?->format('d.m.Y H:i') ?? '-' }}
+            </strong>
+        </span>
+    </div>
 
+    {{-- GROZU INDIKATORI --}}
     <div class="hole-indicators">
-
         @foreach($courseHoles as $hole)
-
             @php
-                $completed =
-                    $results->has(
-                        $hole->id
-                    );
-
-                $active =
-                    $currentHole &&
-                    $hole->id ===
-                    $currentHole->id;
+                $completed = $results->has($hole->id);
+                $active = $currentHole &&
+                    $hole->id === $currentHole->id;
             @endphp
 
             <a
-                href="{{ route(
-                    'competitions.scorecard',
-                    [
-                        'competition' => $competition,
-                        'hole' => $hole->hole_number,
-                    ]
-                ) }}"
-                class="
-                    hole-indicator
-
-                    @if($active)
-                        active
-                    @elseif($completed)
-                        completed
-                    @endif
-                "
+                href="{{ route('competitions.scorecard', [
+                    'competition' => $competition,
+                    'hole' => $hole->hole_number,
+                ]) }}"
+                class="hole-indicator {{ $active ? 'active' : ($completed ? 'completed' : '') }}"
                 title="Grozs {{ $hole->hole_number }}"
+                aria-label="Grozs {{ $hole->hole_number }}"
+                @if($active) aria-current="step" @endif
             ></a>
-
         @endforeach
-
     </div>
 
-
-    {{-- =====================================================
-         GROZA INFORMĀCIJA
-    ===================================================== --}}
-
+    {{-- GROZA INFORMĀCIJA --}}
     @if($currentHole)
-
         <div class="hole-info">
-
             <div class="hole-info-title">
-                Grozs
-                {{ $currentHole->hole_number }}
-
-                |
-
-                PAR
-                {{ $currentHole->par }}
+                Grozs {{ $currentHole->hole_number }}
+                | PAR {{ $currentHole->par }}
             </div>
 
             <div class="hole-info-subtitle">
@@ -602,43 +117,25 @@
                 ·
                 {{ $competition->name }}
             </div>
-
         </div>
-
     @endif
 
-
-    {{-- =====================================================
-         SCORECARD
-    ===================================================== --}}
-
+    {{-- REZULTĀTA IEVADES FORMA --}}
     @if($currentHole)
-
         @php
-            $result =
-                $results->get(
-                    $currentHole->id
-                );
-
-            $relative =
-                $result
-                    ? $result->score -
-                        $currentHole->par
-                    : 0;
+            $result = $results->get($currentHole->id);
+            $relative = $result
+                ? $result->score - $currentHole->par
+                : 0;
         @endphp
 
         <div class="score-card">
-
             <form
                 id="scoreForm"
                 method="POST"
-                action="{{ route(
-                    'competitions.scorecard.store',
-                    $competition
-                ) }}"
+                action="{{ route('competitions.scorecard.store', $competition) }}"
                 class="competition-score-form"
             >
-
                 @csrf
 
                 <input
@@ -648,10 +145,7 @@
                 >
 
                 <div class="player-row">
-
-                    <div class="player-position">
-                        1.
-                    </div>
+                    <div class="player-position">1.</div>
 
                     <div class="player-name">
                         {{ auth()->user()->name }}
@@ -661,9 +155,7 @@
                         @endif
                     </div>
 
-                    <div class="penalty">
-                        PEN
-                    </div>
+                    <div class="penalty">PEN</div>
 
                     <input
                         type="number"
@@ -672,12 +164,12 @@
                         class="score-input"
                         min="1"
                         max="100"
-                        value="{{ $result?->score }}"
+                        value="{{ old('score', $result?->score) }}"
                         placeholder="Rezultāts"
                         inputmode="numeric"
                         @if($canEdit)
-                            autofocus
                             required
+                            autofocus
                         @else
                             disabled
                         @endif
@@ -687,474 +179,235 @@
                         class="relative-score"
                         id="relativeScore"
                     >
-
-                        @if($result)
-
-                            @if($relative < 0)
-
-                                <span class="under-par">
-                                    {{ $relative }}
-                                </span>
-
-                            @elseif($relative > 0)
-
-                                <span class="over-par">
-                                    +{{ $relative }}
-                                </span>
-
-                            @else
-
-                                <span class="even-par">
-                                    E
-                                </span>
-
-                            @endif
-
-                        @else
-
-                            <span class="even-par">
-                                -
+                        @if(!$result)
+                            <span class="even-par">-</span>
+                        @elseif($relative < 0)
+                            <span class="under-par">
+                                {{ $relative }}
                             </span>
-
+                        @elseif($relative > 0)
+                            <span class="over-par">
+                                +{{ $relative }}
+                            </span>
+                        @else
+                            <span class="even-par">E</span>
                         @endif
-
                     </div>
-
                 </div>
 
                 @if($canEdit)
-
                     <div class="autosave-info">
-                        Ieraksti rezultātu —
-                        tas saglabāsies automātiski.
+                        Ieraksti rezultātu — tas saglabāsies automātiski.
                     </div>
-
                 @else
-
                     <div class="autosave-info">
-                        Šo sacensību rezultātus vairs nevar rediģēt.
+                        Rezultātu ievade pašlaik nav pieejama.
                     </div>
-
                 @endif
-
             </form>
-
         </div>
-
     @endif
 
-
-    {{-- =====================================================
-         NAVIGĀCIJA
-    ===================================================== --}}
-
+    {{-- NAVIGĀCIJA --}}
     <div class="score-navigation">
-
         @if($previousHole)
-
             <a
-                href="{{ route(
-                    'competitions.scorecard',
-                    [
-                        'competition' => $competition,
-                        'hole' => $previousHole->hole_number,
-                    ]
-                ) }}"
+                href="{{ route('competitions.scorecard', [
+                    'competition' => $competition,
+                    'hole' => $previousHole->hole_number,
+                ]) }}"
                 class="nav-hole"
             >
                 ← Iepriekšējais
             </a>
-
         @else
-
             <span class="nav-hole disabled">
                 ← Iepriekšējais
             </span>
-
         @endif
 
-
         <a
-            href="{{ route(
-                'competitions.show',
-                $competition
-            ) }}"
+            href="{{ route('competitions.show', $competition) }}"
             class="nav-hole"
         >
             Sacensības
         </a>
 
-
         @if($nextHole)
-
             <a
-                href="{{ route(
-                    'competitions.scorecard',
-                    [
-                        'competition' => $competition,
-                        'hole' => $nextHole->hole_number,
-                    ]
-                ) }}"
+                href="{{ route('competitions.scorecard', [
+                    'competition' => $competition,
+                    'hole' => $nextHole->hole_number,
+                ]) }}"
                 class="nav-hole"
             >
                 Nākamais →
             </a>
-
         @else
-
             <span class="nav-hole disabled">
                 Nākamais →
             </span>
-
         @endif
-
     </div>
 
-
-    {{-- =====================================================
-         KOPSAVILKUMS
-    ===================================================== --}}
-
+    {{-- REZULTĀTU KOPSAVILKUMS --}}
     <div class="summary">
-
         <div class="summary-title">
             Mans sacensību rezultāts
         </div>
 
         <div class="summary-row">
-
-            <span>
-                Sacensības
-            </span>
-
-            <strong>
-                {{ $competition->name }}
-            </strong>
-
+            <span>Sacensības</span>
+            <strong>{{ $competition->name }}</strong>
         </div>
 
-
         <div class="summary-row">
-
-            <span>
-                Trase
-            </span>
-
-            <strong>
-                {{ $competition->course->name }}
-            </strong>
-
+            <span>Trase</span>
+            <strong>{{ $competition->course->name }}</strong>
         </div>
 
-
         <div class="summary-row">
-
-            <span>
-                Izspēlēti grozi
-            </span>
-
+            <span>Izspēlēti grozi</span>
             <strong>
-                {{ $playedCount }}
-                /
-                {{ $courseHoles->count() }}
+                {{ $playedCount }}/{{ $courseHoles->count() }}
             </strong>
-
         </div>
 
-
         <div class="summary-row">
-
-            <span>
-                Metieni
-            </span>
-
-            <strong>
-                {{ $totalScore }}
-            </strong>
-
+            <span>Metieni</span>
+            <strong>{{ $totalScore }}</strong>
         </div>
 
-
         <div class="summary-row">
-
-            <span>
-                Pret PAR
-            </span>
-
+            <span>Pret PAR</span>
             <strong>
-
                 @if($playedCount === 0)
-
                     -
-
                 @elseif($relativeToPar > 0)
-
                     +{{ $relativeToPar }}
-
                 @elseif($relativeToPar < 0)
-
                     {{ $relativeToPar }}
-
                 @else
-
                     E
-
                 @endif
-
             </strong>
-
         </div>
-
     </div>
 
-
-    {{-- =====================================================
-         STATUSS
-    ===================================================== --}}
-
-    @if($isFinished)
-
+    {{-- STATUSA PAZIŅOJUMI --}}
+    @if($competition->status === 'finished')
         <div class="finished-message">
-            Sacensības ir pabeigtas.
-            Scorecard iespējams apskatīt,
-            bet rezultātus vairs nevar mainīt.
+            Sacensības ir pabeigtas. Rezultātus vairs nevar mainīt.
         </div>
-
-    @elseif($isCancelled)
-
+    @elseif($competition->status === 'cancelled')
         <div class="finished-message">
             Sacensības ir atceltas.
-            Rezultātus vairs nevar mainīt.
         </div>
-
+    @elseif(!$canEdit)
+        <div class="finished-message">
+            Rezultātu ievade nav pieejama ārpus sacensību norises laika.
+        </div>
     @elseif($allHolesPlayed)
-
         <div class="finished-message">
             Visi grozi ir aizpildīti.
-            Gala rezultāts un raunda reitings ir saglabāts.
+            Gala rezultāts ir saglabāts.
         </div>
-
     @endif
 
-</main>
+</div>
+@endsection
 
-
-{{-- =====================================================
-     AUTOSAVE
-===================================================== --}}
-
+@push('scripts')
 @if($currentHole && $canEdit)
-
 <script>
-    document.addEventListener(
-        'DOMContentLoaded',
-        function () {
+document.addEventListener('DOMContentLoaded', function () {
+    const scoreForm = document.getElementById('scoreForm');
+    const scoreInput = document.getElementById('scoreInput');
+    const relativeScore = document.getElementById('relativeScore');
 
-            const scoreForm =
-                document.getElementById(
-                    'scoreForm'
-                );
+    if (!scoreForm || !scoreInput || !relativeScore) {
+        return;
+    }
 
-            const scoreInput =
-                document.getElementById(
-                    'scoreInput'
-                );
+    const par = {{ (int) $currentHole->par }};
+    let saveTimer = null;
+    let isSubmitting = false;
 
-            const relativeScore =
-                document.getElementById(
-                    'relativeScore'
-                );
+    function updateRelativeScore() {
+        const score = Number.parseInt(scoreInput.value, 10);
 
-            const par =
-                {{ (int) $currentHole->par }};
-
-            let saveTimer = null;
-
-            let isSubmitting = false;
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | PRET PAR ATJAUNINĀŠANA
-            |--------------------------------------------------------------------------
-            */
-
-            function updateRelativeScore() {
-
-                const score =
-                    parseInt(
-                        scoreInput.value,
-                        10
-                    );
-
-                if (
-                    Number.isNaN(score)
-                ) {
-                    relativeScore.innerHTML =
-                        '<span class="even-par">-</span>';
-
-                    return;
-                }
-
-                const relative =
-                    score - par;
-
-                if (relative < 0) {
-
-                    relativeScore.innerHTML =
-                        '<span class="under-par">' +
-                        relative +
-                        '</span>';
-
-                } else if (relative > 0) {
-
-                    relativeScore.innerHTML =
-                        '<span class="over-par">+' +
-                        relative +
-                        '</span>';
-
-                } else {
-
-                    relativeScore.innerHTML =
-                        '<span class="even-par">E</span>';
-
-                }
-            }
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | AUTOMĀTISKĀ SAGLABĀŠANA
-            |--------------------------------------------------------------------------
-            */
-
-            function scheduleSave() {
-
-                clearTimeout(
-                    saveTimer
-                );
-
-                const score =
-                    parseInt(
-                        scoreInput.value,
-                        10
-                    );
-
-                if (
-                    Number.isNaN(score) ||
-                    score < 1 ||
-                    score > 100
-                ) {
-                    return;
-                }
-
-                saveTimer =
-                    setTimeout(
-                        function () {
-
-                            if (isSubmitting) {
-                                return;
-                            }
-
-                            isSubmitting = true;
-
-                            scoreInput
-                                .classList
-                                .add(
-                                    'saving'
-                                );
-
-                            scoreForm.submit();
-
-                        },
-                        650
-                    );
-            }
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | INPUT
-            |--------------------------------------------------------------------------
-            */
-
-            scoreInput.addEventListener(
-                'input',
-                function () {
-
-                    updateRelativeScore();
-
-                    scheduleSave();
-
-                }
-            );
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | ENTER
-            |--------------------------------------------------------------------------
-            */
-
-            scoreInput.addEventListener(
-                'keydown',
-                function (event) {
-
-                    if (
-                        event.key === 'Enter'
-                    ) {
-
-                        event.preventDefault();
-
-                        clearTimeout(
-                            saveTimer
-                        );
-
-                        const score =
-                            parseInt(
-                                scoreInput.value,
-                                10
-                            );
-
-                        if (
-                            Number.isNaN(score) ||
-                            score < 1 ||
-                            score > 100
-                        ) {
-                            return;
-                        }
-
-                        if (!isSubmitting) {
-
-                            isSubmitting = true;
-
-                            scoreInput
-                                .classList
-                                .add(
-                                    'saving'
-                                );
-
-                            scoreForm.submit();
-                        }
-                    }
-                }
-            );
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | FOCUS
-            |--------------------------------------------------------------------------
-            */
-
-            scoreInput.focus();
-
-            scoreInput.select();
+        if (!Number.isInteger(score) || score < 1 || score > 100) {
+            relativeScore.innerHTML =
+                '<span class="even-par">-</span>';
+            return;
         }
-    );
+
+        const relative = score - par;
+
+        if (relative < 0) {
+            relativeScore.innerHTML =
+                '<span class="under-par">' + relative + '</span>';
+        } else if (relative > 0) {
+            relativeScore.innerHTML =
+                '<span class="over-par">+' + relative + '</span>';
+        } else {
+            relativeScore.innerHTML =
+                '<span class="even-par">E</span>';
+        }
+    }
+
+    function submitScore() {
+        if (isSubmitting) {
+            return;
+        }
+
+        const score = Number.parseInt(scoreInput.value, 10);
+
+        if (
+            !Number.isInteger(score) ||
+            score < 1 ||
+            score > 100
+        ) {
+            return;
+        }
+
+        isSubmitting = true;
+        scoreInput.classList.add('saving');
+        scoreForm.submit();
+    }
+
+    function scheduleSave() {
+        clearTimeout(saveTimer);
+
+        const score = Number.parseInt(scoreInput.value, 10);
+
+        if (
+            !Number.isInteger(score) ||
+            score < 1 ||
+            score > 100
+        ) {
+            return;
+        }
+
+        saveTimer = setTimeout(submitScore, 650);
+    }
+
+    scoreInput.addEventListener('input', function () {
+        updateRelativeScore();
+        scheduleSave();
+    });
+
+    scoreInput.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            clearTimeout(saveTimer);
+            submitScore();
+        }
+    });
+
+    scoreInput.focus();
+    scoreInput.select();
+});
 </script>
-
 @endif
-
-</body>
-</html>
+@endpush

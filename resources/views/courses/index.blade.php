@@ -1,190 +1,113 @@
-<!DOCTYPE html>
-<html lang="lv">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Trases - Discapp</title>
+@extends('layouts.app')
 
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-</head>
+@section('title', 'Trases - Discapp')
 
-<body>
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/admin-courses.css') }}">
+@endpush
 
-<nav>
+@section('content')
+<main class="courses-page">
 
-    <div>
-        <a href="{{ route('home') }}">Discapp</a>
-    </div>
-
-    <div class="nav-auth">
-
-        <a href="{{ route('competitions.index') }}">
-            Sacensības
-        </a>
-
-        <a href="{{ route('courses.index') }}">
-            Trases
-        </a>
-
-        <a href="{{ route('profile') }}">
-            Profils
-        </a>
-
-        <form action="{{ route('logout') }}" method="POST">
-            @csrf
-
-            <button type="submit">
-                Iziet
-            </button>
-        </form>
-
-    </div>
-
-</nav>
-
-
-<main class="profile-page">
-
-    <div class="profile-header">
-
+    <div class="courses-header">
         <div>
+            <span class="courses-eyebrow">DISCAPP ADMINISTRĀCIJA</span>
             <h1>Disku golfa trases</h1>
-
-            <p>
-                Pārvaldi trases un to grozu PAR vērtības
-            </p>
+            <p>Pārvaldi trases, grozu PAR vērtības un reitinga parametrus.</p>
         </div>
 
-        <div>
-            <a
-                href="{{ route('courses.create') }}"
-                class="btn"
-            >
-                + Pievienot trasi
-            </a>
-        </div>
-
+        <a href="{{ route('courses.create') }}" class="courses-btn-primary">
+            + Pievienot trasi
+        </a>
     </div>
-
 
     @if(session('success'))
-
-        <div class="success-message">
+        <div class="courses-alert courses-alert-success" role="status">
             {{ session('success') }}
         </div>
-
     @endif
 
+    @if($errors->any())
+        <div class="courses-alert courses-alert-error" role="alert">
+            <ul>
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-    <section class="competitions">
-
+    <div class="courses-list">
         @forelse($courses as $course)
+            <article class="courses-list-card">
+                <div class="courses-list-top">
+                    <span class="courses-list-icon">⛳</span>
 
-            <div class="competition">
-
-                <div>
-
-                    <h2>
-                        {{ $course->name }}
-                    </h2>
-
-                    <p>
-                        <strong>Grozu skaits:</strong>
-                        {{ $course->holes }}
-                    </p>
-
-                    <p>
-                        <strong>Kopējais PAR:</strong>
-                        {{ $course->courseHoles()->sum('par') }}
-                    </p>
-
-                    <p>
-                        <strong>1000 reitinga rezultāts:</strong>
-                        {{ $course->rating_1000_score }}
-                    </p>
-
-                    <p>
-                        <strong>Reitinga punkti par metienu:</strong>
-                        {{ $course->rating_per_throw }}
-                    </p>
-
+                    <div>
+                        <h2>{{ $course->name }}</h2>
+                        <span class="courses-list-subtitle">
+                            Disku golfa trase
+                        </span>
+                    </div>
                 </div>
 
+                <div class="courses-details-grid">
+                    <div class="courses-detail">
+                        <span>Grozu skaits</span>
+                        <strong>{{ $course->holes }}</strong>
+                    </div>
 
-                <div style="
-                    display: flex;
-                    gap: 10px;
-                    align-items: center;
-                    flex-wrap: wrap;
-                ">
+                    <div class="courses-detail">
+                        <span>Kopējais PAR</span>
+                        <strong>{{ $course->courseHoles()->sum('par') }}</strong>
+                    </div>
 
+                    <div class="courses-detail">
+                        <span>1000 reitinga rezultāts</span>
+                        <strong>{{ $course->rating_1000_score }}</strong>
+                    </div>
+
+                    <div class="courses-detail">
+                        <span>Punkti par metienu</span>
+                        <strong>{{ $course->rating_per_throw }}</strong>
+                    </div>
+                </div>
+
+                <div class="courses-list-actions">
                     <a
                         href="{{ route('courses.edit', $course) }}"
-                        style="
-                            display: inline-block;
-                            padding: 10px 15px;
-                            background: #222;
-                            color: white;
-                            text-decoration: none;
-                            border-radius: 6px;
-                        "
+                        class="courses-btn-primary"
                     >
                         Rediģēt PAR
                     </a>
 
-
                     <form
                         action="{{ route('courses.destroy', $course) }}"
                         method="POST"
-                        style="display: inline;"
                         onsubmit="return confirm('Vai tiešām vēlies dzēst šo trasi?')"
                     >
                         @csrf
                         @method('DELETE')
 
-                        <button
-                            type="submit"
-                            style="
-                                padding: 10px 15px;
-                                background: #c0392b;
-                                color: white;
-                                border: none;
-                                border-radius: 6px;
-                                cursor: pointer;
-                            "
-                        >
-                            Dzēst
+                        <button type="submit" class="courses-btn-danger">
+                            Dzēst trasi
                         </button>
-
                     </form>
-
                 </div>
-
-            </div>
-
+            </article>
         @empty
+            <div class="courses-empty">
+                <span class="courses-empty-icon">⛳</span>
+                <h2>Nav pievienotu trašu</h2>
+                <p>Izveido pirmo disku golfa trasi, lai sāktu darbu.</p>
 
-            <div class="competition">
-
-                <p>
-                    Šobrīd nav pievienota neviena trase.
-                </p>
-
-                <a
-                    href="{{ route('courses.create') }}"
-                    class="btn"
-                >
+                <a href="{{ route('courses.create') }}" class="courses-btn-primary">
                     + Pievienot pirmo trasi
                 </a>
-
             </div>
-
         @endforelse
-
-    </section>
+    </div>
 
 </main>
-
-</body>
-</html>
+@endsection
