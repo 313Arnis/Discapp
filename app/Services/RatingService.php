@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Competition;
@@ -10,13 +11,26 @@ use Illuminate\Validation\ValidationException;
 
 class RatingService
 {
+    private function courseParameters(Course $course): array
+    {
+        $base = (float) $course->rating_1000_score;
+        $perThrow = (float) $course->rating_per_throw;
+
+        if ($base <= 0 || $perThrow <= 0) {
+            throw ValidationException::withMessages([
+                'course_id' => 'Trasei nav iestatīti derīgi reitinga parametri. Administratoram jānorāda pozitīvas vērtības.',
+            ]);
+        }
+
+        return [$base, $perThrow];
+    }
+
     // REZERVES FORMULA, JA NAV PIETIEKAMI DAUDZ REITĒTU SPĒLĒTĀJU
     public function calculateRoundRating(Course $course, int $totalScore): int
     {
-        $coursePar = (int) $course->courseHoles()->sum('par');
-        $rating1000Score = $coursePar - 5;
+        [$rating1000Score, $ratingPerThrow] = $this->courseParameters($course);
 
-        return (int) round(1000 + (($rating1000Score - $totalScore) * 10));
+        return (int) round(1000 + (($rating1000Score - $totalScore) * $ratingPerThrow));
     }
 
     // APRĒĶINA REITINGUS PĒC SACENSĪBU PABEIGŠANAS
@@ -39,6 +53,8 @@ class RatingService
                 'status' => 'Sacensībām nav piesaistīta trase.',
             ]);
         }
+
+        [$courseRating1000Score, $ratingPerThrow] = $this->courseParameters($competition->course);
 
         $participants = $competition->users()
             ->orderBy('users.id')
@@ -81,17 +97,13 @@ class RatingService
             }
         }
 
-        $ratingPerThrow = 10;
-
         if (count($anchors) >= 3) {
             $rating1000Score = collect($anchors)->avg(
                 fn ($anchor) => $anchor['score']
                     + (($anchor['rating'] - 1000) / $ratingPerThrow)
             );
         } else {
-            $rating1000Score = (int) $competition->course
-                ->courseHoles()
-                ->sum('par') - 5;
+            $rating1000Score = $courseRating1000Score;
         }
 
         // VISPIRMS SAGLABĀ VISU DALĪBNIEKU RAUNDA REITINGUS
@@ -126,14 +138,12 @@ class RatingService
             return;
         }
 
-        // LĪDZ 8 RAUNDIEM - VISU REITINGU VIDĒJAIS
         if ($ratings->count() < 9) {
             $user->rating = (int) round($ratings->avg());
             $user->save();
             return;
         }
 
-        // NO 9 RAUNDIEM - JAUNĀKAJIEM 25% DUBULTS SVARS
         $recentCount = max(1, (int) ceil($ratings->count() * 0.25));
         $recentRatings = $ratings->take(-$recentCount);
 

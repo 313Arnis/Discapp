@@ -74,6 +74,7 @@ class CompetitionRegistrationController extends Controller
                 ->lockForUpdate()
                 ->firstOrFail();
 
+            // Pārbauda statusu un reģistrācijas laiku
             $error = $this->getJoinStatusError($competition);
 
             if ($error) {
@@ -202,7 +203,7 @@ class CompetitionRegistrationController extends Controller
         return $divisions;
     }
 
-    // PIETEIKŠANĀS STATUSA PĀRBAUDE
+    // PIETEIKŠANĀS STATUSA UN LAIKA PĀRBAUDE
     private function getJoinStatusError(Competition $competition): ?string
     {
         if (!auth()->check()) {
@@ -213,10 +214,15 @@ class CompetitionRegistrationController extends Controller
             return 'Administrators nevar pieteikties sacensībām kā spēlētājs.';
         }
 
-        // Sacensību veidotājam vairs nav aizliegts piedalīties.
+        // Sacensību organizators drīkst piedalīties.
 
         if ($competition->status !== 'planned') {
             return 'Pieteikties var tikai plānotām sacensībām.';
+        }
+
+        // Pārbauda reģistrācijas sākuma un beigu laiku.
+        if (!$competition->isRegistrationOpen()) {
+            return 'Reģistrācija šīm sacensībām vēl nav sākusies vai jau ir beigusies.';
         }
 
         return null;

@@ -7,6 +7,8 @@ use App\Models\Course;
 use App\Services\RatingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -41,7 +43,7 @@ class CompetitionController extends Controller
     // SACENSĪBU IZVEIDE
     public function store(Request $request)
     {
-        $validated = $this->validateCompetition($request);
+        $validated = $this->validateCompetition($request, true);
 
         // Jaunas sacensības vienmēr ir plānotas.
         // Statusu vēlāk automātiski maina Laravel plānotājs.
@@ -262,72 +264,59 @@ class CompetitionController extends Controller
     }
 
     // SACENSĪBU DATU VALIDĀCIJA
-    private function validateCompetition(Request $request): array
+    private function validateCompetition(Request $request, bool $creating = false): array
     {
-        return $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-
-            'description' => [
-                'nullable',
-                'string',
-            ],
-
-            'date' => [
-                'required',
-                'date',
-            ],
-
-            'starts_at' => [
-                'required',
-                'date',
-            ],
-
-            'ends_at' => [
-                'required',
-                'date',
-                'after:starts_at',
-            ],
-
-            'course_id' => [
-                'required',
-                'integer',
-                'exists:courses,id',
-            ],
-
-            'max_players' => [
-                'nullable',
-                'integer',
-                'min:1',
-            ],
-
-            // Saglabājam saderību ar esošajām formām.
-            // Faktisko statusu nosaka kontrolieris un plānotājs.
-            'status' => [
-                'sometimes',
-                Rule::in([
-                    'planned',
-                    'active',
-                    'finished',
-                    'cancelled',
-                ]),
-            ],
-
-            'registration_starts_at' => [
-                'required',
-                'date',
-                'before:registration_ends_at',
-            ],
-
-            'registration_ends_at' => [
-                'required',
-                'date',
-                'after:registration_starts_at',
-            ],
+        $validator = Validator::make($request->all(), [
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'date' => ['required', 'date_format:Y-m-d'],
+            'starts_at' => ['required', 'date'],
+            'ends_at' => ['required', 'date', 'after:starts_at'],
+            'course_id' => ['required', 'integer', 'exists:courses,id'],
+            'max_players' => ['nullable', 'integer', 'min:1'],
+            'status' => ['sometimes', Rule::in(['planned', 'active', 'finished', 'cancelled'])],
+            'registration_starts_at' => ['required', 'date'],
+            'registration_ends_at' => ['required', 'date', 'after:registration_starts_at'],
+        ], [
+            'date.date_format' => 'Sacensību datumam jābūt formātā GGGG-MM-DD.',
+            'ends_at.after' => 'Sacensību beigu laikam jābūt pēc sākuma laika.',
+            'registration_ends_at.after' => 'Reģistrācijas beigām jābūt pēc reģistrācijas sākuma.',
         ]);
+
+        $validator->after(function ($validator) use ($creating) {
+            $data = $validator->getData();
+            $fields = ['date', 'starts_at', 'ends_at', 'registration_starts_at', 'registration_ends_at'];
+            foreach ($fields as $field) {
+                if ($validator->errors()->has($field) || empty($data[$field])) {
+                    return;
+                }
+            }
+
+            try {
+                $date = Carbon::createFromFormat('!Y-m-d', $data['date']);
+                $start = Carbon::parse($data['starts_at']);
+                $end = Carbon::parse($data['ends_at']);
+                $regStart = Carbon::parse($data['registration_starts_at']);
+                $regEnd = Carbon::parse($data['registration_ends_at']);
+            } catch (\Exception $e) {
+                return;
+            }
+
+            if (!$date->isSameDay($start)) {
+                $validator->errors()->add('date', 'Sacensību datumam jāsakrīt ar sākuma laika datumu.');
+            }
+            if ($regEnd->greaterThan($start)) {
+                $validator->errors()->add('registration_ends_at', 'Reģistrācijai jābeidzas ne vēlāk kā sacensību sākumā.');
+            }
+            if ($regStart->greaterThanOrEqualTo($start)) {
+                $validator->errors()->add('registration_starts_at', 'Reģistrācijai jāsākas pirms sacensībām.');
+            }
+            if ($creating && $start->lessThanOrEqualTo(now())) {
+                $validator->errors()->add('starts_at', 'Jaunām sacensībām sākuma laikam jābūt nākotnē.');
+            }
+        });
+
+        return $validator->validate();
     }
 
     // PĀRBAUDA SACENSĪBU ĪPAŠNIEKU

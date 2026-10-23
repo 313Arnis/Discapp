@@ -14,7 +14,7 @@
         <div>
             <span class="courses-eyebrow">TRASES REDIĢĒŠANA</span>
             <h1>{{ $course->name }}</h1>
-            <p>{{ $course->holes }} grozi · Pārvaldi trases PAR vērtības.</p>
+            <p>{{ $course->holes }} grozi · Pārvaldi trases PAR un reitinga parametrus.</p>
         </div>
 
         <a href="{{ route('courses.index') }}" class="courses-btn-secondary">
@@ -80,13 +80,65 @@
                 @endforeach
             </div>
 
+            <div class="courses-panel-heading" style="margin-top: 32px;">
+                <span class="courses-panel-icon">📊</span>
+                <div>
+                    <h2>Trases reitinga parametri</h2>
+                    <p>Šīs vērtības tiek izmantotas spēlētāju raunda reitinga aprēķinā.</p>
+                </div>
+            </div>
+
+            <div class="courses-holes-grid">
+                <div class="courses-hole-card">
+                    <label for="rating_1000_score">
+                        <span class="courses-hole-number">
+                            1000 reitinga rezultāts
+                        </span>
+                        <span class="courses-hole-caption">
+                            Metienu skaits, kas atbilst 1000 reitinga punktiem
+                        </span>
+                    </label>
+
+                    <input
+                        type="number"
+                        id="rating_1000_score"
+                        name="rating_1000_score"
+                        value="{{ old('rating_1000_score', $course->rating_1000_score) }}"
+                        min="1"
+                        step="0.01"
+                        required
+                    >
+                </div>
+
+                <div class="courses-hole-card">
+                    <label for="rating_per_throw">
+                        <span class="courses-hole-number">
+                            Reitinga punkti par metienu
+                        </span>
+                        <span class="courses-hole-caption">
+                            Punktu izmaiņa par vienu metienu
+                        </span>
+                    </label>
+
+                    <input
+                        type="number"
+                        id="rating_per_throw"
+                        name="rating_per_throw"
+                        value="{{ old('rating_per_throw', $course->rating_per_throw) }}"
+                        min="0.01"
+                        step="0.01"
+                        required
+                    >
+                </div>
+            </div>
+
             <div class="courses-form-actions">
                 <a href="{{ route('courses.index') }}" class="courses-btn-secondary">
                     Atcelt
                 </a>
 
                 <button type="submit" class="courses-btn-primary">
-                    Saglabāt PAR
+                    Saglabāt izmaiņas
                 </button>
             </div>
         </form>

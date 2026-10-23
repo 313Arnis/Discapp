@@ -41,6 +41,7 @@ Lai automātiski mainītos sacensību statusi, **atsevišķā terminālī** pala
 ```bash
 php artisan schedule:work
 ```
-
+Lai izmantotu admin konta priekšrocības - E-pasts: admin@discapp.lv
+Parole: Admin123!?
 
 

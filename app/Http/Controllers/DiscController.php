@@ -89,10 +89,10 @@ class DiscController extends Controller
         if ($request->hasFile('image')) {
 
             if ($disc->image) {
-                Storage::disk('public')->delete($disc->image);
+                $imagePath = $request->file('image')->store('discs', 'public');
             }
 
-            $imagePath = $request->file('image')->store('discs', 'public');
+            Storage::disk('public')->delete($disc->image);
         }
 
         $disc->update([

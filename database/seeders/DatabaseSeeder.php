@@ -5,24 +5,42 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use RuntimeException;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        $email = env('ADMIN_EMAIL');
+        $password = env('ADMIN_PASSWORD');
+
+        if (empty($email) || empty($password)) {
+            throw new RuntimeException(
+                'Norādi ADMIN_EMAIL un ADMIN_PASSWORD .env failā.'
+            );
+        }
+
+        if (strlen($password) < 15) {
+            throw new RuntimeException(
+                'Administratora parolei jābūt vismaz 15 rakstzīmes garai.'
+            );
+        }
+
         User::updateOrCreate(
             [
-                'email' => 'admin@discapp.lv',
+                'email' => $email,
             ],
             [
-                'name' => 'Admin',
-                'password' => Hash::make('admin123'),
+                'name' => env('ADMIN_NAME', 'Admin'),
+                'password' => Hash::make($password),
                 'role' => 'admin',
-                'rating' => 1000,
+                'rating' => 0,
             ]
         );
 
-        $this->command->info('Admin lietotājs izveidots: admin@discapp.lv / admin123');
+        $this->command->info(
+            'Administratora konts veiksmīgi konfigurēts.'
+        );
 
         $this->call([
             CourseSeeder::class,

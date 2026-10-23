@@ -265,46 +265,60 @@
     border-top: 1px solid #eeeeeb;
 }
 
-/* GROZU PAR */
+/* GROZU PAR UN REITINGA PARAMETRI */
 
 .courses-holes-grid {
     display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    width: 100%;
+    margin-top: 22px;
 }
 
 .courses-hole-card {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 15px;
-    border: 1px solid #eaeae6;
-    border-radius: 12px;
-    background: #fafaf8;
+    gap: 14px;
+    min-width: 0;
+    padding: 20px;
+    border: 1px solid #f0e4dc;
+    border-radius: 14px;
+    background: #fffaf6;
 }
 
 .courses-hole-card label {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 6px;
+    width: 100%;
+    min-width: 0;
 }
 
 .courses-hole-number {
-    color: #333;
-    font-size: 13px;
+    color: #252525;
+    font-size: 16px;
     font-weight: 800;
+    line-height: 1.4;
 }
 
 .courses-hole-caption {
-    color: #999;
-    font-size: 11px;
+    color: #888;
+    font-size: 13px;
+    line-height: 1.5;
 }
 
 .courses-hole-card input {
-    min-height: 44px;
-    padding: 8px;
-    font-size: 19px;
-    font-weight: 800;
+    display: block;
+    width: 100%;
+    min-width: 0;
+    min-height: 52px;
+    padding: 10px 14px;
+    border: 1px solid #dededb;
+    border-radius: 10px;
+    background: #fff;
+    color: #252525;
+    font-size: 18px;
+    font-weight: 700;
     text-align: center;
 }
 
@@ -411,9 +425,9 @@
 
 /* RESPONSĪVAIS DIZAINS */
 
-@media (max-width: 1000px) {
+@media (max-width: 900px) {
     .courses-holes-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
@@ -432,10 +446,6 @@
         grid-template-columns: 1fr;
     }
 
-    .courses-holes-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
     .courses-panel {
         padding: 22px;
     }
@@ -448,7 +458,12 @@
     }
 
     .courses-holes-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .courses-hole-card {
+        padding: 18px;
     }
 
     .courses-form-actions {
